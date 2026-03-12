@@ -4,7 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "turbo dev",
+    "dev:mobile": "turbo dev --filter=@midwifes-notebook/mobile",
+    "dev:web": "turbo dev --filter=@midwifes-notebook/web",
+    "dev:server": "turbo dev --filter=@midwifes-notebook/server",
+    "build": "turbo build",
+    "build:mobile": "turbo build --filter=@midwifes-notebook/mobile",
+    "build:web": "turbo build --filter=@midwifes-notebook/web",
+    "build:server": "turbo build --filter=@midwifes-notebook/server",
+    "test": "turbo test",
+    "test:mobile": "turbo test --filter=@midwifes-notebook/mobile",
+    "test:web": "turbo test --filter=@midwifes-notebook/web",
+    "test:server": "turbo test --filter=@midwifes-notebook/server",
+    "lint": "turbo lint"
   },
   "keywords": [],
   "author": "",

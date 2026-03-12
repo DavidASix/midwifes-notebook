@@ -14,6 +14,9 @@ importers:
 
   apps/mobile:
     dependencies:
+      '@midwifes-notebook/trpc':
+        specifier: workspace:*
+        version: link:../../packages/trpc
       drizzle-orm:
         specifier: ^0.45.1
         version: 0.45.1(expo-sqlite@55.0.10(expo@55.0.6)(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))
@@ -60,6 +63,9 @@ importers:
 
   apps/server:
     dependencies:
+      '@midwifes-notebook/trpc':
+        specifier: workspace:*
+        version: link:../../packages/trpc
       '@trpc/server':
         specifier: ^11.12.0
         version: 11.12.0(typescript@5.9.3)
@@ -88,6 +94,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@midwifes-notebook/trpc':
+        specifier: workspace:*
+        version: link:../../packages/trpc
       '@tanstack/react-query':
         specifier: ^5.90.21
         version: 5.90.21(react@19.2.3)
