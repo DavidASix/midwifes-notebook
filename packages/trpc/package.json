@@ -1,5 +1,5 @@
 {
-  "name": "midwifes-notebook",
+  "name": "trpc",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,7 +10,11 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.26.1",
+  "dependencies": {
+    "@trpc/server": "^11.12.0",
+    "zod": "^4.3.6"
+  },
   "devDependencies": {
-    "turbo": "^2.8.16"
+    "typescript": "^5.9.3"
   }
 }
