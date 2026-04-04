@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "turbo dev",
     "dev:mobile": "turbo dev --filter=@midwifes-notebook/mobile",
@@ -17,13 +18,17 @@
     "test:web": "turbo test --filter=@midwifes-notebook/web",
     "test:server": "turbo test --filter=@midwifes-notebook/server",
     "check:lint": "turbo check:lint",
-    "check:types": "turbo check:types"
+    "check:types": "turbo check:types",
+    "check:format": "prettier --check .",
+    "format": "prettier --write ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.26.1",
   "devDependencies": {
+    "prettier": "^3.8.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "turbo": "^2.8.16"
   }
 }
