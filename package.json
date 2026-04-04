@@ -16,7 +16,7 @@
     "test:mobile": "turbo test --filter=@midwifes-notebook/mobile",
     "test:web": "turbo test --filter=@midwifes-notebook/web",
     "test:server": "turbo test --filter=@midwifes-notebook/server",
-    "lint": "turbo lint",
+    "check:lint": "turbo check:lint",
     "check:types": "turbo check:types"
   },
   "keywords": [],
