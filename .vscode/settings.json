@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
         "midwifes"
-    ]
+    ],
+    "eslint.useFlatConfig": true 
 }
