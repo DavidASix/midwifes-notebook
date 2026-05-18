@@ -10,3 +10,9 @@ pnpm-*.yaml
 tsconfig.json
 # Ignore all settings files from hidden folders
 .*/settings*.json
+
+# Astro generated
+**/.astro/
+
+# Drizzle generated
+**/drizzle/
