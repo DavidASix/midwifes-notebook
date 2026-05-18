@@ -1,5 +1,5 @@
 {
-  "name": "astro",
+  "name": "@midwifes-notebook/astro",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -12,6 +12,12 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@midwifes-notebook/trpc": "workspace:*",
+    "@trpc/client": "^11.12.0",
     "astro": "^6.3.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "typescript": "^6.0.3"
   }
 }

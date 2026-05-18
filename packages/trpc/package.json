@@ -2,7 +2,10 @@
   "name": "@midwifes-notebook/trpc",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
   "scripts": {
     "test": "echo \"No tests yet\"",
     "check:types": "tsc --noEmit"
