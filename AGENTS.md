@@ -8,10 +8,10 @@ This file is a directory reference for AI agents working in this repository. Whe
 
 ### [`documentation/TECHSPEC.md`](documentation/TECHSPEC.md)
 The technical specification for the full monorepo. Covers:
-- Monorepo structure (`apps/mobile`, `apps/web`, `apps/server`, `packages/trpc`, `packages/ui`)
+- Monorepo structure (`apps/mobile`, `apps/web`, `apps/server`, `packages/ui`)
 - Mobile app stack: Expo, EAS, NativeWind v4, Expo Router, `@gorhom/bottom-sheet`, `expo-sqlite`, Drizzle ORM, `expo-local-authentication`
-- Server stack: Express + tRPC
-- Web stack: Next.js + tRPC client
+- Server stack: Fastify + tRPC (router defined in `apps/server/routers/`, `AppRouter` exported from `@midwifes-notebook/server/router`)
+- Web stack: Astro + tRPC client (client configured in `src/lib/trpc.ts`, `AppRouter` imported from `@midwifes-notebook/server/router`)
 - Shared conventions: TypeScript, pnpm, Turborepo, Jest
 
 **Update when:** adding or changing a dependency, altering the monorepo structure, changing the build/deploy process, or revising testing strategy.

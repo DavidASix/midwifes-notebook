@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a monorepo containing three applications: a React Native mobile app, an Express API server, and a Next.js marketing website. The monorepo is managed with **Turborepo** and **pnpm workspaces**.
+This project is a monorepo containing three applications: a React Native mobile app, a Fastify API server, and an Astro web frontend. The monorepo is managed with **Turborepo** and **pnpm workspaces**.
 
 ---
 
@@ -12,10 +12,9 @@ This project is a monorepo containing three applications: a React Native mobile 
 /
   apps/
     mobile/        # Expo / React Native app
-    web/           # Next.js marketing site
-    server/        # Express + tRPC API
+    web/           # Astro web frontend
+    server/        # Fastify + tRPC API
   packages/
-    trpc/          # Shared tRPC router types
     ui/            # Shared UI components (if needed)
 ```
 
@@ -85,28 +84,43 @@ TypeScript is used throughout. Expo scaffolds with TypeScript by default. Expo R
 
 ---
 
-## App 2: Server (Express + tRPC)
+## App 2: Server (Fastify + tRPC)
 
 ### Framework
-**Express** — chosen to keep the API layer framework-agnostic and independent of any front-end framework.
+**Fastify** — chosen for its performance, TypeScript-first design, and plugin ecosystem.
 
 ### API Layer
-**tRPC** is used to define the API surface. tRPC provides end-to-end type safety between the server and all clients (mobile app and web) without code generation. The shared router type is published from the `packages/trpc` workspace package and consumed by both the mobile app and the Next.js site.
+**tRPC** is used to define the API surface. tRPC provides end-to-end type safety between the server and all clients (mobile app and web) without code generation.
+
+The tRPC instance is initialized within the server app. All routers and procedures are defined under `apps/server/routers/`. The `AppRouter` type is exported from `@midwifes-notebook/server/router` and imported by clients — this is a type-only import, so nothing from the server is bundled into the client at runtime.
 
 tRPC is the exclusive API protocol between the server and clients. REST endpoints are not defined unless required by a third-party integration.
 
+### tRPC Structure
+```
+apps/server/
+  routers/
+    index.ts       # Root router — assembles all sub-routers, exports AppRouter
+  index.ts         # Fastify server entry point
+```
+
+Clients import the shared type like so:
+```ts
+import type { AppRouter } from '@midwifes-notebook/server/router';
+```
+
 ---
 
-## App 3: Web (Next.js)
+## App 3: Web (Astro)
 
 ### Purpose
-The Next.js site serves as the public-facing web presence: marketing pages, changelog, privacy policy, terms of service, and similar static or semi-static content.
+The Astro site serves as the public-facing web frontend: marketing pages, changelog, privacy policy, terms of service, and similar static or semi-static content.
 
 ### API Connectivity
-The site connects to the Express server via tRPC when dynamic server interaction is needed (e.g. contact forms, waitlist signups). For simple static content, no server connection is made. The tRPC client is used rather than raw fetch calls wherever the Express API is consumed.
+The site connects to the Fastify server via tRPC when dynamic server interaction is needed. All tRPC calls are made server-side in Astro page frontmatter using the configured client in `src/lib/trpc.ts`. The `AppRouter` type is imported from `@midwifes-notebook/server/router` for full type safety.
 
 ### TypeScript
-TypeScript is used throughout. The shared tRPC router types from `packages/trpc` provide full type safety for any server calls made from the site.
+TypeScript is used throughout. Astro ships with TypeScript support built in, with the project configured to use Astro's `strict` tsconfig preset.
 
 ---
 
@@ -115,7 +129,7 @@ TypeScript is used throughout. The shared tRPC router types from `packages/trpc`
 - **Language:** TypeScript everywhere — no JavaScript files in any application.
 - **Package manager:** pnpm
 - **Monorepo orchestration:** Turborepo
-- **Linting / formatting:** To be defined (ESLint + Prettier recommended)
+- **Linting / formatting:** ESLint + Prettier
 - **Environment variables:** Per-app `.env` files; secrets are never committed to the repository.
 
 ---
@@ -139,8 +153,8 @@ E2E tests are not in scope at this stage.
 | App | Test Runner | Key Libraries |
 |---|---|---|
 | Mobile (Expo/RN) | Jest + `jest-expo` preset | `@testing-library/react-native` |
-| Server (Express) | Jest | `supertest` for HTTP integration tests |
-| Web (Next.js) | Jest | `@testing-library/react` |
+| Server (Fastify) | Jest | `supertest` for HTTP integration tests |
+| Web (Astro) | Jest | — |
 
 ### Running Tests
 
