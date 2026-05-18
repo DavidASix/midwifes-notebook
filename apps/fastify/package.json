@@ -1,0 +1,30 @@
+{
+  "name": "@midwifes-notebook/fastify",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "nodemon --exec tsx index.ts",
+    "start": "tsx index.ts",
+    "test": "echo \"No tests yet\"",
+    "check:lint": "eslint --max-warnings 0",
+    "check:types": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.26.1",
+  "dependencies": {
+    "fastify": "^5.8.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.5.0",
+    "eslint": "^10.2.0",
+    "nodemon": "^3.1.14",
+    "tsx": "^4.19.4",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.58.0"
+  }
+}
