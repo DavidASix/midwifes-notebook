@@ -1,6 +1,6 @@
 ---
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "@midwifes-notebook/fastify/router";
+import type { AppRouter } from "@midwifes-notebook/server/router";
 
 const trpc = createTRPCClient<AppRouter>({
   links: [
