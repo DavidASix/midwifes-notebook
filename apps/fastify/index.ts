@@ -2,7 +2,7 @@ import Fastify from "fastify";
 import FastifyCors from "@fastify/cors";
 import FastifyWebSocket from "@fastify/websocket";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
-import { appRouter } from "@midwifes-notebook/trpc";
+import { appRouter } from "./routers/index.js";
 
 const fastify = Fastify({ logger: true });
 
