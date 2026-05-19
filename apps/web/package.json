@@ -15,8 +15,10 @@
   },
   "dependencies": {
     "@midwifes-notebook/server": "workspace:*",
+    "@tailwindcss/vite": "^4.3.0",
     "@trpc/client": "^11.12.0",
-    "astro": "^6.3.5"
+    "astro": "^6.3.5",
+    "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
