@@ -71,6 +71,7 @@ const faqs = [
 
 <BaseLayout>
   <script
+    is:inline
     slot="schema"
     type="application/ld+json"
     set:html={JSON.stringify(faqPageSchema(faqs))}
