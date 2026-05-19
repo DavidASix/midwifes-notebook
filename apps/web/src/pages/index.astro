@@ -71,7 +71,7 @@ const faqs = [
 <BaseLayout>
   <div class="flex min-h-screen flex-col bg-background text-foreground">
     <!-- Hero -->
-    <section class="relative overflow-hidden">
+    <section aria-label="Introduction" class="relative overflow-hidden">
       <div
         class="pointer-events-none absolute inset-0 bg-linear-to-br from-accent/60 via-background to-background"
       >
@@ -139,7 +139,10 @@ const faqs = [
     </section>
 
     <!-- Store badges -->
-    <section class="border-y border-border bg-muted/20 py-10">
+    <section
+      aria-label="Download links"
+      class="border-y border-border bg-muted/20 py-10"
+    >
       <div class="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6">
         <p
           class="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground"
@@ -157,7 +160,7 @@ const faqs = [
     </section>
 
     <!-- Features -->
-    <section class="bg-muted/40 py-20 lg:py-28">
+    <section aria-label="Features" class="bg-muted/40 py-20 lg:py-28">
       <div class="mx-auto max-w-6xl px-6">
         <div class="mb-12 flex flex-col gap-3">
           <SectionLabel>What's inside</SectionLabel>
@@ -271,7 +274,7 @@ const faqs = [
     </section>
 
     <!-- Screenshots -->
-    <section class="bg-primary py-20 lg:py-28">
+    <section aria-label="App screenshots" class="bg-primary py-20 lg:py-28">
       <div class="mb-14 px-6 text-center">
         <SectionLabel class="text-primary-foreground/60">The app</SectionLabel>
         <h2
@@ -382,7 +385,7 @@ const faqs = [
     </section>
 
     <!-- Who it's for -->
-    <section class="bg-muted/30 py-20 lg:py-28">
+    <section aria-label="Who it's for" class="bg-muted/30 py-20 lg:py-28">
       <div class="mx-auto max-w-7xl px-6">
         <div class="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-16">
           <div class="order-2 flex flex-col gap-4 lg:order-1 lg:flex-1">
@@ -422,7 +425,7 @@ const faqs = [
     <div class="h-px bg-border" aria-hidden="true"></div>
 
     <!-- CTA -->
-    <section class="bg-muted/30 py-20 lg:py-28">
+    <section aria-label="Stay in the loop" class="bg-muted/30 py-20 lg:py-28">
       <div
         class="mx-auto flex max-w-xl flex-col items-center justify-center gap-4 px-6 text-center"
       >
@@ -443,7 +446,10 @@ const faqs = [
     </section>
 
     <!-- FAQ -->
-    <section class="bg-primary py-20 lg:py-28">
+    <section
+      aria-label="Frequently asked questions"
+      class="bg-primary py-20 lg:py-28"
+    >
       <div class="mx-auto max-w-3xl px-6">
         <div class="mb-10 text-center">
           <SectionLabel class="text-primary-foreground/60">FAQ</SectionLabel>
@@ -543,7 +549,6 @@ const faqs = [
           if (chevron) chevron.style.transform = "rotate(180deg)";
         }
       });
-
     });
   }
 </script>
