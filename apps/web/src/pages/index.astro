@@ -1,19 +1,550 @@
 ---
-import { trpc } from "../lib/trpc";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PhoneFrame from "../components/PhoneFrame.astro";
+import SectionLabel from "../components/SectionLabel.astro";
+import StoreButton from "../components/StoreButton.astro";
+import WaitlistForm from "../components/WaitlistForm.astro";
 
-const message = await trpc.hello.query();
+const features = [
+  {
+    title: "Client Records",
+    description:
+      "A full client register with pregnancy status, clinical details, partner info, GBS status, and care notes.",
+    icon: "users",
+  },
+  {
+    title: "Clinical Tools",
+    description:
+      "LMP, gestational age, and EDD calculators that work in both directions. Enter any one value and the rest are derived instantly.",
+    icon: "wrench",
+  },
+  {
+    title: "Due Date Calendar",
+    description:
+      "A continuous scrolling calendar showing upcoming EDDs and delivery dates at a glance. Tap any date to see the relevant clients.",
+    icon: "calendar",
+  },
+  {
+    title: "Practice Statistics",
+    description:
+      "Delivery counts, GBS rates, feeding breakdowns, and more — derived entirely from your local records. No data leaves your device.",
+    icon: "chart",
+  },
+] as const;
+
+const faqs = [
+  {
+    q: "Is my data stored in the cloud?",
+    a: "No. All client data is stored in a local SQLite database on your device. Nothing is uploaded to a server or synced anywhere. The app works entirely offline.",
+  },
+  {
+    q: "Are there ads in this app?",
+    a: "No.",
+  },
+  {
+    q: "Do I need to create an account?",
+    a: "No account, no sign-in, no subscription. Install the app and it's ready to use immediately.",
+  },
+  {
+    q: "Is Midwife's Notebook PHIPA compliant?",
+    a: "Because all data stays on your device and never touches a server, there is no data transmission or third-party storage to govern. You remain the sole custodian of your records.",
+  },
+  {
+    q: "What happens if I lose my phone?",
+    a: "The app supports biometric lock (Face ID, Touch ID, or PIN) to prevent unauthorised access. If you lose your phone, or switch to a new device you will lose your client records. We are planning to implement encrypted database backups in the future to mitigate this.",
+  },
+  {
+    q: "How do you make money?",
+    a: "Essentially, we don't. This app is a labour of love.",
+  },
+  {
+    q: "Why did you make this app?",
+    a: "My wife is a midwife in Ontario, I built this app for her. ♥️",
+  },
+  {
+    q: "When will it be available?",
+    a: "We're targeting August 2026 for the initial release on iOS and Android. Sign up above and we'll email you the moment it's live.",
+  },
+];
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astro</title>
-  </head>
-  <body>
-    <h1>{message}</h1>
-  </body>
-</html>
+<BaseLayout>
+  <div class="flex min-h-screen flex-col bg-background text-foreground">
+    <!-- Hero -->
+    <section class="relative overflow-hidden">
+      <div
+        class="pointer-events-none absolute inset-0 bg-linear-to-br from-accent/60 via-background to-background"
+      >
+      </div>
+
+      <div
+        class="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 py-20 md:grid-cols-2 lg:py-32"
+      >
+        <div class="flex flex-col gap-6">
+          <span
+            class="w-fit rounded-full border border-border px-2.5 py-1 text-xs font-medium text-foreground"
+          >
+            Private · Offline-first
+          </span>
+
+          <h1
+            class="font-heading text-4xl font-semibold leading-[1.15] tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+          >
+            Your notes,
+            <em class="not-italic text-primary">your clients</em>, your device.
+          </h1>
+
+          <div
+            class="flex max-w-lg flex-col gap-2 text-base leading-relaxed text-muted-foreground sm:text-lg"
+          >
+            <p>
+              Midwife's Notebook is a private client management app for midwives
+              and doulas.
+            </p>
+            <p>
+              Track client records while on-the-go — all stored locally on your
+              phone.
+            </p>
+            <p>No cloud. No account. PHIPA Compliant.</p>
+          </div>
+
+          <div class="flex flex-col gap-3 pt-2">
+            <p class="text-sm font-medium text-foreground">
+              Be first to know when we launch:
+            </p>
+            <WaitlistForm class="w-full max-w-md" buttonLabel="Notify me" />
+            <p class="text-xs text-muted-foreground">
+              No spam. One email when the app is available.
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="relative flex items-center justify-center gap-6 lg:justify-end"
+        >
+          <div class="relative z-10 -rotate-3 translate-y-4">
+            <PhoneFrame
+              src="/mockup-client-list.png"
+              alt="Client list screen showing prenatal and postpartum patients"
+            />
+          </div>
+          <div class="relative z-20 rotate-2">
+            <PhoneFrame
+              src="/mockup-client-detail.png"
+              alt="Client detail screen showing clinical information"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Store badges -->
+    <section class="border-y border-border bg-muted/20 py-10">
+      <div class="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6">
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground"
+        >
+          Available soon on
+        </p>
+        <div class="flex flex-wrap justify-center gap-3">
+          <StoreButton store="apple" />
+          <StoreButton store="google" />
+        </div>
+        <p class="text-xs text-muted-foreground">
+          Links live at launch — August 2026
+        </p>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="bg-muted/40 py-20 lg:py-28">
+      <div class="mx-auto max-w-6xl px-6">
+        <div class="mb-12 flex flex-col gap-3">
+          <SectionLabel>What's inside</SectionLabel>
+          <h2
+            class="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
+          >
+            Everything you need to reference your records on the go.
+          </h2>
+          <p class="max-w-xl text-base text-muted-foreground">
+            Built specifically for midwives and doulas — not adapted from a
+            generic clinic system.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-6">
+          {
+            features.map((f) => (
+              <div class="rounded-2xl border border-border/60 bg-card p-6 ring-1 ring-foreground/5">
+                <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-primary">
+                  {f.icon === "users" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  )}
+                  {f.icon === "wrench" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                    </svg>
+                  )}
+                  {f.icon === "calendar" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                      <line x1="16" x2="16" y1="2" y2="6" />
+                      <line x1="8" x2="8" y1="2" y2="6" />
+                      <line x1="3" x2="21" y1="10" y2="10" />
+                      <path d="M8 14h.01" />
+                      <path d="M12 14h.01" />
+                      <path d="M16 14h.01" />
+                      <path d="M8 18h.01" />
+                      <path d="M12 18h.01" />
+                      <path d="M16 18h.01" />
+                    </svg>
+                  )}
+                  {f.icon === "chart" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 3v18h18" />
+                      <path d="M18 17V9" />
+                      <path d="M13 17V5" />
+                      <path d="M8 17v-3" />
+                    </svg>
+                  )}
+                </div>
+                <h3 class="font-heading text-base font-semibold text-foreground">
+                  {f.title}
+                </h3>
+                <p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  {f.description}
+                </p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Screenshots -->
+    <section class="bg-primary py-20 lg:py-28">
+      <div class="mb-14 px-6 text-center">
+        <SectionLabel class="text-primary-foreground/60">The app</SectionLabel>
+        <h2
+          class="mt-3 font-heading text-3xl font-semibold tracking-tight text-primary-foreground sm:text-4xl"
+        >
+          Designed for how you actually work.
+        </h2>
+        <p class="mx-auto mt-3 max-w-xl text-base text-primary-foreground/70">
+          Clean, clear, and fast. Inspired by modern consumer apps — but built
+          for the realities of a midwifery practice.
+        </p>
+      </div>
+
+      <div
+        class="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        <div class="flex w-max items-end gap-6 px-6 pb-4 md:mx-auto">
+          <div class="flex shrink-0 flex-col items-center gap-4">
+            <PhoneFrame
+              src="/mockup-client-list.png"
+              alt="Client list screen with filter tabs for Prenatal, Postpartum, and Out of Care"
+            />
+            <p class="text-sm font-medium text-primary-foreground/80">
+              Client register
+            </p>
+          </div>
+
+          <div class="flex shrink-0 flex-col items-center gap-4">
+            <div
+              class="relative mx-auto flex w-55 aspect-[9/19.5] flex-col items-center justify-center gap-2 rounded-[2.5rem] border-4 border-primary-foreground/15 bg-primary-foreground/5 p-6 text-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="text-primary-foreground/30"
+                aria-hidden="true"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                ></path>
+              </svg>
+              <p class="text-xs text-primary-foreground/40">
+                Clinical tools screen
+              </p>
+              <p class="text-[10px] text-primary-foreground/25">
+                Screenshot coming soon
+              </p>
+            </div>
+            <p class="text-sm font-medium text-primary-foreground/80">
+              Clinical tools
+            </p>
+          </div>
+
+          <div class="flex shrink-0 flex-col items-center gap-4">
+            <PhoneFrame
+              src="/mockup-client-detail.png"
+              alt="Client detail view showing identity, clinical stats, and partner information"
+            />
+            <p class="text-sm font-medium text-primary-foreground/80">
+              Client detail
+            </p>
+          </div>
+
+          <div class="flex shrink-0 flex-col items-center gap-4">
+            <div
+              class="relative mx-auto flex w-55 aspect-[9/19.5] flex-col items-center justify-center gap-2 rounded-[2.5rem] border-4 border-primary-foreground/15 bg-primary-foreground/5 p-6 text-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="text-primary-foreground/30"
+                aria-hidden="true"
+              >
+                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                <line x1="16" x2="16" y1="2" y2="6"></line>
+                <line x1="8" x2="8" y1="2" y2="6"></line>
+                <line x1="3" x2="21" y1="10" y2="10"></line>
+                <path d="M8 14h.01"></path><path d="M12 14h.01"></path><path
+                  d="M16 14h.01"></path>
+                <path d="M8 18h.01"></path><path d="M12 18h.01"></path><path
+                  d="M16 18h.01"></path>
+              </svg>
+              <p class="text-xs text-primary-foreground/40">Calendar screen</p>
+              <p class="text-[10px] text-primary-foreground/25">
+                Screenshot coming soon
+              </p>
+            </div>
+            <p class="text-sm font-medium text-primary-foreground/80">
+              Due date calendar
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Who it's for -->
+    <section class="bg-muted/30 py-20 lg:py-28">
+      <div class="mx-auto max-w-7xl px-6">
+        <div class="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-16">
+          <div class="order-2 flex flex-col gap-4 lg:order-1 lg:flex-1">
+            <SectionLabel>Who it's for</SectionLabel>
+            <h2
+              class="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
+            >
+              Built for care providers.
+            </h2>
+            <p class="text-base leading-relaxed text-muted-foreground">
+              Midwife's Notebook is for midwives, doulas, and other care
+              providers who manage their own client lists on the go. It focuses
+              on allowing you to easily access &amp; update your client notes
+              while visiting clients wherever they are. Whether you use it as a
+              staging-area before you transfer your notes to Accuro, or as the
+              primary place you track your client information, it provides
+              focused, private record-keeping.
+            </p>
+          </div>
+
+          <div
+            class="order-1 mx-auto w-2/3 overflow-hidden rounded-2xl sm:w-1/2 lg:order-2 lg:w-auto lg:flex-1"
+          >
+            <img
+              src="/holding-baby.webp"
+              alt="Midwife holding a newborn"
+              width="896"
+              height="512"
+              class="w-full object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Separator -->
+    <div class="h-px bg-border"></div>
+
+    <!-- CTA -->
+    <section class="bg-muted/30 py-20 lg:py-28">
+      <div
+        class="mx-auto flex max-w-xl flex-col items-center justify-center gap-4 px-6 text-center"
+      >
+        <p class="text-sm italic text-muted-foreground">
+          Launching August 2026
+        </p>
+        <h2
+          class="font-heading text-3xl font-semibold tracking-tight sm:text-4xl"
+        >
+          Stay in the loop.
+        </h2>
+        <p class="text-base">
+          Leave your email and we'll send you one message when Midwife's
+          Notebook is available. No newsletter, no marketing sequence.
+        </p>
+        <WaitlistForm class="mt-4" buttonLabel="Notify me at launch" />
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="bg-primary py-20 lg:py-28">
+      <div class="mx-auto max-w-3xl px-6">
+        <div class="mb-10 text-center">
+          <SectionLabel class="text-primary-foreground/60">FAQ</SectionLabel>
+          <h2
+            class="mt-3 font-heading text-3xl font-semibold tracking-tight text-primary-foreground sm:text-4xl"
+          >
+            Common questions.
+          </h2>
+        </div>
+
+        <div
+          data-accordion
+          class="w-full divide-y divide-primary-foreground/20"
+        >
+          {
+            faqs.map((faq, i) => (
+              <div class="accordion-item">
+                <button
+                  class="flex w-full items-center justify-between gap-4 py-4 text-left text-base font-medium text-primary-foreground transition-colors hover:text-primary-foreground/80"
+                  aria-expanded="false"
+                  aria-controls={`faq-content-${i}`}
+                  data-accordion-trigger
+                >
+                  <span>{faq.q}</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="shrink-0 transition-transform duration-200"
+                    aria-hidden="true"
+                    data-chevron
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                <div
+                  id={`faq-content-${i}`}
+                  data-accordion-body
+                  class="grid"
+                  style="grid-template-rows: 0fr;"
+                >
+                  <div class="overflow-hidden">
+                    <p class="pb-4 text-sm leading-relaxed text-primary-foreground/90">
+                      {faq.a}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  const accordion = document.querySelector("[data-accordion]");
+  if (accordion) {
+    accordion
+      .querySelectorAll<HTMLButtonElement>("[data-accordion-trigger]")
+      .forEach((trigger) => {
+        const body = document.getElementById(
+          trigger.getAttribute("aria-controls") ?? "",
+        ) as HTMLElement | null;
+        const chevron = trigger.querySelector<SVGElement>("[data-chevron]");
+
+        if (!body) return;
+
+        trigger.addEventListener("click", () => {
+          const isOpen = trigger.getAttribute("aria-expanded") === "true";
+
+          if (isOpen) {
+            trigger.setAttribute("aria-expanded", "false");
+            body.style.gridTemplateRows = "0fr";
+            if (chevron) chevron.style.transform = "";
+          } else {
+            trigger.setAttribute("aria-expanded", "true");
+            body.style.gridTemplateRows = "1fr";
+            if (chevron) chevron.style.transform = "rotate(180deg)";
+          }
+        });
+
+        trigger.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            trigger.click();
+          }
+        });
+      });
+  }
+</script>
+
+<style>
+  [data-accordion-body] {
+    transition: grid-template-rows 250ms ease;
+  }
+</style>
