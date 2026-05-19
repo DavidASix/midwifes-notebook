@@ -509,37 +509,48 @@ const faqs = [
 <script>
   const accordion = document.querySelector("[data-accordion]");
   if (accordion) {
-    accordion
-      .querySelectorAll<HTMLButtonElement>("[data-accordion-trigger]")
-      .forEach((trigger) => {
-        const body = document.getElementById(
-          trigger.getAttribute("aria-controls") ?? "",
-        ) as HTMLElement | null;
-        const chevron = trigger.querySelector<SVGElement>("[data-chevron]");
+    const triggers = Array.from(
+      accordion.querySelectorAll<HTMLButtonElement>("[data-accordion-trigger]"),
+    );
 
-        if (!body) return;
+    function closeItem(trigger: HTMLButtonElement) {
+      const body = document.getElementById(
+        trigger.getAttribute("aria-controls") ?? "",
+      ) as HTMLElement | null;
+      const chevron = trigger.querySelector<SVGElement>("[data-chevron]");
+      trigger.setAttribute("aria-expanded", "false");
+      if (body) body.style.gridTemplateRows = "0fr";
+      if (chevron) chevron.style.transform = "";
+    }
 
-        trigger.addEventListener("click", () => {
-          const isOpen = trigger.getAttribute("aria-expanded") === "true";
+    triggers.forEach((trigger) => {
+      const body = document.getElementById(
+        trigger.getAttribute("aria-controls") ?? "",
+      ) as HTMLElement | null;
+      const chevron = trigger.querySelector<SVGElement>("[data-chevron]");
 
-          if (isOpen) {
-            trigger.setAttribute("aria-expanded", "false");
-            body.style.gridTemplateRows = "0fr";
-            if (chevron) chevron.style.transform = "";
-          } else {
-            trigger.setAttribute("aria-expanded", "true");
-            body.style.gridTemplateRows = "1fr";
-            if (chevron) chevron.style.transform = "rotate(180deg)";
-          }
-        });
+      if (!body) return;
 
-        trigger.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            trigger.click();
-          }
-        });
+      trigger.addEventListener("click", () => {
+        const isOpen = trigger.getAttribute("aria-expanded") === "true";
+
+        if (isOpen) {
+          closeItem(trigger);
+        } else {
+          triggers.forEach((t) => t !== trigger && closeItem(t));
+          trigger.setAttribute("aria-expanded", "true");
+          body.style.gridTemplateRows = "1fr";
+          if (chevron) chevron.style.transform = "rotate(180deg)";
+        }
       });
+
+      trigger.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          trigger.click();
+        }
+      });
+    });
   }
 </script>
 
