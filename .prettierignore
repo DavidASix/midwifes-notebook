@@ -1,0 +1,18 @@
+node_modules
+.next
+dist
+build
+.expo
+*.md
+pnpm-*.yaml
+**/package-lock.json
+**/next-env.d.ts
+tsconfig.json
+# Ignore all settings files from hidden folders
+.*/settings*.json
+
+# Astro generated
+**/.astro/
+
+# Drizzle generated
+**/drizzle/

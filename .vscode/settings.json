@@ -1,0 +1,11 @@
+{
+    "cSpell.words": [
+        "midwifes"
+    ],
+    "eslint.useFlatConfig": true,
+    "eslint.workingDirectories": [
+        { "directory": "apps/web", "changeProcessCWD": true },
+        { "directory": "apps/mobile", "changeProcessCWD": true },
+        { "directory": "apps/server", "changeProcessCWD": true }
+    ]
+}

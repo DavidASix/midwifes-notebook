@@ -1,53 +1,53 @@
 {
-  "name": "midwife",
-  "version": "0.0.1",
-  "private": true,
+  "name": "midwifes-notebook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "android": "react-native run-android",
-    "ios": "react-native run-ios",
-    "start": "react-native start",
-    "test": "jest",
-    "lint": "eslint ."
+    "dev": "turbo dev",
+    "dev:mobile": "turbo dev --filter=@midwifes-notebook/mobile",
+    "dev:web": "turbo dev --filter=@midwifes-notebook/web",
+    "dev:server": "turbo dev --filter=@midwifes-notebook/server",
+    "dev:web-stack": "turbo dev --filter=@midwifes-notebook/web --filter=@midwifes-notebook/server",
+    "dev:mobile-stack": "turbo dev --filter=@midwifes-notebook/mobile --filter=@midwifes-notebook/server",
+    "build": "turbo build",
+    "build:mobile": "turbo build --filter=@midwifes-notebook/mobile",
+    "build:web": "turbo build --filter=@midwifes-notebook/web",
+    "build:server": "turbo build --filter=@midwifes-notebook/server",
+    "test": "turbo test",
+    "test:mobile": "turbo test --filter=@midwifes-notebook/mobile",
+    "test:web": "turbo test --filter=@midwifes-notebook/web",
+    "test:server": "turbo test --filter=@midwifes-notebook/server",
+    "check": "pnpm check:format && pnpm check:types && pnpm check:lint && pnpm test",
+    "check:mobile": "pnpm check:types --filter=@midwifes-notebook/mobile && pnpm check:lint --filter=@midwifes-notebook/mobile && pnpm test --filter=@midwifes-notebook/mobile",
+    "check:web": "pnpm check:types:web && pnpm check:lint --filter=@midwifes-notebook/web && pnpm test --filter=@midwifes-notebook/web",
+    "check:types:web": "turbo check:types --filter=@midwifes-notebook/web",
+    "check:server": "pnpm check:types --filter=@midwifes-notebook/server && pnpm check:lint --filter=@midwifes-notebook/server && pnpm test --filter=@midwifes-notebook/server",
+    "check:lint": "turbo check:lint",
+    "check:types": "turbo check:types",
+    "check:format": "prettier --check .",
+    "format": "prettier --write .",
+    "prepare": "husky"
   },
-  "dependencies": {
-    "@react-native-async-storage/async-storage": "^1.17.9",
-    "@react-native-community/datetimepicker": "^6.3.1",
-    "@react-native-community/masked-view": "^0.1.11",
-    "@react-native-picker/picker": "^2.4.6",
-    "@react-navigation/bottom-tabs": "^6.3.2",
-    "@react-navigation/native": "^6.0.11",
-    "@react-navigation/stack": "^6.2.2",
-    "axios": "^0.27.2",
-    "crypto-random-string": "^5.0.0",
-    "react": "^18.0.0",
-    "react-native": "^0.69.4",
-    "react-native-biometrics": "^2.2.0",
-    "react-native-dropdown-picker": "^5.4.2",
-    "react-native-gesture-handler": "^2.5.0",
-    "react-native-global-props": "^1.1.5",
-    "react-native-material-dropdown": "^0.11.1",
-    "react-native-reanimated": "^2.9.1",
-    "react-native-safe-area-context": "^4.3.1",
-    "react-native-screens": "^3.15.0",
-    "react-native-svg": "^12.4.4",
-    "react-native-toast-message": "^2.1.5",
-    "react-native-vector-icons": "^9.2.0",
-    "react-redux": "^8.0.2",
-    "redux": "^4.2.0",
-    "redux-persist": "^6.0.0",
-    "redux-thunk": "^2.4.1"
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.26.1",
+  "pnpm": {
+    "overrides": {
+      "minimatch@3>brace-expansion": "^1.1.11"
+    }
+  },
+  "lint-staged": {
+    "*": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9",
-    "@babel/runtime": "^7.12.5",
-    "@react-native-community/eslint-config": "^2.0.0",
-    "babel-jest": "^26.6.3",
-    "eslint": "^7.32.0",
-    "jest": "^26.6.3",
-    "metro-react-native-babel-preset": "^0.70.3",
-    "react-test-renderer": "18.0.0"
-  },
-  "jest": {
-    "preset": "react-native"
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5",
+    "prettier": "^3.8.1",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "turbo": "^2.8.16"
   }
 }
