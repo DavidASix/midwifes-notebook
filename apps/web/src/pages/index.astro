@@ -4,6 +4,7 @@ import PhoneFrame from "../components/PhoneFrame.astro";
 import SectionLabel from "../components/SectionLabel.astro";
 import StoreButton from "../components/StoreButton.astro";
 import WaitlistForm from "../components/WaitlistForm.astro";
+import { faqPageSchema } from "../lib/schema";
 
 const features = [
   {
@@ -69,6 +70,11 @@ const faqs = [
 ---
 
 <BaseLayout>
+  <script
+    slot="schema"
+    type="application/ld+json"
+    set:html={JSON.stringify(faqPageSchema(faqs))}
+  />
   <div class="flex min-h-screen flex-col bg-background text-foreground">
     <!-- Hero -->
     <section aria-label="Introduction" class="relative overflow-hidden">

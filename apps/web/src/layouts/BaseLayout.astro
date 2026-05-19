@@ -3,6 +3,7 @@ import Navigation from "../components/Navigation.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/global.css";
 import { site } from "../lib/site";
+import { mobileApplicationSchema } from "../lib/schema";
 
 interface Props {
   title?: string;
@@ -43,6 +44,13 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
+
+    <!-- Structured data -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(mobileApplicationSchema())}
+    />
+    <slot name="schema" />
   </head>
   <body>
     <a
