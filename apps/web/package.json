@@ -10,7 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check:types": "astro check",
+    "check:types": "astro check --minimumFailingSeverity hint",
     "check:lint": "eslint --max-warnings 0"
   },
   "dependencies": {
