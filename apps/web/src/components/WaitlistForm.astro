@@ -1,0 +1,164 @@
+---
+interface Props {
+  buttonLabel?: string;
+  class?: string;
+}
+
+const { buttonLabel = "Stay in the loop", class: className } = Astro.props;
+---
+
+<div data-waitlist-form class:list={[className]}>
+  <form data-form novalidate>
+    <div aria-hidden="true" style="position:absolute;left:-2024px">
+      <input type="text" name="b_honeypot" tabindex="-1" value="" />
+    </div>
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-start">
+      <input
+        data-email-input
+        type="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+        class="min-w-0 flex-1 rounded-[1.3rem] border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/20 disabled:opacity-50"
+      />
+      <button
+        data-submit-btn
+        data-label={buttonLabel}
+        type="submit"
+        class="shrink-0 rounded-[1.3rem] bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {buttonLabel}
+      </button>
+    </div>
+  </form>
+
+  <p data-success class="hidden text-sm font-medium text-secondary">
+    You're on the list — we'll be in touch before launch.
+  </p>
+
+  <div data-error class="hidden flex-col gap-2">
+    <p data-error-message class="text-sm text-destructive"></p>
+    <button
+      data-reset-btn
+      class="w-fit text-sm text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
+    >
+      &larr; Back
+    </button>
+  </div>
+</div>
+
+<script>
+  const LOOPS_FORM_ID = "cmnkecb322od20iy8e5u3bst5";
+  const LOOPS_USER_GROUP = "waitlist";
+  const LOOPS_DOMAIN = "app.loops.so";
+
+  function initWaitlistForm(container: HTMLElement) {
+    const form = container.querySelector<HTMLFormElement>("[data-form]");
+    const emailInput =
+      container.querySelector<HTMLInputElement>("[data-email-input]");
+    const submitBtn =
+      container.querySelector<HTMLButtonElement>("[data-submit-btn]");
+    const successEl = container.querySelector<HTMLElement>("[data-success]");
+    const errorEl = container.querySelector<HTMLElement>("[data-error]");
+    const errorMessage = container.querySelector<HTMLElement>(
+      "[data-error-message]",
+    );
+    const resetBtn =
+      container.querySelector<HTMLButtonElement>("[data-reset-btn]");
+
+    if (
+      !form ||
+      !emailInput ||
+      !submitBtn ||
+      !successEl ||
+      !errorEl ||
+      !errorMessage
+    )
+      return;
+
+    const originalLabel = submitBtn.dataset.label ?? "Stay in the loop";
+
+    function showSuccess() {
+      form!.classList.add("hidden");
+      successEl!.classList.remove("hidden");
+    }
+
+    function showError(msg: string) {
+      errorMessage!.textContent = msg;
+      form!.classList.add("hidden");
+      errorEl!.classList.remove("hidden");
+      errorEl!.classList.add("flex");
+    }
+
+    function reset() {
+      emailInput!.value = "";
+      submitBtn!.disabled = false;
+      submitBtn!.textContent = originalLabel;
+      form!.classList.remove("hidden");
+      successEl!.classList.add("hidden");
+      errorEl!.classList.remove("flex");
+      errorEl!.classList.add("hidden");
+    }
+
+    resetBtn?.addEventListener("click", reset);
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (submitBtn.disabled) return;
+
+      const email = emailInput.value.trim();
+
+      if (!/.+@.+/.test(email)) {
+        showError("Please enter a valid email address.");
+        return;
+      }
+
+      const now = Date.now();
+      const prev = localStorage.getItem("loops-form-timestamp");
+      if (prev && Number(prev) + 60_000 > now) {
+        showError("Too many signups, please try again in a little while.");
+        return;
+      }
+      localStorage.setItem("loops-form-timestamp", String(now));
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending…";
+
+      const body = `userGroup=${encodeURIComponent(LOOPS_USER_GROUP)}&email=${encodeURIComponent(email)}&mailingLists=`;
+
+      try {
+        const res = await fetch(
+          `https://${LOOPS_DOMAIN}/api/newsletter-form/${LOOPS_FORM_ID}`,
+          {
+            method: "POST",
+            body,
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          },
+        );
+
+        if (res.ok) {
+          showSuccess();
+        } else {
+          const data = await res.json().catch(() => ({}));
+          localStorage.setItem("loops-form-timestamp", "");
+          showError(
+            (data as { message?: string }).message ||
+              res.statusText ||
+              "Something went wrong.",
+          );
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "";
+        localStorage.setItem("loops-form-timestamp", "");
+        showError(
+          message === "Failed to fetch"
+            ? "Too many signups, please try again in a little while."
+            : message || "Something went wrong, please try again.",
+        );
+      }
+    });
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-waitlist-form]")
+    .forEach(initWaitlistForm);
+</script>
