@@ -3,6 +3,10 @@
     {
       "source": "/(.*)",
       "headers": [{ "key": "X-Robots-Tag", "value": "all" }]
+    },
+    {
+      "source": "/",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
     }
   ],
   "cleanUrls": true
