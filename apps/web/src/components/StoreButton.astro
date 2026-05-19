@@ -1,0 +1,46 @@
+---
+import AppleLogo from "../assets/apple-logo.svg";
+import GooglePlayIcon from "../assets/google-play-icon.svg";
+
+interface Props {
+  store: "apple" | "google";
+  href?: string;
+}
+
+const { store, href } = Astro.props;
+
+const data = {
+  apple: { label: "Download on the", storeName: "App Store" },
+  google: { label: "Get it on", storeName: "Google Play" },
+} as const;
+
+const { label, storeName } = data[store];
+const disabled = !href;
+---
+
+<a
+  href={disabled ? undefined : href}
+  aria-disabled={disabled}
+  aria-label={disabled ? `${storeName} — coming soon` : `${label} ${storeName}`}
+  class:list={[
+    "flex h-14 w-48 select-none items-center gap-3 rounded-xl bg-foreground px-4",
+    disabled
+      ? "pointer-events-none grayscale opacity-80"
+      : "transition-opacity hover:opacity-80",
+  ]}
+>
+  {
+    store === "apple" && (
+      <AppleLogo class="h-7 w-auto shrink-0" fill="white" aria-hidden="true" />
+    )
+  }
+  {
+    store === "google" && (
+      <GooglePlayIcon class="h-7 w-auto shrink-0" aria-hidden="true" />
+    )
+  }
+  <div class="flex flex-col leading-none text-background">
+    <span class="text-[10px] opacity-80">{label}</span>
+    <span class="text-base font-semibold">{storeName}</span>
+  </div>
+</a>

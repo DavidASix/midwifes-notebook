@@ -1,0 +1,28 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  class?: string;
+}
+const { src, alt, class: className } = Astro.props;
+---
+
+<div class:list={["relative mx-auto w-55", className]}>
+  <div
+    class="relative overflow-hidden rounded-[2.5rem] border-4 border-foreground/15 bg-foreground/5 shadow-2xl"
+  >
+    <div class="relative overflow-hidden rounded-[2.2rem]">
+      <img
+        src={src}
+        alt={alt}
+        width="600"
+        height="1200"
+        class="w-full object-cover object-top"
+      />
+    </div>
+  </div>
+  <div
+    class="pointer-events-none absolute inset-0 rounded-[2.5rem] ring-1 ring-inset ring-white/10"
+  >
+  </div>
+</div>
