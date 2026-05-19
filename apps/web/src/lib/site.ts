@@ -5,5 +5,5 @@ export const site = {
     "Midwife's Notebook — Private Client Records App for Midwives & Doulas",
   description:
     "A private practice management app for midwives and doulas. Client records, clinical tools, and delivery tracking — all stored locally on your device.",
-  ogImage: "/holding-baby.webp",
+  ogImage: "/og-image.png",
 } as const;
