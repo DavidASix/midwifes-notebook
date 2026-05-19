@@ -1,4 +1,4 @@
-![graphic](https://github.com/DavidASix/midwife-assist-app/assets/3901710/879e567a-9578-48aa-a090-91d2e7016109)
+![Midwife's Notebook, an offline first client management app](https://raw.githubusercontent.com/DavidASix/midwifes-notebook/refs/heads/main/apps/web/public/og-image.png)
 
 # Midwife Assist | A Mobile App for Midwives.
 Client tracking & Pregnancy calculation, all done offline
