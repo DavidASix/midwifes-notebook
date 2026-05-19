@@ -4,6 +4,7 @@ import PhoneFrame from "../components/PhoneFrame.astro";
 import SectionLabel from "../components/SectionLabel.astro";
 import StoreButton from "../components/StoreButton.astro";
 import WaitlistForm from "../components/WaitlistForm.astro";
+import { Icon } from "astro-icon/components";
 import { faqPageSchema } from "../lib/schema";
 
 const features = [
@@ -11,25 +12,25 @@ const features = [
     title: "Client Records",
     description:
       "A full client register with pregnancy status, clinical details, partner info, GBS status, and care notes.",
-    icon: "users",
+    icon: "lucide:users",
   },
   {
     title: "Clinical Tools",
     description:
       "LMP, gestational age, and EDD calculators that work in both directions. Enter any one value and the rest are derived instantly.",
-    icon: "wrench",
+    icon: "lucide:wrench",
   },
   {
     title: "Due Date Calendar",
     description:
       "A continuous scrolling calendar showing upcoming EDDs and delivery dates at a glance. Tap any date to see the relevant clients.",
-    icon: "calendar",
+    icon: "lucide:calendar",
   },
   {
     title: "Practice Statistics",
     description:
       "Delivery counts, GBS rates, feeding breakdowns, and more — derived entirely from your local records. No data leaves your device.",
-    icon: "chart",
+    icon: "lucide:bar-chart-2",
   },
 ] as const;
 
@@ -187,85 +188,12 @@ const faqs = [
             features.map((f) => (
               <div class="rounded-2xl border border-border/60 bg-card p-6 ring-1 ring-foreground/5">
                 <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-primary">
-                  {f.icon === "users" && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
-                  )}
-                  {f.icon === "wrench" && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-                    </svg>
-                  )}
-                  {f.icon === "calendar" && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                      <line x1="16" x2="16" y1="2" y2="6" />
-                      <line x1="8" x2="8" y1="2" y2="6" />
-                      <line x1="3" x2="21" y1="10" y2="10" />
-                      <path d="M8 14h.01" />
-                      <path d="M12 14h.01" />
-                      <path d="M16 14h.01" />
-                      <path d="M8 18h.01" />
-                      <path d="M12 18h.01" />
-                      <path d="M16 18h.01" />
-                    </svg>
-                  )}
-                  {f.icon === "chart" && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M3 3v18h18" />
-                      <path d="M18 17V9" />
-                      <path d="M13 17V5" />
-                      <path d="M8 17v-3" />
-                    </svg>
-                  )}
+                  <Icon
+                    name={f.icon}
+                    width={20}
+                    height={20}
+                    aria-hidden="true"
+                  />
                 </div>
                 <h3 class="font-heading text-base font-semibold text-foreground">
                   {f.title}
@@ -313,23 +241,13 @@ const faqs = [
             <div
               class="relative mx-auto flex w-55 aspect-[9/19.5] flex-col items-center justify-center gap-2 rounded-[2.5rem] border-4 border-primary-foreground/15 bg-primary-foreground/5 p-6 text-center"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+              <Icon
+                name="lucide:wrench"
+                width={32}
+                height={32}
                 class="text-primary-foreground/30"
                 aria-hidden="true"
-              >
-                <path
-                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
-                ></path>
-              </svg>
+              />
               <p class="text-xs text-primary-foreground/40">
                 Clinical tools screen
               </p>
@@ -356,28 +274,13 @@ const faqs = [
             <div
               class="relative mx-auto flex w-55 aspect-[9/19.5] flex-col items-center justify-center gap-2 rounded-[2.5rem] border-4 border-primary-foreground/15 bg-primary-foreground/5 p-6 text-center"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+              <Icon
+                name="lucide:calendar"
+                width={32}
+                height={32}
                 class="text-primary-foreground/30"
                 aria-hidden="true"
-              >
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
-                <line x1="16" x2="16" y1="2" y2="6"></line>
-                <line x1="8" x2="8" y1="2" y2="6"></line>
-                <line x1="3" x2="21" y1="10" y2="10"></line>
-                <path d="M8 14h.01"></path><path d="M12 14h.01"></path><path
-                  d="M16 14h.01"></path>
-                <path d="M8 18h.01"></path><path d="M12 18h.01"></path><path
-                  d="M16 18h.01"></path>
-              </svg>
+              />
               <p class="text-xs text-primary-foreground/40">Calendar screen</p>
               <p class="text-[10px] text-primary-foreground/25">
                 Screenshot coming soon
@@ -481,22 +384,14 @@ const faqs = [
                   data-accordion-trigger
                 >
                   <span>{faq.q}</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  <Icon
+                    name="lucide:chevron-down"
+                    width={16}
+                    height={16}
                     class="shrink-0 transition-transform duration-200"
                     aria-hidden="true"
                     data-chevron
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
+                  />
                 </button>
                 <div
                   id={`faq-content-${i}`}
