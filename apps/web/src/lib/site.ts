@@ -1,5 +1,5 @@
 export const site = {
-  url: "https://midwifesnotebook.com",
+  url: "https://www.midwifesnotebook.com",
   name: "Midwife's Notebook",
   title:
     "Midwife's Notebook — Private Client Records App for Midwives & Doulas",

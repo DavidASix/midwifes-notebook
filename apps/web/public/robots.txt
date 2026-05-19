@@ -47,4 +47,4 @@ Allow: /
 User-agent: Slackbot
 Allow: /
 
-Sitemap: https://midwifesnotebook.com/sitemap-index.xml
+Sitemap: https://www.midwifesnotebook.com/sitemap-index.xml
