@@ -2,12 +2,13 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
+import icon from "astro-icon";
 import { site } from "./src/lib/site.ts";
 
 // https://astro.build/config
 export default defineConfig({
   site: site.url,
-  integrations: [sitemap()],
+  integrations: [sitemap(), icon()],
   vite: {
     plugins: [tailwindcss()],
   },

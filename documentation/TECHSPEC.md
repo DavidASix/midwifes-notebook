@@ -119,6 +119,36 @@ The Astro site serves as the public-facing web frontend: marketing pages, change
 ### API Connectivity
 The site connects to the Fastify server via tRPC when dynamic server interaction is needed. All tRPC calls are made server-side in Astro page frontmatter using the configured client in `src/lib/trpc.ts`. The `AppRouter` type is imported from `@midwifes-notebook/server/router` for full type safety.
 
+### Icons & SVGs
+
+Inline `<svg>` tags are **never** written by hand in this codebase. All SVG usage falls into one of two patterns:
+
+**1. UI icons — use `astro-icon`**
+
+Icons are sourced from the **Lucide** Iconify pack (`@iconify-json/lucide`) via the `<Icon>` component from `astro-icon/components`. Reference icons as `"lucide:<icon-name>"`. Browse [lucide.dev](https://lucide.dev) to find names.
+
+```astro
+---
+import { Icon } from "astro-icon/components";
+---
+
+<Icon name="lucide:calendar" width={20} height={20} aria-hidden="true" />
+```
+
+**2. Project SVG assets (logos, illustrations) — import as a component**
+
+SVG files that belong to the project (e.g. brand logos, custom illustrations) live in `src/assets/` and are imported directly as Astro components. Astro inlines them at build time and the import target accepts standard SVG props (`class`, `fill`, `aria-hidden`, etc.).
+
+```astro
+---
+import AppleLogo from "../assets/apple-logo.svg";
+---
+
+<AppleLogo class="h-7 w-auto" fill="white" aria-hidden="true" />
+```
+
+Never copy-paste SVG markup inline — either add the file to `src/assets/` and import it, or use an `astro-icon` icon.
+
 ### TypeScript
 TypeScript is used throughout. Astro ships with TypeScript support built in, with the project configured to use Astro's `strict` tsconfig preset.
 

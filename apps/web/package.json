@@ -19,11 +19,13 @@
     "@tailwindcss/vite": "^4.3.0",
     "@trpc/client": "^11.12.0",
     "astro": "^6.3.5",
+    "astro-icon": "^1.1.5",
     "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@eslint/js": "^10.0.1",
+    "@iconify-json/lucide": "^1.2.108",
     "eslint": "^10.4.0",
     "eslint-plugin-astro": "^1.7.0",
     "typescript": "^6.0.3",
