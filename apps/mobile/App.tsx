@@ -1,7 +1,15 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+import { db } from "./src/db";
+import migrations from "./drizzle/migrations";
 
 export default function App() {
+  const { success, error } = useMigrations(db, migrations);
+
+  if (error) throw error;
+  if (!success) return null;
+
   return (
     <View style={styles.container}>
       <Text>Open up App.tsx to start working on your app!</Text>

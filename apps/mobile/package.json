@@ -9,7 +9,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "check:lint": "eslint --max-warnings 0",
-    "check:types": "tsc --noEmit"
+    "check:types": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
     "@midwifes-notebook/server": "workspace:*",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "babel-plugin-inline-import": "^3.0.0",
     "drizzle-kit": "^0.31.9",
     "eslint": "^9.39.4",
     "eslint-config-expo": "^55.0.0",
