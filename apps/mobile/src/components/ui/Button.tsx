@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable } from "react-native";
+import { makeStyles } from "../../lib/make-styles";
 import { Text } from "./Text";
 
 type ButtonProps = {
@@ -14,6 +15,8 @@ export function Button({
   disabled,
   variant = "primary",
 }: ButtonProps) {
+  const styles = useStyles();
+
   return (
     <Pressable
       onPress={onPress}
@@ -29,8 +32,7 @@ export function Button({
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
+const useStyles = makeStyles((theme) => ({
   base: {
     borderRadius: 8,
     paddingVertical: 12,
@@ -39,12 +41,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   primary: {
-    backgroundColor: "#1a4331",
+    backgroundColor: theme.primary,
   },
   secondary: {
     backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: "#1a4331",
+    borderColor: theme.primary,
   },
   pressed: {
     opacity: 0.8,
@@ -57,9 +59,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   primaryLabel: {
-    color: "#fcfbf7",
+    color: theme.primaryForeground,
   },
   secondaryLabel: {
-    color: "#1a4331",
+    color: theme.primary,
   },
-});
+}));

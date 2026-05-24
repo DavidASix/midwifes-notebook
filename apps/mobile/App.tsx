@@ -6,7 +6,7 @@ import migrations from "./drizzle/migrations";
 import { ClientsTest } from "./src/components/ClientsTest";
 import { useAppFonts } from "./src/hooks/useAppFonts";
 import { ThemeProvider, useTheme } from "./src/lib/theme-context";
-import { makeStyles } from "./src/lib/makeStyles";
+import { makeStyles } from "./src/lib/make-styles";
 
 const useStyles = makeStyles((theme) => ({
   container: {
