@@ -31,7 +31,7 @@ export const radius = {
   "4xl": 21,
 } as const;
 
-type ColorTheme = {
+export type ColorTheme = {
   background: string;
   foreground: string;
   card: string;
@@ -48,9 +48,10 @@ type ColorTheme = {
   border: string;
   input: string;
   ring: string;
+  statusBarIcons: "light" | "dark";
 };
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark";
 
 export const themes: Record<Theme, ColorTheme> = {
   light: {
@@ -70,6 +71,7 @@ export const themes: Record<Theme, ColorTheme> = {
     border: "#e2e0d8",
     input: "#e2e0d8",
     ring: "#1a4331",
+    statusBarIcons: "dark",
   },
   dark: {
     background: "#0d1f18",
@@ -88,5 +90,6 @@ export const themes: Record<Theme, ColorTheme> = {
     border: "rgba(255, 255, 255, 0.1)",
     input: "rgba(255, 255, 255, 0.15)",
     ring: "#34d399",
+    statusBarIcons: "light",
   },
 };

@@ -4,6 +4,7 @@ import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { db } from "../db";
 import { clients } from "../db/schema";
 import { Button } from "./ui/Button";
+import { useToggleTheme } from "../lib/theme-context";
 
 const NAMES = [
   "Alice",
@@ -29,6 +30,7 @@ function randomName() {
 export function ClientsTest() {
   const { data } = useLiveQuery(db.select().from(clients));
   const [inserting, setInserting] = useState(false);
+  const toggleTheme = useToggleTheme();
 
   async function insertClient() {
     setInserting(true);
@@ -44,6 +46,7 @@ export function ClientsTest() {
         disabled={inserting}
         variant="primary"
       />
+      <Button title="Toggle theme" onPress={toggleTheme} variant="secondary" />
       <FlatList
         data={data}
         keyExtractor={(item) => String(item.id)}
