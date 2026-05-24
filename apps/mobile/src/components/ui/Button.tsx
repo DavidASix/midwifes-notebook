@@ -1,4 +1,4 @@
-import { Pressable, Text } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 type ButtonProps = {
   title: string;
@@ -13,19 +13,52 @@ export function Button({
   disabled,
   variant = "primary",
 }: ButtonProps) {
-  const variants = {
-    primary: "bg-primary",
-    secondary: "bg-secondary",
-  };
-  const disabledClass = disabled ? "opacity-40" : "";
-
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      className={`rounded-full px-6 py-3 items-center justify-center ${variants[variant]} ${disabledClass}`}
+      style={({ pressed }) => [
+        styles.base,
+        styles[variant],
+        pressed && styles.pressed,
+        disabled && styles.disabled,
+      ]}
     >
-      <Text className="text-xl">{title}</Text>
+      <Text style={[styles.label, styles[`${variant}Label`]]}>{title}</Text>
     </Pressable>
   );
 }
+
+const styles = StyleSheet.create({
+  base: {
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  primary: {
+    backgroundColor: "#1a4331",
+  },
+  secondary: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#1a4331",
+  },
+  pressed: {
+    opacity: 0.8,
+  },
+  disabled: {
+    opacity: 0.4,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  primaryLabel: {
+    color: "#fcfbf7",
+  },
+  secondaryLabel: {
+    color: "#1a4331",
+  },
+});

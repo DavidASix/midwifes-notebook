@@ -39,10 +39,10 @@ This project is a monorepo containing three applications: a React Native mobile 
 OTA updates are the primary update mechanism for non-native changes. Full app store builds are reserved for native dependency changes, new permissions, or major version releases.
 
 ### Styling
-**NativeWind v4** — the Tailwind CSS implementation for React Native. Syntax aligns with Tailwind v4. All component styling is done via NativeWind utility classes. This is the only styling system used in the mobile app.
+React Native's built-in **`StyleSheet`** API is the only styling system used in the mobile app. No utility-class or CSS-in-JS library is used.
 
 ### UI Components
-Simple, stateless components (buttons, badges, cards, avatars, etc.) are built in-house using NativeWind. There is no dependency on a component library for these.
+Simple, stateless components (buttons, badges, cards, avatars, etc.) are built in-house using `StyleSheet`. There is no dependency on a component library for these.
 
 For complex interactive components with non-trivial logic or accessibility requirements (dropdowns, dialogs, tooltips, popovers), a dedicated library or React Native Reusables may be used on a case-by-case basis.
 
@@ -80,7 +80,7 @@ The app supports an optional lock feature. When enabled, the user must authentic
 - Biometric methods fall back gracefully to device PIN/passcode if biometrics fail or are unavailable
 
 ### TypeScript
-TypeScript is used throughout. Expo scaffolds with TypeScript by default. Expo Router provides fully typed routes — navigating to a non-existent route path is a compile-time error. All libraries in the mobile stack (NativeWind, Drizzle, tRPC) are TypeScript-first.
+TypeScript is used throughout. Expo scaffolds with TypeScript by default. Expo Router provides fully typed routes — navigating to a non-existent route path is a compile-time error. All libraries in the mobile stack (Drizzle, tRPC) are TypeScript-first.
 
 ---
 
