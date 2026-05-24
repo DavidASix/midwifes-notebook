@@ -29,6 +29,35 @@ Any function or component that goes beyond simple (i.e. non-obvious purpose, non
 
 Wrap prose at roughly 120 characters per line.
 
+---
+
+## Testing
+
+### When to write tests
+
+Any function or component with more than moderate complexity should have tests. Simple one-liners or components whose behaviour is fully described by their name and types do not need them.
+
+### What to test
+
+Tests should either illustrate the intended usage of the function or encode its contract so that a behaviour change causes a failure. Coverage should be balanced:
+
+- **Happy path** — verify expected outputs for valid inputs.
+- **Failure cases** — verify that invalid inputs are rejected, that certain values are absent from results, or that the function throws/returns an error as intended.
+
+Do not write many tests that assert the same thing in slightly different ways. A small number of precise, well-named tests that together cover the meaningful cases is preferable to exhaustive redundancy.
+
+### Example
+
+```ts
+describe("formatDate", () => {
+  it("formats an ISO string as DD/MM/YYYY", () => { ... });
+  it("returns null for an invalid date string", () => { ... });
+  it("handles the end of a month correctly", () => { ... });
+});
+```
+
+---
+
 ### Example
 
 ```ts
