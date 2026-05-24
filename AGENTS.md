@@ -53,6 +53,15 @@ The visual design language for the mobile app. Covers:
 
 ---
 
+### [`documentation/CONVENTIONS.md`](documentation/CONVENTIONS.md)
+Coding conventions for the repository. Covers:
+- File naming: PascalCase for components, camelCase for hooks, kebab-case for lib/util files
+- JSDoc: when to write one, what to include (params, returns, examples), and line length
+
+**Update when:** establishing or changing any coding convention that should be applied consistently across the codebase.
+
+---
+
 ## Mockups
 
 Visual mockups live in `documentation/mockups/` and are for reference only — do not modify them unless producing new design artifacts.
