@@ -10,6 +10,8 @@
     "web": "expo start --web",
     "check:lint": "eslint --max-warnings 0",
     "check:types": "tsc --noEmit",
+    "check:format": "prettier --check .",
+    "check": "pnpm check:format && pnpm run check:lint && pnpm run check:types",
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
