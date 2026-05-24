@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
-        "midwifes"
+        "midwifes",
+        "Pressable"
     ],
     "eslint.useFlatConfig": true,
     "eslint.workingDirectories": [

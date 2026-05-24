@@ -1,20 +1,43 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { View } from "react-native";
+// import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+// import { db } from "./src/db";
+// import migrations from "./drizzle/migrations";
+import { ClientsTest } from "./src/components/ClientsTest";
+import { useAppFonts } from "./src/hooks/useAppFonts";
+import { ThemeProvider, useTheme } from "./src/lib/theme-context";
+import { makeStyles } from "./src/lib/make-styles";
 
-export default function App() {
+const useStyles = makeStyles((theme) => ({
+  container: {
+    flex: 1,
+    backgroundColor: theme.background,
+    paddingTop: 30,
+  },
+}));
+
+function AppContent() {
+  const styles = useStyles();
+  const theme = useTheme();
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <ClientsTest />
+      <StatusBar style={theme.statusBarIcons} />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+export default function App() {
+  const fontsLoaded = useAppFonts();
+  // const { success, error } = useMigrations(db, migrations);
+
+  if (!fontsLoaded) return null;
+  // if (error) throw error;
+  // if (!success) return null;
+
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}

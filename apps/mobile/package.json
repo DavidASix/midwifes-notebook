@@ -9,9 +9,16 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "check:lint": "eslint --max-warnings 0",
-    "check:types": "tsc --noEmit"
+    "check:types": "tsc --noEmit",
+    "check:format": "prettier --check .",
+    "check": "pnpm check:format && pnpm run check:lint && pnpm run check:types",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.2",
+    "@expo-google-fonts/newsreader": "^0.4.1",
     "@midwifes-notebook/server": "workspace:*",
     "drizzle-orm": "^0.45.1",
     "expo": "~55.0.6",
@@ -20,17 +27,23 @@
     "expo-splash-screen": "^55.0.10",
     "expo-sqlite": "^55.0.10",
     "expo-status-bar": "~55.0.4",
-    "nativewind": "^4.2.2",
     "react": "19.2.0",
     "react-native": "0.83.2"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "29.5.14",
     "@types/react": "~19.2.2",
+    "babel-plugin-inline-import": "^3.0.0",
     "drizzle-kit": "^0.31.9",
     "eslint": "^9.39.4",
     "eslint-config-expo": "^55.0.0",
-    "tailwindcss": "^4.2.1",
+    "jest": "~29.7.0",
+    "jest-expo": "~55.0.18",
     "typescript": "~5.9.2"
+  },
+  "jest": {
+    "preset": "jest-expo"
   },
   "private": true
 }
