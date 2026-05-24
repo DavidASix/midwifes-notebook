@@ -13,6 +13,8 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.2",
+    "@expo-google-fonts/newsreader": "^0.4.1",
     "@midwifes-notebook/server": "workspace:*",
     "drizzle-orm": "^0.45.1",
     "expo": "~55.0.6",

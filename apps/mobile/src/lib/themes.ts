@@ -9,6 +9,11 @@ export const fontSize = {
   "4xl": 36,
 } as const;
 
+export const fontFamilies = {
+  base: "Inter_400Regular",
+  heading: "Newsreader_400Regular",
+} as const;
+
 export const fontWeight = {
   normal: "400",
   medium: "500",
