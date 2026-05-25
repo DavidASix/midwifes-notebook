@@ -31,6 +31,7 @@
         "projectId": "1b272342-e26d-4d4a-aad3-422d626b1db7"
       }
     },
-    "owner": "davidasix"
+    "owner": "davidasix",
+    "plugins": ["expo-router"]
   }
 }
