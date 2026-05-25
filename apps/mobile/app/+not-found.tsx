@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Text } from "../src/components/ui/Text";
 
 export default function NotFound() {
   return (
