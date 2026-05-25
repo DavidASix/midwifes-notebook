@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
   container: {
     flex: 1,
     backgroundColor: theme.background,
-    paddingTop: 30,
+    paddingTop: 40, // Padding for status bar, might not be 100% accurate across all devices
   },
 }));
 
