@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
-import { Text } from "../../../src/components/ui/Text";
-import { ClientsTest } from "../../../src/components/ClientsTest";
+import { Text } from "@/components/ui/Text";
+import { ClientsTest } from "@/components/ClientsTest";
 
 export default function ClientsScreen() {
   return (

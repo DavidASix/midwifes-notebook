@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from "react-native";
-import { useTheme } from "./theme-context";
-import type { ColorTheme } from "./themes";
+import { useTheme } from "@/lib/theme-context";
+import type { ColorTheme } from "@/lib/themes";
 
 type NamedStyles = Record<string, ViewStyle | TextStyle | ImageStyle>;
 

@@ -1,6 +1,6 @@
 import { Pressable } from "react-native";
-import { makeStyles } from "../../lib/make-styles";
-import { Text } from "./Text";
+import { makeStyles } from "@/lib/make-styles";
+import { Text } from "@/components/ui/Text";
 
 type ButtonProps = {
   title: string;

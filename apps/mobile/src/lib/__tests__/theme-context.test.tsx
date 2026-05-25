@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react-native";
 import React from "react";
-import { ThemeProvider, useTheme, useToggleTheme } from "../theme-context";
-import { themes } from "../themes";
+import { ThemeProvider, useTheme, useToggleTheme } from "@/lib/theme-context";
+import { themes } from "@/lib/themes";
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider>{children}</ThemeProvider>

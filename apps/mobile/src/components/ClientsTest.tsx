@@ -2,12 +2,12 @@ import { useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 
-import { db } from "../db";
-import { clients } from "../db/schema";
-import { useToggleTheme } from "../lib/theme-context";
+import { db } from "@/db";
+import { clients } from "@/db/schema";
+import { useToggleTheme } from "@/lib/theme-context";
 
-import { Text } from "./ui/Text";
-import { Button } from "./ui/Button";
+import { Text } from "@/components/ui/Text";
+import { Button } from "@/components/ui/Button";
 
 const NAMES = [
   "Alice",

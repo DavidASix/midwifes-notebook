@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { useTheme } from "../../../src/lib/theme-context";
+import { useTheme } from "@/lib/theme-context";
 
 export default function StatisticsLayout() {
   const theme = useTheme();

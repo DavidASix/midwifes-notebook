@@ -1,6 +1,6 @@
 import { Text as RNText, TextProps as RNTextProps } from "react-native";
-import { fontFamilies } from "../../lib/themes";
-import { makeStyles } from "../../lib/make-styles";
+import { fontFamilies } from "@/lib/themes";
+import { makeStyles } from "@/lib/make-styles";
 
 type TextProps = RNTextProps & {
   header?: boolean;

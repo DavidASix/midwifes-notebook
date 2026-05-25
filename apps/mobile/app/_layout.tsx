@@ -7,8 +7,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // import { db } from "../src/db";
 // import migrations from "../drizzle/migrations";
-import { useAppFonts } from "../src/hooks/useAppFonts";
-import { ThemeProvider, useTheme } from "../src/lib/theme-context";
+import { useAppFonts } from "@/hooks/useAppFonts";
+import { ThemeProvider, useTheme } from "@/lib/theme-context";
 
 SplashScreen.preventAutoHideAsync();
 
