@@ -2,7 +2,6 @@ import { StatusBar } from "expo-status-bar";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 // import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 
 // import { db } from "../src/db";
@@ -14,16 +13,12 @@ SplashScreen.preventAutoHideAsync();
 
 function RootLayoutContent() {
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
   return (
     <>
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: {
-            backgroundColor: theme.background,
-            paddingTop: insets.top,
-          },
+          contentStyle: { backgroundColor: theme.background },
         }}
       />
       <StatusBar style={theme.statusBarIcons} />

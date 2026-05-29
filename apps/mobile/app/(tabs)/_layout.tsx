@@ -1,12 +1,21 @@
 import { Tabs } from "expo-router";
 import { useTheme } from "@/lib/theme-context";
+import { fontFamilies, fontSize } from "@/lib/themes";
 
 export default function TabsLayout() {
   const theme = useTheme();
   return (
     <Tabs
       screenOptions={{
-        headerShown: false,
+        headerShown: true,
+        headerStyle: { backgroundColor: theme.background },
+        headerTintColor: theme.primary,
+        headerTitleStyle: {
+          fontFamily: fontFamilies.heading,
+          fontSize: fontSize["4xl"],
+          color: theme.foreground,
+        },
+        headerShadowVisible: true,
         sceneStyle: { backgroundColor: theme.background },
       }}
     >
