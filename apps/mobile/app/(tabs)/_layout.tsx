@@ -8,7 +8,7 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: true,
-        headerStyle: { backgroundColor: theme.background, height: 140 },
+        headerStyle: { backgroundColor: theme.background },
         headerTintColor: theme.primary,
         headerTitleStyle: {
           fontFamily: fontFamilies.heading.bold,
@@ -20,9 +20,9 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen name="tools" options={{ title: "Tools" }} />
-      <Tabs.Screen name="clients" options={{ title: "Clients" }} />
+      <Tabs.Screen name="clients" options={{ headerShown: false }} />
       <Tabs.Screen name="calendar" options={{ title: "Calendar" }} />
-      <Tabs.Screen name="statistics" options={{ title: "Statistics" }} />
+      <Tabs.Screen name="statistics" options={{ headerShown: false }} />
     </Tabs>
   );
 }
