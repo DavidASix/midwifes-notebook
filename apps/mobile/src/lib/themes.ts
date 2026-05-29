@@ -10,8 +10,16 @@ export const fontSize = {
 } as const;
 
 export const fontFamilies = {
-  base: "Inter_400Regular",
-  heading: "Newsreader_400Regular",
+  base: {
+    regular: "Inter_400Regular",
+    medium: "Inter_500Medium",
+    semiBold: "Inter_600SemiBold",
+    bold: "Inter_700Bold",
+  },
+  heading: {
+    regular: "Newsreader_400Regular",
+    bold: "Newsreader_700Bold",
+  },
 } as const;
 
 export const fontWeight = {

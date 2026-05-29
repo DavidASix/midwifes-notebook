@@ -12,6 +12,8 @@ const useStyles = makeStyles((theme) => ({
 
 export function Text({ header: heading, style, ...props }: TextProps) {
   const styles = useStyles();
-  const fontFamily = heading ? fontFamilies.heading : fontFamilies.base;
+  const fontFamily = heading
+    ? fontFamilies.heading.regular
+    : fontFamilies.base.regular;
   return <RNText style={[styles.base, { fontFamily }, style]} {...props} />;
 }

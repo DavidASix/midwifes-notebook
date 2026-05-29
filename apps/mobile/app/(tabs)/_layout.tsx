@@ -8,11 +8,11 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: true,
-        headerStyle: { backgroundColor: theme.background },
+        headerStyle: { backgroundColor: theme.background, height: 140 },
         headerTintColor: theme.primary,
         headerTitleStyle: {
-          fontFamily: fontFamilies.heading,
-          fontSize: fontSize["4xl"],
+          fontFamily: fontFamilies.heading.bold,
+          fontSize: fontSize["3xl"],
           color: theme.foreground,
         },
         headerShadowVisible: true,
