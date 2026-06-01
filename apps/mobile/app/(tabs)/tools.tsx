@@ -1,6 +1,10 @@
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 
+export function HeaderRightButton() {
+  return null;
+}
+
 export default function ToolsScreen() {
   return (
     <View style={styles.container}>

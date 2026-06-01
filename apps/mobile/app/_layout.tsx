@@ -8,6 +8,7 @@ import { useEffect } from "react";
 // import migrations from "../drizzle/migrations";
 import { useAppFonts } from "@/hooks/useAppFonts";
 import { ThemeProvider, useTheme } from "@/lib/theme-context";
+import { screenOptions } from "@/lib/themes";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,12 +16,9 @@ function RootLayoutContent() {
   const theme = useTheme();
   return (
     <>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: theme.background },
-        }}
-      />
+      <Stack screenOptions={screenOptions(theme)}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
       <StatusBar style={theme.statusBarIcons} />
     </>
   );
