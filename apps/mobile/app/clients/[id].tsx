@@ -3,10 +3,10 @@ import { StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 
 export default function ClientDetailScreen() {
-  const { client_id } = useLocalSearchParams<{ client_id: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   return (
     <View style={styles.container}>
-      <Text>Client Detail — {client_id}</Text>
+      <Text>Client Detail — {id}</Text>
     </View>
   );
 }

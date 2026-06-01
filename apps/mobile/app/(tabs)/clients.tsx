@@ -8,7 +8,7 @@ export function HeaderRightButton() {
   const theme = useTheme();
   return (
     <Pressable
-      onPress={() => router.push("/new-client")}
+      onPress={() => router.push("/clients/new")}
       style={styles.headerButton}
     >
       <Text style={{ color: theme.primary, fontSize: 28, lineHeight: 30 }}>
