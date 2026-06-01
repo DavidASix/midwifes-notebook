@@ -101,3 +101,21 @@ export const themes: Record<Theme, ColorTheme> = {
     statusBarIcons: "light",
   },
 };
+
+/**
+ * Returns the screen options to be provided to the Stack and Tabs navigators
+ */
+export function screenOptions(theme: ColorTheme) {
+  return {
+    headerStyle: { backgroundColor: theme.background },
+    headerTintColor: theme.primary,
+    headerTitleStyle: {
+      fontFamily: fontFamilies.heading.bold,
+      fontSize: fontSize["3xl"],
+      color: theme.foreground,
+    },
+    headerShadowVisible: true,
+    contentStyle: { backgroundColor: theme.background },
+    sceneStyle: { backgroundColor: theme.background },
+  };
+}
