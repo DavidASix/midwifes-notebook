@@ -20,6 +20,11 @@ export const SKIP_ONBOARDING = false;
 /** Dev utility — set true to require authentication before the app is accessible. */
 export const SHOW_AUTHENTICATION = true;
 
+/** Returns the first route the root Stack should render */
+function getInitialRouteName(): "(tabs)" | "onboarding" {
+  return SKIP_ONBOARDING ? "(tabs)" : "onboarding";
+}
+
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutContent() {
@@ -38,7 +43,7 @@ function RootLayoutContent() {
   return (
     <>
       <Stack
-        initialRouteName={SKIP_ONBOARDING ? "(tabs)" : "onboarding"}
+        initialRouteName={getInitialRouteName()}
         screenOptions={{
           ...screenOptions(theme),
           headerLeft: () => (
