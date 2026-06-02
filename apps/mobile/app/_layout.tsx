@@ -11,14 +11,30 @@ import { ArrowBigLeft } from "lucide-react-native";
 import { useAppFonts } from "@/hooks/useAppFonts";
 import { ThemeProvider, useTheme } from "@/lib/theme-context";
 import { screenOptions } from "@/lib/themes";
+import LockScreen from "@/components/LockScreen";
+import { LockProvider, useLock } from "@/lib/lock-context";
 
 /** Dev utility — set true to skip onboarding and land directly on tabs. */
 export const SKIP_ONBOARDING = false;
+
+/** Dev utility — set true to require authentication before the app is accessible. */
+export const SHOW_AUTHENTICATION = true;
 
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutContent() {
   const theme = useTheme();
+  const { isLocked, unlock } = useLock();
+
+  if (isLocked) {
+    return (
+      <>
+        <LockScreen onAuthenticated={unlock} />
+        <StatusBar style={theme.statusBarIcons} />
+      </>
+    );
+  }
+
   return (
     <>
       <Stack
@@ -56,7 +72,9 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <RootLayoutContent />
+      <LockProvider initiallyLocked={SHOW_AUTHENTICATION}>
+        <RootLayoutContent />
+      </LockProvider>
     </ThemeProvider>
   );
 }
