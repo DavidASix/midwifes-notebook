@@ -26,6 +26,38 @@ When enabled in Settings, the app requires the user to authenticate via their de
 
 ---
 
+## Routing Architecture
+
+The app uses Expo Router with a file-based route tree rooted at `app/_layout.tsx`.
+
+### Lock gate
+
+`LockProvider` wraps the entire tree. When `isLocked` is true, `RootLayoutContent` renders `LockScreen` directly — the Stack never mounts. There is no route to navigate away from; the lock screen is a React render gate, not a route. Any screen can trigger it by calling `lock()` from `useLock()`.
+
+### Root Stack (`app/_layout.tsx`)
+
+Once unlocked, a single `Stack` navigator is mounted. The starting screen is determined by `getInitialRouteName()` in `_layout.tsx`. Both `onboarding` and `(tabs)` have `headerShown: false`. All other screens in the stack inherit a default header with a custom back arrow.
+
+### Tabs group (`app/(tabs)/`)
+
+A `Tabs` navigator with four tabs: Tools, Clients, Calendar, Statistics. Each tab screen can export a `HeaderRightButton` component, which the tabs layout injects into that screen's header.
+
+**Do not add new screens inside the `(tabs)/` group.** Any screen that needs to be navigated to — including detail views, edit forms, and settings — should be added to the root stack instead. Tabs are reserved for the four top-level sections only.
+
+### Root stack screens
+
+Screens at the root stack level (outside tabs) are pushed over the tab bar:
+
+| Route | Description |
+|---|---|
+| `onboarding` | First-launch onboarding flow |
+| `(tabs)` | The tab navigator (treated as a single stack entry) |
+| `clients/[id]` | Client detail |
+| `clients/new` | Add client form |
+| `settings` | Settings screen |
+
+---
+
 ## Navigation Structure
 
 ### Bottom Tab Bar
