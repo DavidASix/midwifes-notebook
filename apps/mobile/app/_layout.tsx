@@ -12,6 +12,9 @@ import { useAppFonts } from "@/hooks/useAppFonts";
 import { ThemeProvider, useTheme } from "@/lib/theme-context";
 import { screenOptions } from "@/lib/themes";
 
+/** Dev utility — set true to skip onboarding and land directly on tabs. */
+export const SKIP_ONBOARDING = false;
+
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutContent() {
@@ -19,6 +22,7 @@ function RootLayoutContent() {
   return (
     <>
       <Stack
+        initialRouteName={SKIP_ONBOARDING ? "(tabs)" : "onboarding"}
         screenOptions={{
           ...screenOptions(theme),
           headerLeft: () => (
@@ -28,6 +32,7 @@ function RootLayoutContent() {
           ),
         }}
       >
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style={theme.statusBarIcons} />
