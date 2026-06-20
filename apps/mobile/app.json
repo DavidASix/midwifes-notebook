@@ -32,6 +32,6 @@
       }
     },
     "owner": "davidasix",
-    "plugins": ["expo-router"]
+    "plugins": ["expo-router", "expo-font", "expo-sqlite"]
   }
 }
