@@ -6,7 +6,7 @@ import { radius } from "@/lib/themes";
 export default function LockScreen({
   onAuthenticated,
 }: {
-  onAuthenticated: () => void;
+  onAuthenticated: () => Promise<void>;
 }) {
   const theme = useTheme();
 

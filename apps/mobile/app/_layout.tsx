@@ -1,18 +1,19 @@
 import { StatusBar } from "expo-status-bar";
 import { router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-import { useMigrations } from "drizzle-orm/op-sqlite/migrator";
-
-import { db } from "../src/db";
-import migrations from "../drizzle/migrations";
+import { useCallback, useEffect } from "react";
 import { Pressable } from "react-native";
 import { ArrowBigLeft } from "lucide-react-native";
+
+import { initDb } from "@/db";
+
 import { useAppFonts } from "@/hooks/useAppFonts";
+import LockScreen from "@/components/LockScreen";
+
 import { ThemeProvider, useTheme } from "@/lib/theme-context";
 import { screenOptions } from "@/lib/themes";
-import LockScreen from "@/components/LockScreen";
 import { LockProvider, useLock } from "@/lib/lock-context";
+import { getOrCreateDbKey } from "@/lib/encryption-key";
 
 /** Dev utility — set true to skip onboarding and land directly on tabs. */
 export const SKIP_ONBOARDING = false;
@@ -29,12 +30,21 @@ SplashScreen.preventAutoHideAsync();
 
 function RootLayoutContent() {
   const theme = useTheme();
-  const { isLocked, unlock } = useLock();
+  const { isLocked, unlock, markDbReady } = useLock();
+
+  const handleAuthenticated = useCallback(async () => {
+    const key = await getOrCreateDbKey();
+    if (!key)
+      throw new Error("SecureStore unavailable — cannot decrypt database.");
+    await initDb(key);
+    markDbReady();
+    unlock();
+  }, [markDbReady, unlock]);
 
   if (isLocked) {
     return (
       <>
-        <LockScreen onAuthenticated={unlock} />
+        <LockScreen onAuthenticated={handleAuthenticated} />
         <StatusBar style={theme.statusBarIcons} />
       </>
     );
@@ -63,7 +73,6 @@ function RootLayoutContent() {
 
 export default function RootLayout() {
   const fontsLoaded = useAppFonts();
-  const { success, error } = useMigrations(db, migrations);
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -72,8 +81,6 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
-  if (error) throw error;
-  if (!success) return null;
 
   return (
     <ThemeProvider>

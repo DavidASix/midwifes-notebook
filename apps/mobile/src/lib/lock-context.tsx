@@ -2,14 +2,18 @@ import { createContext, useContext, useState } from "react";
 
 type LockContextValue = {
   isLocked: boolean;
+  dbReady: boolean;
   lock: () => void;
   unlock: () => void;
+  markDbReady: () => void;
 };
 
 const LockContext = createContext<LockContextValue>({
   isLocked: false,
+  dbReady: false,
   lock: () => {},
   unlock: () => {},
+  markDbReady: () => {},
 });
 
 /**
@@ -26,13 +30,16 @@ export function LockProvider({
   initiallyLocked?: boolean;
 }) {
   const [isLocked, setIsLocked] = useState(initiallyLocked);
+  const [dbReady, setDbReady] = useState(false);
 
   return (
     <LockContext.Provider
       value={{
         isLocked,
+        dbReady,
         lock: () => setIsLocked(true),
         unlock: () => setIsLocked(false),
+        markDbReady: () => setDbReady(true),
       }}
     >
       {children}
