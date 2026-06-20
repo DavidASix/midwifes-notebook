@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 
-import { db } from "@/db";
+import { getDb } from "@/db";
 import { clients } from "@/db/schema";
 import { useToggleTheme } from "@/lib/theme-context";
 
@@ -30,13 +30,14 @@ function randomName() {
 }
 
 export function ClientsTest() {
+  const db = getDb();
   const [data, setData] = useState<(typeof clients.$inferSelect)[]>([]);
   const [inserting, setInserting] = useState(false);
   const toggleTheme = useToggleTheme();
 
   const fetchClients = useCallback(async () => {
     setData(await db.select().from(clients));
-  }, []);
+  }, [db]);
 
   useEffect(() => {
     fetchClients();
