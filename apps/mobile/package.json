@@ -21,7 +21,7 @@
     "@expo-google-fonts/inter": "^0.4.2",
     "@expo-google-fonts/newsreader": "^0.4.1",
     "@midwifes-notebook/server": "workspace:*",
-    "@op-engineering/op-sqlite": "^17.0.0",
+    "@op-engineering/op-sqlite": "^16.2.2",
     "drizzle-orm": "^0.45.1",
     "expo": "~55.0.26",
     "expo-constants": "~55.0.16",
