@@ -2,10 +2,10 @@ import { StatusBar } from "expo-status-bar";
 import { router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-// import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+import { useMigrations } from "drizzle-orm/op-sqlite/migrator";
 
-// import { db } from "../src/db";
-// import migrations from "../drizzle/migrations";
+import { db } from "../src/db";
+import migrations from "../drizzle/migrations";
 import { Pressable } from "react-native";
 import { ArrowBigLeft } from "lucide-react-native";
 import { useAppFonts } from "@/hooks/useAppFonts";
@@ -63,7 +63,7 @@ function RootLayoutContent() {
 
 export default function RootLayout() {
   const fontsLoaded = useAppFonts();
-  // const { success, error } = useMigrations(db, migrations);
+  const { success, error } = useMigrations(db, migrations);
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -72,8 +72,8 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
-  // if (error) throw error;
-  // if (!success) return null;
+  if (error) throw error;
+  if (!success) return null;
 
   return (
     <ThemeProvider>

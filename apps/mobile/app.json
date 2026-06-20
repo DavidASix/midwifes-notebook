@@ -32,6 +32,11 @@
       }
     },
     "owner": "davidasix",
-    "plugins": ["expo-router", "expo-font", "expo-sqlite"]
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "@op-engineering/op-sqlite",
+      { "sqlcipher": true }
+    ]
   }
 }
