@@ -21,7 +21,8 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.davidasix.midwifesnotebook"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,11 +33,6 @@
       }
     },
     "owner": "davidasix",
-    "plugins": [
-      "expo-router",
-      "expo-font",
-      "@op-engineering/op-sqlite",
-      { "sqlcipher": true }
-    ]
+    "plugins": ["expo-router", "expo-font"]
   }
 }
