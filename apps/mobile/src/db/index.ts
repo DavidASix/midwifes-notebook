@@ -34,3 +34,12 @@ export function getDb() {
   }
   return _db!;
 }
+
+/**
+ * Clears the in-memory database reference so the app returns to a locked
+ * state. Call this before navigating to `/lock` when the user manually locks
+ * the app. The underlying SQLite file is not affected.
+ */
+export function resetDb(): void {
+  _db = undefined;
+}

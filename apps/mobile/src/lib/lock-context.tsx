@@ -1,55 +1,55 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
+import { initDb, resetDb } from "@/db";
+import { getOrCreateDbKey } from "@/lib/encryption-key";
 
 type LockContextValue = {
   isLocked: boolean;
-  dbReady: boolean;
   lock: () => void;
-  unlock: () => void;
-  markDbReady: () => void;
+  unlock: () => Promise<void>;
 };
 
 const LockContext = createContext<LockContextValue>({
   isLocked: false,
-  dbReady: false,
   lock: () => {},
-  unlock: () => {},
-  markDbReady: () => {},
+  unlock: async () => {},
 });
 
 /**
- * Provides app-wide lock state to the tree. Pass `initiallyLocked={true}` to start the app in a locked state,
- * requiring the user to authenticate before the rest of the UI is rendered.
+ * Provides app-wide lock and database state.
  *
- * Consume via `useLock` to read `isLocked` or call `lock()`/`unlock()` from any component in the tree.
+ * - `unlock()` — runs the full auth flow: fetches the encryption key, initializes the DB, then unlocks.
+ * - `lock()` — clears the DB reference and re-locks.
+ *
+ * Consume via `useLock`
  */
-export function LockProvider({
-  children,
-  initiallyLocked = false,
-}: {
-  children: React.ReactNode;
-  initiallyLocked?: boolean;
-}) {
-  const [isLocked, setIsLocked] = useState(initiallyLocked);
-  const [dbReady, setDbReady] = useState(false);
+export function LockProvider({ children }: { children: React.ReactNode }) {
+  const [isLocked, setIsLocked] = useState(false);
+
+  const lock = useCallback(() => {
+    resetDb();
+    setIsLocked(true);
+  }, []);
+
+  const unlock = useCallback(async () => {
+    const key = await getOrCreateDbKey();
+    // TODO: Allow creating a db key if user doesn't have a lock on their phone
+    if (!key) {
+      throw new Error("SecureStore unavailable, cannot decrypt database.");
+    }
+    await initDb(key);
+    setIsLocked(false);
+  }, []);
 
   return (
-    <LockContext.Provider
-      value={{
-        isLocked,
-        dbReady,
-        lock: () => setIsLocked(true),
-        unlock: () => setIsLocked(false),
-        markDbReady: () => setDbReady(true),
-      }}
-    >
+    <LockContext.Provider value={{ isLocked, lock, unlock }}>
       {children}
     </LockContext.Provider>
   );
 }
 
 /**
- * Returns the current lock state and functions to lock or unlock the app.
- * Call `lock()` from any screen to show the authentication screen over the entire app.
+ * Returns lock state and `lock`/`unlock` functions.
+ * Call `lock()` from any screen to re-engage the auth gate.
  * Must be used inside `LockProvider`.
  *
  * @example

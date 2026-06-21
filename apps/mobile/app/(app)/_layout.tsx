@@ -1,4 +1,4 @@
-import { Stack, router } from "expo-router";
+import { Stack, router, Redirect } from "expo-router";
 import { Pressable } from "react-native";
 import { ArrowBigLeft } from "lucide-react-native";
 import { useTheme } from "@/lib/theme-context";
@@ -6,14 +6,15 @@ import { screenOptions } from "@/lib/themes";
 import { useLock } from "@/lib/lock-context";
 
 /**
- * Layout for the authenticated route group. Renders nothing until the DB is ready,
- * which is set in the root layout after the user authenticates and `initDb` resolves.
+ * Layout for the authenticated route group
  */
 export default function AppLayout() {
-  const { dbReady } = useLock();
   const theme = useTheme();
+  const { isLocked } = useLock();
 
-  if (!dbReady) return null;
+  if (isLocked) {
+    return <Redirect href="/lock" />;
+  }
 
   return (
     <Stack

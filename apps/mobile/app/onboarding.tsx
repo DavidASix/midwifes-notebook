@@ -10,7 +10,7 @@ export default function OnboardingScreen() {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Pressable
-        onPress={() => router.replace("/(tabs)/clients")}
+        onPress={() => router.replace("lock")}
         style={[styles.button, { backgroundColor: theme.primary }]}
       >
         <Text style={[styles.buttonText, { color: theme.primaryForeground }]}>
