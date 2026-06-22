@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import { initDb, resetDb } from "@/db";
-import { getOrCreateDbKey } from "@/lib/encryption-key";
+import { getOrCreateDbKey } from "@/lib/locking";
 
 type LockContextValue = {
   isLocked: boolean;
