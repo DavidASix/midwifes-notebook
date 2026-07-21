@@ -15,6 +15,10 @@ AsyncStorage contains non-sensitive preferences and state:
 - `encryption_key_storage_method` — whether the database key is currently
   stored with or without an authentication requirement.
 
+All AsyncStorage keys and constrained value enums are defined in
+`apps/mobile/src/lib/async-storage.ts`. Callers import those constants and use
+AsyncStorage directly.
+
 ### SecureStore
 
 SecureStore contains:

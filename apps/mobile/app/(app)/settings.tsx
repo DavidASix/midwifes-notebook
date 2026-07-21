@@ -5,10 +5,10 @@ import * as SecureStore from "expo-secure-store";
 import { Text } from "@/components/ui/Text";
 import { Button } from "@/components/ui/Button";
 import { useLock } from "@/lib/lock-context";
+import { LockType } from "@/lib/async-storage";
 import { makeStyles } from "@/lib/make-styles";
 import { fontSize, fontFamilies } from "@/lib/themes";
 import {
-  type AuthPreference,
   getAuthPreference,
   setAuthPreference,
   getOrCreateDbKey,
@@ -17,7 +17,7 @@ import {
 export default function SettingsScreen() {
   const { lock } = useLock();
   const styles = useStyles();
-  const [authPref, setAuthPref] = useState<AuthPreference | null>(null);
+  const [authPref, setAuthPref] = useState<LockType | null>(null);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [updating, setUpdating] = useState(false);
 
@@ -36,7 +36,7 @@ export default function SettingsScreen() {
   }, []);
 
   const handleToggleLock = async (enabled: boolean) => {
-    const newPref: AuthPreference = enabled ? "secure" : "unsecure";
+    const newPref = enabled ? LockType.Secure : LockType.Unsecure;
     const prevPref = authPref;
     setAuthPref(newPref);
     setUpdating(true);
@@ -52,7 +52,7 @@ export default function SettingsScreen() {
     }
   };
 
-  const lockEnabled = authPref === "secure";
+  const lockEnabled = authPref === LockType.Secure;
   const toggleDisabled = updating || (!biometricAvailable && !lockEnabled);
 
   return (

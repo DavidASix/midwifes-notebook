@@ -2,28 +2,24 @@ import * as SecureStore from "expo-secure-store";
 import * as Crypto from "expo-crypto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { AsyncStorageKey, LockType } from "@/lib/async-storage";
+
 const KEY_ALIAS = "db_encryption_key";
-
-const STORE_METHOD_KEY = "encryption_key_storage_method";
-const AUTH_PREFERENCE_KEY = "auth_preference";
-
-type StorageMethod = "secure" | "unsecure" | null;
-export type AuthPreference = "secure" | "unsecure";
 
 /**
  * Checks how the encryption key is currently stored on the device.
  * A key stored as unsecured which is then attempted to be read as secured (or vice versa) will fail
  */
-async function getKeyStorageMethod(): Promise<StorageMethod> {
-  const method = await AsyncStorage.getItem(STORE_METHOD_KEY);
-  if (method === null) {
-    return null;
-  }
-  if (method === "secure" || method === "unsecure") {
+async function getKeyStorageMethod(): Promise<LockType | null> {
+  const method = await AsyncStorage.getItem(
+    AsyncStorageKey.EncryptionKeyStorageMethod,
+  );
+  if (method === LockType.Secure || method === LockType.Unsecure) {
     return method;
   }
-  // If the value is something unexpected, clear it and start fresh
-  await AsyncStorage.removeItem(STORE_METHOD_KEY);
+  if (method !== null) {
+    await AsyncStorage.removeItem(AsyncStorageKey.EncryptionKeyStorageMethod);
+  }
   return null;
 }
 
@@ -32,19 +28,17 @@ async function getKeyStorageMethod(): Promise<StorageMethod> {
  *
  * If no valid authentication preference is found, returns null
  */
-export async function getAuthPreference(): Promise<AuthPreference | null> {
-  const preference = await AsyncStorage.getItem(AUTH_PREFERENCE_KEY);
-  if (preference === "secure" || preference === "unsecure") {
+export async function getAuthPreference(): Promise<LockType | null> {
+  const preference = await AsyncStorage.getItem(AsyncStorageKey.AuthPreference);
+  if (preference === LockType.Secure || preference === LockType.Unsecure) {
     return preference;
   }
   return null;
 }
 
 /** Persists the user's authentication preference. */
-export async function setAuthPreference(
-  preference: AuthPreference,
-): Promise<void> {
-  await AsyncStorage.setItem(AUTH_PREFERENCE_KEY, preference);
+export async function setAuthPreference(preference: LockType): Promise<void> {
+  await AsyncStorage.setItem(AsyncStorageKey.AuthPreference, preference);
 }
 
 /**
@@ -69,7 +63,7 @@ export async function getOrCreateDbKey(): Promise<string | null> {
 
   let requireAuthentication: boolean;
 
-  if (storageMethod === "secure") {
+  if (storageMethod === LockType.Secure) {
     if (!canUseSecureStore || !biometricEnabled) {
       // User has selected preference for auth, but has since disabled their auth. Ask to re-enable it or truncate the DB.
       throw new Error(
@@ -89,17 +83,23 @@ export async function getOrCreateDbKey(): Promise<string | null> {
     // no key exists yet, generate and persist a new one
     key = Crypto.randomUUID();
     await SecureStore.setItemAsync(KEY_ALIAS, key, {
-      requireAuthentication: authPreference === "secure",
+      requireAuthentication: authPreference === LockType.Secure,
     });
-    await AsyncStorage.setItem(STORE_METHOD_KEY, authPreference);
+    await AsyncStorage.setItem(
+      AsyncStorageKey.EncryptionKeyStorageMethod,
+      authPreference,
+    );
   } else if (storageMethod !== authPreference) {
     // A key exists, but he the users authPreference has changed since it was created. Delete the old key and persist it with the new settings
     await SecureStore.deleteItemAsync(KEY_ALIAS);
-    await AsyncStorage.removeItem(STORE_METHOD_KEY);
+    await AsyncStorage.removeItem(AsyncStorageKey.EncryptionKeyStorageMethod);
     await SecureStore.setItemAsync(KEY_ALIAS, key, {
-      requireAuthentication: authPreference === "secure",
+      requireAuthentication: authPreference === LockType.Secure,
     });
-    await AsyncStorage.setItem(STORE_METHOD_KEY, authPreference);
+    await AsyncStorage.setItem(
+      AsyncStorageKey.EncryptionKeyStorageMethod,
+      authPreference,
+    );
   }
   return key;
 }

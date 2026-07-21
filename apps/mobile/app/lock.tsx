@@ -3,6 +3,7 @@ import { Text } from "@/components/ui/Text";
 import { useTheme } from "@/lib/theme-context";
 import { radius } from "@/lib/themes";
 import { useLock } from "@/lib/lock-context";
+import { LockType } from "@/lib/async-storage";
 import { getAuthPreference } from "@/lib/locking";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -30,7 +31,7 @@ export default function LockScreen() {
         const authPreference = await getAuthPreference();
         if (cancelled) return;
 
-        if (authPreference === "unsecure") {
+        if (authPreference === LockType.Unsecure) {
           // Opening the database is still required even without an auth prompt.
           await unlock();
           if (!cancelled) router.replace("/(app)");

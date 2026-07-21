@@ -4,11 +4,8 @@ import * as SecureStore from "expo-secure-store";
 
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
-import {
-  type AuthPreference,
-  getOrCreateDbKey,
-  setAuthPreference,
-} from "@/lib/locking";
+import { LockType } from "@/lib/async-storage";
+import { getOrCreateDbKey, setAuthPreference } from "@/lib/locking";
 import { makeStyles } from "@/lib/make-styles";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize, radius } from "@/lib/themes";
@@ -21,8 +18,9 @@ export function LockSelectionScreen({
   const styles = useStyles();
   const theme = useTheme();
   const [biometricAvailable, setBiometricAvailable] = useState(false);
-  const [selectedPreference, setSelectedPreference] =
-    useState<AuthPreference | null>(null);
+  const [selectedPreference, setSelectedPreference] = useState<LockType | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -68,14 +66,14 @@ export function LockSelectionScreen({
           <Pressable
             accessibilityRole="radio"
             accessibilityState={{
-              checked: selectedPreference === "secure",
+              checked: selectedPreference === LockType.Secure,
               disabled: !biometricAvailable,
             }}
             disabled={!biometricAvailable || loading}
-            onPress={() => setSelectedPreference("secure")}
+            onPress={() => setSelectedPreference(LockType.Secure)}
             style={[
               styles.option,
-              selectedPreference === "secure" && {
+              selectedPreference === LockType.Secure && {
                 borderColor: theme.primary,
               },
               !biometricAvailable && styles.optionDisabled,
@@ -98,12 +96,14 @@ export function LockSelectionScreen({
 
           <Pressable
             accessibilityRole="radio"
-            accessibilityState={{ checked: selectedPreference === "unsecure" }}
+            accessibilityState={{
+              checked: selectedPreference === LockType.Unsecure,
+            }}
             disabled={loading}
-            onPress={() => setSelectedPreference("unsecure")}
+            onPress={() => setSelectedPreference(LockType.Unsecure)}
             style={[
               styles.option,
-              selectedPreference === "unsecure" && {
+              selectedPreference === LockType.Unsecure && {
                 borderColor: theme.primary,
               },
             ]}
