@@ -22,11 +22,10 @@ const NAMES = [
 ];
 
 function randomName() {
-  return (
-    NAMES[Math.floor(Math.random() * NAMES.length)] +
-    " " +
-    Math.floor(Math.random() * 9000 + 1000)
-  );
+  return {
+    firstName: NAMES[Math.floor(Math.random() * NAMES.length)],
+    lastName: String(Math.floor(Math.random() * 9000 + 1000)),
+  };
 }
 
 export function ClientsTest() {
@@ -45,7 +44,7 @@ export function ClientsTest() {
 
   async function insertClient() {
     setInserting(true);
-    await db.insert(clients).values({ name: randomName() });
+    await db.insert(clients).values(randomName());
     await fetchClients();
     setInserting(false);
   }
@@ -64,7 +63,7 @@ export function ClientsTest() {
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <Text style={styles.row}>
-            Found one! {item.id}. {item.name}
+            Found one! {item.id}. {item.firstName} {item.lastName}
           </Text>
         )}
         ListEmptyComponent={<Text style={styles.empty}>No clients yet.</Text>}
