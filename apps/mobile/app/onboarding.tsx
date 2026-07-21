@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { FeaturesScreen } from "@/components/onboarding/FeaturesScreen";
 import { LockSelectionScreen } from "@/components/onboarding/LockSelectionScreen";
@@ -32,6 +33,7 @@ export default function OnboardingScreen() {
   const [currentStep, setCurrentStep] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const styles = useStyles();
 
   useEffect(() => {
@@ -109,7 +111,10 @@ export default function OnboardingScreen() {
         ))}
       </ScrollView>
 
-      <View style={styles.pagination} accessibilityLabel="Onboarding progress">
+      <View
+        style={[styles.pagination, { bottom: insets.bottom + 24 }]}
+        accessibilityLabel="Onboarding progress"
+      >
         {steps.map((step, index) => (
           <View
             key={step.key}
@@ -134,7 +139,6 @@ const useStyles = makeStyles((theme) => ({
   },
   pagination: {
     position: "absolute" as const,
-    bottom: 24,
     left: 0,
     right: 0,
     flexDirection: "row" as const,
