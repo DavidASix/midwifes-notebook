@@ -38,6 +38,7 @@ Clean, clinical minimalism with warm undertones. Intentionally approachable for 
 - Bottom tab bar: icon + label, active state in `#1a4331`
 - Detail view tabs: underline indicator, inactive labels in `#96a5b9`
 - Skeleton loaders: used wherever load time may exceed 200ms — match the geometry of the content they replace (row height, label width, badge width), colored in a `#96a5b9`-tinted pulse
+- Onboarding: full-width horizontal pages with a single primary action, centered copy, and pagination dots fixed near the bottom; the active dot is elongated and uses the primary accent
 
 ---
 

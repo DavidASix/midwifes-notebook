@@ -8,11 +8,16 @@ A mobile app for midwives and doulas to manage client records, track pregnancies
 
 ## First Launch & Onboarding
 
-On first launch the user is taken through a multi-step onboarding flow:
+On first launch the user is taken through a horizontally paged onboarding flow:
 
-1. **Feature highlights** — brief walkthrough of key app sections (Clients, Tools, Calendar, Statistics)
-2. **App lock setup** — user is prompted to enable biometric/PIN lock via `expo-local-authentication`; this step is optional and can be skipped
-3. **Mailing list** — user is optionally prompted to enter their email to receive app update announcements
+1. **Welcome** — brief introduction to the app
+2. **Feature highlights** — a list of three key benefits covering client records, clinical tools, and practice overview
+3. **App lock setup** — user selects biometric/PIN protection or no lock before completing onboarding
+
+The user can swipe horizontally between screens or use each screen's Continue button. Pagination dots show the current
+position. Each screen is an independent component under `src/components/onboarding/`; their order is controlled by the
+`steps` registry in `app/onboarding.tsx`, which is the single place to add, remove, or reorder onboarding screens. The
+lock-selection component owns its selection state and secure-key setup, then calls `onContinue` after setup succeeds.
 
 After onboarding completes, the user lands on the **Clients** screen. On all subsequent launches (after any lock screen, if enabled), the Clients screen is the landing screen.
 

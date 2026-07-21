@@ -1,183 +1,154 @@
-import { Pressable, StyleSheet, View } from "react-native";
-import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Redirect, router } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-
-import { Text } from "@/components/ui/Text";
-import { Button } from "@/components/ui/Button";
-import { useTheme } from "@/lib/theme-context";
-import { fontSize, fontFamilies, radius } from "@/lib/themes";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  type AuthPreference,
-  setAuthPreference,
-  getOrCreateDbKey,
-} from "@/lib/locking";
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  ScrollView,
+  useWindowDimensions,
+  View,
+} from "react-native";
+
+import { FeaturesScreen } from "@/components/onboarding/FeaturesScreen";
+import { LockSelectionScreen } from "@/components/onboarding/LockSelectionScreen";
+import { WelcomeScreen } from "@/components/onboarding/WelcomeScreen";
+import { makeStyles } from "@/lib/make-styles";
 
 const ONBOARDING_COMPLETE_KEY = "onboardingComplete";
 
+type OnboardingStep = {
+  key: string;
+  content: React.ReactNode;
+};
+
+/**
+ * Coordinates onboarding navigation and persistence while each individual step
+ * remains an independently editable component.
+ */
 export default function OnboardingScreen() {
   const [onboardingComplete, setOnboardingComplete] = useState<
     boolean | undefined
   >(undefined);
-  const [selectedPref, setSelectedPref] = useState<AuthPreference | null>(null);
-  const [biometricAvailable, setBiometricAvailable] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const theme = useTheme();
+  const [currentStep, setCurrentStep] = useState(0);
+  const scrollRef = useRef<ScrollView>(null);
+  const { width } = useWindowDimensions();
+  const styles = useStyles();
 
   useEffect(() => {
     const init = async () => {
       try {
-        const [value, storeAvailable] = await Promise.all([
-          AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY),
-          SecureStore.isAvailableAsync(),
-        ]);
+        const value = await AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY);
         setOnboardingComplete(value === "complete");
-        setBiometricAvailable(
-          storeAvailable && SecureStore.canUseBiometricAuthentication(),
-        );
-      } catch (e) {
-        console.error("Failed to read onboarding status", e);
+      } catch (error) {
+        console.error("Failed to read onboarding status", error);
         setOnboardingComplete(false);
       }
     };
+
     init();
   }, []);
 
-  const completeOnboarding = async () => {
-    if (!selectedPref) return;
-    setLoading(true);
-    try {
-      await setAuthPreference(selectedPref);
-      await getOrCreateDbKey();
-      await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, "complete");
-      router.replace("lock");
-    } catch (error) {
-      console.error("Failed to complete onboarding:", error);
-    } finally {
-      setLoading(false);
-    }
+  const goToStep = useCallback(
+    (index: number) => {
+      scrollRef.current?.scrollTo({ x: index * width, animated: true });
+      setCurrentStep(index);
+    },
+    [width],
+  );
+
+  const goToNextStep = useCallback(() => {
+    goToStep(currentStep + 1);
+  }, [currentStep, goToStep]);
+
+  const completeOnboarding = useCallback(async () => {
+    await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, "complete");
+    router.replace("lock");
+  }, []);
+
+  /**
+   * Ordered onboarding registry. To add a screen, create its component beside
+   * the existing onboarding screens, import it, and insert one entry here.
+   */
+  const steps: OnboardingStep[] = [
+    {
+      key: "welcome",
+      content: <WelcomeScreen onContinue={goToNextStep} />,
+    },
+    {
+      key: "features",
+      content: <FeaturesScreen onContinue={goToNextStep} />,
+    },
+    {
+      key: "lock-selection",
+      content: <LockSelectionScreen onContinue={completeOnboarding} />,
+    },
+  ];
+
+  const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setCurrentStep(Math.round(event.nativeEvent.contentOffset.x / width));
   };
 
   if (onboardingComplete === undefined) return null;
   if (onboardingComplete) return <Redirect href="/lock" />;
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: theme.foreground }]}>
-          Secure your data
-        </Text>
-        <Text style={[styles.subtitle, { color: theme.mutedForeground }]}>
-          Choose how you want to protect access to this app.
-        </Text>
+    <View style={styles.container}>
+      <ScrollView
+        ref={scrollRef}
+        style={styles.scroller}
+        horizontal
+        pagingEnabled
+        bounces={false}
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={handleScrollEnd}
+      >
+        {steps.map((step) => (
+          <View key={step.key} style={[styles.page, { width }]}>
+            {step.content}
+          </View>
+        ))}
+      </ScrollView>
+
+      <View style={styles.pagination} accessibilityLabel="Onboarding progress">
+        {steps.map((step, index) => (
+          <View
+            key={step.key}
+            style={[styles.dot, index === currentStep && styles.activeDot]}
+          />
+        ))}
       </View>
-
-      <View style={styles.options}>
-        <Pressable
-          onPress={() => biometricAvailable && setSelectedPref("secure")}
-          style={[
-            styles.option,
-            {
-              backgroundColor: theme.card,
-              borderColor:
-                selectedPref === "secure" ? theme.primary : theme.border,
-            },
-            !biometricAvailable && styles.optionDisabled,
-          ]}
-        >
-          <Text
-            style={[
-              styles.optionTitle,
-              {
-                color: biometricAvailable
-                  ? theme.foreground
-                  : theme.mutedForeground,
-              },
-            ]}
-          >
-            Biometric / PIN
-          </Text>
-          <Text style={[styles.optionDesc, { color: theme.mutedForeground }]}>
-            {biometricAvailable
-              ? "Require Face ID, fingerprint, or PIN to open the app."
-              : "Not available on this device."}
-          </Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => setSelectedPref("unsecure")}
-          style={[
-            styles.option,
-            {
-              backgroundColor: theme.card,
-              borderColor:
-                selectedPref === "unsecure" ? theme.primary : theme.border,
-            },
-          ]}
-        >
-          <Text style={[styles.optionTitle, { color: theme.foreground }]}>
-            No lock
-          </Text>
-          <Text style={[styles.optionDesc, { color: theme.mutedForeground }]}>
-            Open the app without authentication.
-          </Text>
-        </Pressable>
-      </View>
-
-      <Button
-        title={loading ? "Setting up…" : "Get Started"}
-        onPress={completeOnboarding}
-        disabled={!selectedPref || loading}
-      />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((theme) => ({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 24,
-    gap: 32,
+    backgroundColor: theme.background,
   },
-  header: {
-    alignItems: "center",
+  page: {
+    flex: 1,
+  },
+  scroller: {
+    flex: 1,
+  },
+  pagination: {
+    position: "absolute" as const,
+    bottom: 24,
+    left: 0,
+    right: 0,
+    flexDirection: "row" as const,
+    justifyContent: "center" as const,
     gap: 8,
   },
-  title: {
-    fontFamily: fontFamilies.heading.bold,
-    fontSize: fontSize["3xl"],
-    textAlign: "center",
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.border,
   },
-  subtitle: {
-    fontFamily: fontFamilies.base.regular,
-    fontSize: fontSize.md,
-    textAlign: "center",
-    lineHeight: 22,
+  activeDot: {
+    width: 24,
+    backgroundColor: theme.primary,
   },
-  options: {
-    width: "100%",
-    gap: 12,
-  },
-  option: {
-    borderWidth: 2,
-    borderRadius: radius["2xl"],
-    padding: 20,
-    gap: 4,
-  },
-  optionDisabled: {
-    opacity: 0.45,
-  },
-  optionTitle: {
-    fontFamily: fontFamilies.base.semiBold,
-    fontSize: fontSize.md,
-  },
-  optionDesc: {
-    fontFamily: fontFamilies.base.regular,
-    fontSize: fontSize.sm,
-    lineHeight: 18,
-  },
-});
+}));
