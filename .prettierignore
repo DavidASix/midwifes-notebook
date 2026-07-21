@@ -16,3 +16,5 @@ tsconfig.json
 
 # Drizzle generated
 **/drizzle/
+
+apps/mobile/android/*

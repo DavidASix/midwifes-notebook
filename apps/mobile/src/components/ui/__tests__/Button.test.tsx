@@ -1,6 +1,6 @@
 import React from "react";
-import { fireEvent, renderWithTheme, screen } from "../../../test-utils";
-import { Button } from "../Button";
+import { fireEvent, renderWithTheme, screen } from "@/test-utils";
+import { Button } from "@/components/ui/Button";
 
 describe("Button", () => {
   it("renders the title", () => {

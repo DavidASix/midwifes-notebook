@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from "react";
 import { useColorScheme } from "react-native";
-import { themes } from "./themes";
-import type { ColorTheme, Theme } from "./themes";
+import { themes } from "@/lib/themes";
+import type { ColorTheme, Theme } from "@/lib/themes";
 
 type ThemeContextValue = {
   theme: ColorTheme;

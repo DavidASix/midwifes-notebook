@@ -1,4 +1,4 @@
-import { themes } from "../themes";
+import { themes } from "@/lib/themes";
 
 describe("themes", () => {
   it("no theme token is undefined", () => {

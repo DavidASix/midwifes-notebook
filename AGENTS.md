@@ -62,6 +62,16 @@ Coding conventions for the repository. Covers:
 
 ---
 
+## Gotchas
+
+- **`expo-dev-client` versioning** — never install with `npm install` or `pnpm add`. Always use `npx expo install expo-dev-client` so Expo resolves the version compatible with the current SDK. Installing manually grabbed v56 against SDK 55 and caused a Kotlin compilation failure.
+
+- **Missing `app/index.tsx`** — Expo Router requires an index route at the app root. Without it, any navigation to `/` (including after a lock screen unmounts the Stack) hits the not-found screen. The file should contain a `<Redirect>` to the appropriate initial route.
+
+-- **Locked op-sqlite version** — At time of writing op-sqlite came out with a new version yesterday that broke Drizzle integration. We just locked to 16.2.2 for now. 2026-06-20.
+
+---
+
 ## Mockups
 
 Visual mockups live in `documentation/mockups/` and are for reference only — do not modify them unless producing new design artifacts.

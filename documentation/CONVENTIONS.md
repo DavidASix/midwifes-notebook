@@ -12,6 +12,33 @@ Coding conventions for this repository. Applies across all packages and apps unl
 
 ---
 
+## UI primitives
+
+Before reaching for a React Native primitive (`Pressable`, `Text`, `View`, etc.) or building a styled element from scratch, check `src/components/ui/` for an existing component that covers the use case. Always use those over rolling a new one:
+
+- Use `<Button>` from `@/components/ui/Button` for any tappable button — do not use a raw `Pressable` with inline styles.
+- Use `<Text>` from `@/components/ui/Text` instead of the React Native `Text` primitive.
+- For any other element, check `src/components/ui/` first before writing a new styled primitive.
+
+---
+
+## Component props
+
+If a component has three or fewer props, declare their types inline rather than in a separate `Props` type:
+
+```tsx
+// ✓ inline — three or fewer props
+function Avatar({ name, size = 40 }: { name: string; size?: number }) { ... }
+
+// ✓ named type — more than three props, or needs to be exported
+export type AvatarProps = { ... };
+function Avatar({ ... }: AvatarProps) { ... }
+```
+
+Create a named `Props` type (or `interface`) only when the component has four or more props, or when the type needs to be exported for consumers to extend or reference.
+
+---
+
 ## JSDoc
 
 ### When to write one

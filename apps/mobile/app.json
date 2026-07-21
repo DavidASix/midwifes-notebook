@@ -21,7 +21,8 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.davidasix.midwifesnotebook"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -31,6 +32,7 @@
         "projectId": "1b272342-e26d-4d4a-aad3-422d626b1db7"
       }
     },
-    "owner": "davidasix"
+    "owner": "davidasix",
+    "plugins": ["expo-router", "expo-font", "expo-secure-store"]
   }
 }

@@ -10,8 +10,16 @@ export const fontSize = {
 } as const;
 
 export const fontFamilies = {
-  base: "Inter_400Regular",
-  heading: "Newsreader_400Regular",
+  base: {
+    regular: "Inter_400Regular",
+    medium: "Inter_500Medium",
+    semiBold: "Inter_600SemiBold",
+    bold: "Inter_700Bold",
+  },
+  heading: {
+    regular: "Newsreader_400Regular",
+    bold: "Newsreader_700Bold",
+  },
 } as const;
 
 export const fontWeight = {
@@ -93,3 +101,21 @@ export const themes: Record<Theme, ColorTheme> = {
     statusBarIcons: "light",
   },
 };
+
+/**
+ * Returns the screen options to be provided to the Stack and Tabs navigators
+ */
+export function screenOptions(theme: ColorTheme) {
+  return {
+    headerStyle: { backgroundColor: theme.background },
+    headerTintColor: theme.primary,
+    headerTitleStyle: {
+      fontFamily: fontFamilies.heading.bold,
+      fontSize: fontSize["3xl"],
+      color: theme.foreground,
+    },
+    headerShadowVisible: true,
+    contentStyle: { backgroundColor: theme.background },
+    sceneStyle: { backgroundColor: theme.background },
+  };
+}

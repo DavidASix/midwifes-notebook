@@ -1,13 +1,12 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
-import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 
-import { db } from "../db";
-import { clients } from "../db/schema";
-import { useToggleTheme } from "../lib/theme-context";
+import { getDb } from "@/db";
+import { clients } from "@/db/schema";
+import { useToggleTheme } from "@/lib/theme-context";
 
-import { Text } from "./ui/Text";
-import { Button } from "./ui/Button";
+import { Text } from "@/components/ui/Text";
+import { Button } from "@/components/ui/Button";
 
 const NAMES = [
   "Alice",
@@ -31,13 +30,23 @@ function randomName() {
 }
 
 export function ClientsTest() {
-  const { data } = useLiveQuery(db.select().from(clients));
+  const db = getDb();
+  const [data, setData] = useState<(typeof clients.$inferSelect)[]>([]);
   const [inserting, setInserting] = useState(false);
   const toggleTheme = useToggleTheme();
+
+  const fetchClients = useCallback(async () => {
+    setData(await db.select().from(clients));
+  }, [db]);
+
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
 
   async function insertClient() {
     setInserting(true);
     await db.insert(clients).values({ name: randomName() });
+    await fetchClients();
     setInserting(false);
   }
 
