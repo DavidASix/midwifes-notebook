@@ -32,6 +32,17 @@ When enabled in Settings, the app requires the user to authenticate via their de
 
 ---
 
+## AsyncStorage
+
+All AsyncStorage keys are declared in `apps/mobile/src/lib/async-storage.ts`. Values with a fixed set of options are
+declared as enums in the same file, such as `LockType` and `OnboardingStatus`. Callers import the appropriate key and
+value enum, then call AsyncStorage directly; the utility does not wrap AsyncStorage reads or writes.
+
+When adding a persisted AsyncStorage value, add its key to `AsyncStorageKey`, colocate an enum when the allowed values
+are finite, and use those exports instead of repeating raw strings at call sites.
+
+---
+
 ## Routing Architecture
 
 The app uses Expo Router with a file-based route tree rooted at `app/_layout.tsx`.

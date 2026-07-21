@@ -13,9 +13,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FeaturesScreen } from "@/components/onboarding/FeaturesScreen";
 import { LockSelectionScreen } from "@/components/onboarding/LockSelectionScreen";
 import { WelcomeScreen } from "@/components/onboarding/WelcomeScreen";
+import { AsyncStorageKey, OnboardingStatus } from "@/lib/async-storage";
 import { makeStyles } from "@/lib/make-styles";
-
-const ONBOARDING_COMPLETE_KEY = "onboardingComplete";
 
 type OnboardingStep = {
   key: string;
@@ -39,8 +38,10 @@ export default function OnboardingScreen() {
   useEffect(() => {
     const init = async () => {
       try {
-        const value = await AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY);
-        setOnboardingComplete(value === "complete");
+        const value = await AsyncStorage.getItem(
+          AsyncStorageKey.OnboardingStatus,
+        );
+        setOnboardingComplete(value === OnboardingStatus.Complete);
       } catch (error) {
         console.error("Failed to read onboarding status", error);
         setOnboardingComplete(false);
@@ -63,7 +64,10 @@ export default function OnboardingScreen() {
   }, [currentStep, goToStep]);
 
   const completeOnboarding = useCallback(async () => {
-    await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, "complete");
+    await AsyncStorage.setItem(
+      AsyncStorageKey.OnboardingStatus,
+      OnboardingStatus.Complete,
+    );
     router.replace("lock");
   }, []);
 
