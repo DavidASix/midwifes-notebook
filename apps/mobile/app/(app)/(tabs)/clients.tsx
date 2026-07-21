@@ -6,6 +6,7 @@ import { getDb } from "@/db";
 import { clients } from "@/db/schema";
 import { useTheme } from "@/lib/theme-context";
 
+import { ClientListItem } from "@/components/ClientListItem";
 import { Text } from "@/components/ui/Text";
 
 export function HeaderRightButton() {
@@ -41,11 +42,7 @@ export default function ClientsScreen() {
         <FlatList
           data={data}
           keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => (
-            <Text style={styles.row}>
-              Found one! {item.id}. {item.firstName} {item.lastName}
-            </Text>
-          )}
+          renderItem={({ item }) => <ClientListItem client={item} />}
           ListEmptyComponent={<Text style={styles.empty}>No clients yet.</Text>}
         />
       </View>
@@ -57,6 +54,5 @@ const styles = StyleSheet.create({
   container: { flex: 1, alignItems: "center", justifyContent: "center" },
   headerButton: { paddingHorizontal: 16 },
   listContainer: { flex: 1, width: "100%", padding: 16, gap: 12 },
-  row: { paddingVertical: 6, fontSize: 16 },
   empty: { color: "#888", fontStyle: "italic" },
 });
