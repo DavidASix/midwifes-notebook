@@ -5,9 +5,10 @@ export const clientStatuses = [
   "postpartum",
   "out-of-care",
 ] as const;
+export const clientStatusFilters = ["all", ...clientStatuses] as const;
 
 export type ClientStatus = (typeof clientStatuses)[number];
-export type ClientStatusFilter = "all" | ClientStatus;
+export type ClientStatusFilter = (typeof clientStatusFilters)[number];
 type ClientRecord = typeof clients.$inferSelect;
 type ClientNameFields = Pick<
   ClientRecord,
@@ -60,6 +61,19 @@ export function groupClientsByLastName<
       return left.localeCompare(right, undefined, { sensitivity: "base" });
     })
     .map(([title, data]) => ({ title, data }));
+}
+
+/** Resolves a pager offset to the nearest available client-status view. */
+export function getClientStatusFilterForOffset(
+  horizontalOffset: number,
+  pageWidth: number,
+): ClientStatusFilter {
+  if (pageWidth <= 0) return "all";
+  const index = Math.min(
+    clientStatusFilters.length - 1,
+    Math.max(0, Math.round(horizontalOffset / pageWidth)),
+  );
+  return clientStatusFilters[index];
 }
 
 /** Matches one query against all name forms associated with a client. */

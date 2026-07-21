@@ -3,13 +3,15 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import {
+  FlatList,
   Pressable,
-  SectionList,
   StyleSheet,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { router, useNavigation } from "expo-router";
@@ -18,17 +20,25 @@ import { Search, UserRoundPlus, X } from "lucide-react-native";
 import { getDb } from "@/db";
 import { clients } from "@/db/schema";
 import {
+  clientStatusFilters,
+  getClientStatusFilterForOffset,
   groupClientsByLastName,
   isClientVisible,
+  type ClientListSection,
   type ClientStatusFilter,
 } from "@/lib/client-list";
 import { makeStyles } from "@/lib/make-styles";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";
 
-import { ClientListItem } from "@/components/ClientListItem";
+import { ClientListView } from "@/components/ClientListView";
 import { ClientStatusFilters } from "@/components/ClientStatusFilters";
-import { Text } from "@/components/ui/Text";
+
+type ClientRecord = typeof clients.$inferSelect;
+type ClientView = {
+  filter: ClientStatusFilter;
+  sections: ClientListSection<ClientRecord>[];
+};
 
 export function HeaderRightButton({ onSearch }: { onSearch: () => void }) {
   const theme = useTheme();
@@ -57,7 +67,9 @@ export function HeaderRightButton({ onSearch }: { onSearch: () => void }) {
 export default function ClientsScreen() {
   const db = getDb();
   const navigation = useNavigation();
+  const { width: pageWidth } = useWindowDimensions();
   const styles = useStyles();
+  const pagerRef = useRef<FlatList<ClientView>>(null);
   const [data, setData] = useState<(typeof clients.$inferSelect)[]>([]);
   const [query, setQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -79,14 +91,24 @@ export default function ClientsScreen() {
     fetchClients();
   }, [fetchClients]);
 
-  const visibleClients = useMemo(
-    () => data.filter((client) => isClientVisible(client, query, statusFilter)),
-    [data, query, statusFilter],
+  const clientViews = useMemo<ClientView[]>(
+    () =>
+      clientStatusFilters.map((filter) => ({
+        filter,
+        sections: groupClientsByLastName(
+          data.filter((client) => isClientVisible(client, query, filter)),
+        ),
+      })),
+    [data, query],
   );
-  const sections = useMemo(
-    () => groupClientsByLastName(visibleClients),
-    [visibleClients],
-  );
+
+  function selectStatusFilter(filter: ClientStatusFilter) {
+    setStatusFilter(filter);
+    pagerRef.current?.scrollToIndex({
+      index: clientStatusFilters.indexOf(filter),
+      animated: true,
+    });
+  }
 
   function closeSearch() {
     setQuery("");
@@ -120,27 +142,48 @@ export default function ClientsScreen() {
           </Pressable>
         </View>
       )}
-      <ClientStatusFilters selected={statusFilter} onChange={setStatusFilter} />
-      <SectionList
-        sections={sections}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => <ClientListItem client={item} />}
-        renderSectionHeader={({ section }) => (
-          <Text style={styles.sectionHeader}>{section.title}</Text>
-        )}
-        stickySectionHeadersEnabled
+      <ClientStatusFilters
+        selected={statusFilter}
+        onChange={selectStatusFilter}
+      />
+      <FlatList
+        ref={pagerRef}
+        horizontal
+        pagingEnabled
+        bounces={false}
+        data={clientViews}
+        decelerationRate="fast"
+        getItemLayout={(_, index) => ({
+          length: pageWidth,
+          offset: pageWidth * index,
+          index,
+        })}
+        initialNumToRender={clientStatusFilters.length}
+        keyExtractor={(view) => view.filter}
         keyboardDismissMode="on-drag"
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={
-          sections.length === 0 ? styles.emptyList : undefined
-        }
-        ListEmptyComponent={
-          <Text style={styles.empty}>
-            {query.trim() || statusFilter !== "all"
-              ? "No matching clients."
-              : "No clients yet."}
-          </Text>
-        }
+        maxToRenderPerBatch={clientStatusFilters.length}
+        onMomentumScrollEnd={({ nativeEvent }) => {
+          setStatusFilter(
+            getClientStatusFilterForOffset(
+              nativeEvent.contentOffset.x,
+              pageWidth,
+            ),
+          );
+        }}
+        removeClippedSubviews={false}
+        renderItem={({ item }) => (
+          <ClientListView
+            sections={item.sections}
+            emptyMessage={
+              query.trim() || item.filter !== "all"
+                ? "No matching clients."
+                : "No clients yet."
+            }
+            width={pageWidth}
+          />
+        )}
+        showsHorizontalScrollIndicator={false}
+        windowSize={clientStatusFilters.length + 1}
       />
     </View>
   );
@@ -186,27 +229,5 @@ const useStyles = makeStyles((theme) => ({
   },
   searchPlaceholder: {
     color: theme.mutedForeground,
-  },
-  sectionHeader: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 6,
-    color: theme.primary,
-    backgroundColor: theme.background,
-    fontFamily: fontFamilies.base.bold,
-    fontSize: fontSize.xs,
-    letterSpacing: 0.8,
-  },
-  emptyList: {
-    flexGrow: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  empty: {
-    color: theme.mutedForeground,
-    fontFamily: fontFamilies.base.regular,
-    fontSize: fontSize.md,
-    fontStyle: "italic" as const,
   },
 }));

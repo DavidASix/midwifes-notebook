@@ -107,11 +107,14 @@ Settings are **not** in the tab bar. A gear icon is shown only on the Statistics
 A scrollable contact-style list of all clients. Clients are sorted by last name and grouped beneath small alphabetical
 section headers matching the first letter of each last name.
 
-**Filter tabs** at the top of the screen (horizontal scroll):
+**Client views** at the top of the screen are presented as horizontally scrollable tabs:
 - All Clients
 - Prenatal
 - Postpartum
 - Out of Care
+
+Each tab represents a full-width list page. Users can swipe horizontally between pages or tap a tab to scroll directly
+to that view; each page keeps its own independent vertical client-list scroll.
 
 **Search** — search icon in the header opens an inline search bar. The single field searches client and partner names;
 baby names use the same matching path once baby records are implemented.

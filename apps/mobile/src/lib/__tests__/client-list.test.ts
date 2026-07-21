@@ -1,10 +1,25 @@
 import {
   deriveClientStatus,
+  getClientStatusFilterForOffset,
   getClientDateSummary,
   groupClientsByLastName,
   isClientVisible,
   matchesClientName,
 } from "../client-list";
+
+describe("getClientStatusFilterForOffset", () => {
+  it("selects the nearest page after a horizontal swipe", () => {
+    expect(getClientStatusFilterForOffset(0, 400)).toBe("all");
+    expect(getClientStatusFilterForOffset(399, 400)).toBe("prenatal");
+    expect(getClientStatusFilterForOffset(810, 400)).toBe("postpartum");
+  });
+
+  it("clamps invalid offsets to an available view", () => {
+    expect(getClientStatusFilterForOffset(-500, 400)).toBe("all");
+    expect(getClientStatusFilterForOffset(5_000, 400)).toBe("out-of-care");
+    expect(getClientStatusFilterForOffset(400, 0)).toBe("all");
+  });
+});
 
 describe("groupClientsByLastName", () => {
   it("orders letter sections and clients by last name", () => {

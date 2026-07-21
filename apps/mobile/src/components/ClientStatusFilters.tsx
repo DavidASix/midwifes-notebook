@@ -1,17 +1,21 @@
-import { Pressable, ScrollView, View } from "react-native";
+import { useCallback, useEffect, useRef } from "react";
+import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
-import type { ClientStatusFilter } from "@/lib/client-list";
+import {
+  clientStatusFilters,
+  type ClientStatusFilter,
+} from "@/lib/client-list";
 import { makeStyles } from "@/lib/make-styles";
 import { fontFamilies, fontSize } from "@/lib/themes";
 
 import { Text } from "@/components/ui/Text";
 
-const filters: { label: string; value: ClientStatusFilter }[] = [
-  { label: "All Clients", value: "all" },
-  { label: "Prenatal", value: "prenatal" },
-  { label: "Postpartum", value: "postpartum" },
-  { label: "Out of Care", value: "out-of-care" },
-];
+const filterLabels: Record<ClientStatusFilter, string> = {
+  all: "All Clients",
+  prenatal: "Prenatal",
+  postpartum: "Postpartum",
+  "out-of-care": "Out of Care",
+};
 
 export function ClientStatusFilters({
   selected,
@@ -21,26 +25,52 @@ export function ClientStatusFilters({
   onChange: (filter: ClientStatusFilter) => void;
 }) {
   const styles = useStyles();
+  const { width } = useWindowDimensions();
+  const scrollViewRef = useRef<ScrollView>(null);
+  const tabLayouts = useRef<
+    Partial<Record<ClientStatusFilter, { x: number; width: number }>>
+  >({});
+
+  const revealFilter = useCallback(
+    (filter: ClientStatusFilter) => {
+      const layout = tabLayouts.current[filter];
+      if (!layout) return;
+      scrollViewRef.current?.scrollTo({
+        x: Math.max(0, layout.x + layout.width / 2 - width / 2),
+        animated: true,
+      });
+    },
+    [width],
+  );
+
+  useEffect(() => {
+    revealFilter(selected);
+  }, [revealFilter, selected]);
 
   return (
     <View style={styles.border}>
       <ScrollView
+        ref={scrollViewRef}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        {filters.map((filter) => {
-          const isSelected = selected === filter.value;
+        {clientStatusFilters.map((filter) => {
+          const isSelected = selected === filter;
           return (
             <Pressable
               accessibilityRole="tab"
               accessibilityState={{ selected: isSelected }}
-              key={filter.value}
-              onPress={() => onChange(filter.value)}
+              key={filter}
+              onLayout={({ nativeEvent }) => {
+                tabLayouts.current[filter] = nativeEvent.layout;
+                if (isSelected) revealFilter(filter);
+              }}
+              onPress={() => onChange(filter)}
               style={styles.tab}
             >
               <Text style={[styles.label, isSelected && styles.selectedLabel]}>
-                {filter.label}
+                {filterLabels[filter]}
               </Text>
               {isSelected && <View style={styles.indicator} />}
             </Pressable>
