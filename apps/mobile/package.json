@@ -14,7 +14,7 @@
     "check": "pnpm check:format && pnpm run check:lint && pnpm run check:types",
     "test": "jest",
     "test:watch": "jest --watch",
-    "db:generate": "drizzle-kit generate",
+    "db:generate": "drizzle-kit generate && node scripts/generate-migrations-manifest.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {
