@@ -5,6 +5,7 @@ import {
   groupClientsByLastName,
   isClientVisible,
   matchesClientName,
+  shouldShowClientSectionHeaders,
 } from "../client-list";
 
 describe("getClientStatusFilterForOffset", () => {
@@ -44,6 +45,13 @@ describe("groupClientsByLastName", () => {
     ]);
 
     expect(sections.map((section) => section.title)).toEqual(["T", "#"]);
+  });
+});
+
+describe("shouldShowClientSectionHeaders", () => {
+  it("hides headers below ten visible clients and shows them at ten", () => {
+    expect(shouldShowClientSectionHeaders(9)).toBe(false);
+    expect(shouldShowClientSectionHeaders(10)).toBe(true);
   });
 });
 

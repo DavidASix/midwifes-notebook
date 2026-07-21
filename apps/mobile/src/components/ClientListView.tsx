@@ -1,7 +1,10 @@
 import { SectionList, View } from "react-native";
 
 import { clients } from "@/db/schema";
-import type { ClientListSection } from "@/lib/client-list";
+import {
+  type ClientListSection,
+  shouldShowClientSectionHeaders,
+} from "@/lib/client-list";
 import { makeStyles } from "@/lib/make-styles";
 import { fontFamilies, fontSize } from "@/lib/themes";
 
@@ -18,6 +21,11 @@ export function ClientListView({
   width: number;
 }) {
   const styles = useStyles();
+  const clientCount = sections.reduce(
+    (total, section) => total + section.data.length,
+    0,
+  );
+  const showSectionHeaders = shouldShowClientSectionHeaders(clientCount);
 
   return (
     <View style={[styles.container, { width }]}>
@@ -25,10 +33,14 @@ export function ClientListView({
         sections={sections}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => <ClientListItem client={item} />}
-        renderSectionHeader={({ section }) => (
-          <Text style={styles.sectionHeader}>{section.title}</Text>
-        )}
-        stickySectionHeadersEnabled
+        renderSectionHeader={
+          showSectionHeaders
+            ? ({ section }) => (
+                <Text style={styles.sectionHeader}>{section.title}</Text>
+              )
+            : undefined
+        }
+        stickySectionHeadersEnabled={showSectionHeaders}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={

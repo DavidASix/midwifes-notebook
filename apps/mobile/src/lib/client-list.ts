@@ -21,6 +21,11 @@ export type ClientListSection<T> = {
   data: T[];
 };
 
+/** Shows alphabetical dividers when a client list is large enough to need them. */
+export function shouldShowClientSectionHeaders(clientCount: number): boolean {
+  return clientCount >= 10;
+}
+
 function normalizeName(value: string): string {
   return value
     .toLocaleLowerCase()
