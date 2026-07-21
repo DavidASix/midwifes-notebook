@@ -124,7 +124,6 @@ baby names use the same matching path once baby records are implemented.
 #### Client List Row
 
 Each row displays:
-- **Avatar** — circular; shows client photo if set, otherwise a default placeholder
 - **Name** — `Last, First` format; last name in heavier serif weight, given name in regular serif weight (Newsreader)
 - **Date line** — `EDD: YYYY-MM-DD` if prenatal; `DD: YYYY-MM-DD` if postpartum. If postpartum, also show **days postpartum** (e.g. `· 4 days postpartum`)
 - **GBS status icon** — shield icon; filled/accented if GBS+, outline/muted if GBS−

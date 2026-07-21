@@ -1,12 +1,6 @@
-import { useState } from "react";
-import { Image, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { router } from "expo-router";
-import {
-  ChevronRight,
-  ShieldPlus,
-  UserRound,
-  UsersRound,
-} from "lucide-react-native";
+import { ChevronRight, ShieldPlus, UsersRound } from "lucide-react-native";
 
 import { clients } from "@/db/schema";
 import { deriveClientStatus, getClientDateSummary } from "@/lib/client-list";
@@ -29,10 +23,8 @@ export function ClientListItem({
 }) {
   const styles = useStyles();
   const theme = useTheme();
-  const [imageFailed, setImageFailed] = useState(false);
   const status = deriveClientStatus(client);
   const { dateLabel, postpartumLabel } = getClientDateSummary(client);
-  const showPhoto = Boolean(client.photoPath) && !imageFailed;
   const gravidaParity =
     client.gravida != null || client.parity != null
       ? `G${client.gravida ?? "—"}P${client.parity ?? "—"}`
@@ -45,18 +37,6 @@ export function ClientListItem({
       onPress={() => router.push(`/clients/${client.id}`)}
       style={({ pressed }) => [styles.container, pressed && styles.pressed]}
     >
-      <View style={styles.avatar}>
-        {showPhoto ? (
-          <Image
-            source={{ uri: client.photoPath! }}
-            onError={() => setImageFailed(true)}
-            style={styles.avatarImage}
-          />
-        ) : (
-          <UserRound color={theme.primary} size={28} strokeWidth={1.8} />
-        )}
-      </View>
-
       <View style={styles.content}>
         <View style={styles.headingRow}>
           <Text header numberOfLines={1} style={styles.name}>
@@ -127,19 +107,6 @@ const useStyles = makeStyles((theme) => {
     },
     pressed: {
       backgroundColor: theme.card,
-    },
-    avatar: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      alignItems: "center" as const,
-      justifyContent: "center" as const,
-      overflow: "hidden" as const,
-      backgroundColor: theme.muted,
-    },
-    avatarImage: {
-      width: "100%" as const,
-      height: "100%" as const,
     },
     content: {
       flex: 1,

@@ -27,7 +27,7 @@ Clean, clinical minimalism with warm undertones. Intentionally approachable for 
 
 - List rows: generous vertical padding, hairline separators, no borders or elevation — rows are flat, not raised
 - Detail view: section-grouped with labeled field pairs in a two-column grid beneath bold section headers
-- Consistent left-rail avatar column in list view
+- Client-list content begins on a consistent text rail without repetitive avatar placeholders
 - Chevron right-rail affordance on all drilldown rows
 
 ---
