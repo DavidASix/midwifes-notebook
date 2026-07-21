@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { useLock } from "@/lib/lock-context";
 import { LockType } from "@/lib/async-storage";
 import { makeStyles } from "@/lib/make-styles";
+import { useToggleTheme } from "@/lib/theme-context";
 import { fontSize, fontFamilies } from "@/lib/themes";
 import {
   getAuthPreference,
@@ -16,6 +17,7 @@ import {
 
 export default function SettingsScreen() {
   const { lock } = useLock();
+  const toggleTheme = useToggleTheme();
   const styles = useStyles();
   const [authPref, setAuthPref] = useState<LockType | null>(null);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
@@ -79,6 +81,15 @@ export default function SettingsScreen() {
             Biometric authentication is not available on this device.
           </Text>
         )}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionHeader}>Appearance</Text>
+        <Button
+          title="Toggle theme"
+          onPress={toggleTheme}
+          variant="secondary"
+        />
       </View>
 
       <Button title="Lock" onPress={lock} disabled={!lockEnabled || updating} />
