@@ -15,11 +15,51 @@ type ClientNameFields = Pick<
 >;
 type ClientStatusFields = Pick<ClientRecord, "isActive" | "actualDeliveryDate">;
 
+export type ClientListSection<T> = {
+  title: string;
+  data: T[];
+};
+
 function normalizeName(value: string): string {
   return value
     .toLocaleLowerCase()
     .trim()
     .replace(/[\s,]+/g, " ");
+}
+
+function getLastNameInitial(lastName: string): string {
+  const initial = Array.from(lastName.trim())[0]?.toLocaleUpperCase();
+  if (!initial || initial.toLocaleLowerCase() === initial) return "#";
+  return initial;
+}
+
+/** Sorts clients by last name and groups them under alphabetic section headers. */
+export function groupClientsByLastName<
+  T extends Pick<ClientRecord, "firstName" | "lastName">,
+>(clientsToGroup: readonly T[]): ClientListSection<T>[] {
+  const grouped = new Map<string, T[]>();
+  const sortedClients = [...clientsToGroup].sort(
+    (left, right) =>
+      left.lastName.localeCompare(right.lastName, undefined, {
+        sensitivity: "base",
+      }) ||
+      left.firstName.localeCompare(right.firstName, undefined, {
+        sensitivity: "base",
+      }),
+  );
+
+  for (const client of sortedClients) {
+    const title = getLastNameInitial(client.lastName);
+    grouped.set(title, [...(grouped.get(title) ?? []), client]);
+  }
+
+  return [...grouped.entries()]
+    .sort(([left], [right]) => {
+      if (left === "#") return 1;
+      if (right === "#") return -1;
+      return left.localeCompare(right, undefined, { sensitivity: "base" });
+    })
+    .map(([title, data]) => ({ title, data }));
 }
 
 /** Matches one query against all name forms associated with a client. */

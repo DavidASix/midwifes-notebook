@@ -104,7 +104,8 @@ Settings are **not** in the tab bar. A gear icon is shown only on the Statistics
 
 ### Clients Screen
 
-A scrollable contact-style list of all clients.
+A scrollable contact-style list of all clients. Clients are sorted by last name and grouped beneath small alphabetical
+section headers matching the first letter of each last name.
 
 **Filter tabs** at the top of the screen (horizontal scroll):
 - All Clients

@@ -1,9 +1,36 @@
 import {
   deriveClientStatus,
   getClientDateSummary,
+  groupClientsByLastName,
   isClientVisible,
   matchesClientName,
 } from "../client-list";
+
+describe("groupClientsByLastName", () => {
+  it("orders letter sections and clients by last name", () => {
+    const sections = groupClientsByLastName([
+      { firstName: "Maya", lastName: "Chen" },
+      { firstName: "Claire", lastName: "Bennett" },
+      { firstName: "Olivia", lastName: "Martin" },
+      { firstName: "Amina", lastName: "Brown" },
+    ]);
+
+    expect(sections.map((section) => section.title)).toEqual(["B", "C", "M"]);
+    expect(sections[0].data.map((client) => client.lastName)).toEqual([
+      "Bennett",
+      "Brown",
+    ]);
+  });
+
+  it("normalizes lowercase initials and places non-letter names last", () => {
+    const sections = groupClientsByLastName([
+      { firstName: "One", lastName: "2-Smith" },
+      { firstName: "Grace", lastName: "thompson" },
+    ]);
+
+    expect(sections.map((section) => section.title)).toEqual(["T", "#"]);
+  });
+});
 
 const names = {
   firstName: "Olivia",

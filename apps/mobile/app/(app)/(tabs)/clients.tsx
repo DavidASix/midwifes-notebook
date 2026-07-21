@@ -5,13 +5,23 @@ import {
   useMemo,
   useState,
 } from "react";
-import { FlatList, Pressable, StyleSheet, TextInput, View } from "react-native";
+import {
+  Pressable,
+  SectionList,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 import { router, useNavigation } from "expo-router";
 import { Search, UserRoundPlus, X } from "lucide-react-native";
 
 import { getDb } from "@/db";
 import { clients } from "@/db/schema";
-import { isClientVisible, type ClientStatusFilter } from "@/lib/client-list";
+import {
+  groupClientsByLastName,
+  isClientVisible,
+  type ClientStatusFilter,
+} from "@/lib/client-list";
 import { makeStyles } from "@/lib/make-styles";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";
@@ -73,6 +83,10 @@ export default function ClientsScreen() {
     () => data.filter((client) => isClientVisible(client, query, statusFilter)),
     [data, query, statusFilter],
   );
+  const sections = useMemo(
+    () => groupClientsByLastName(visibleClients),
+    [visibleClients],
+  );
 
   function closeSearch() {
     setQuery("");
@@ -107,14 +121,18 @@ export default function ClientsScreen() {
         </View>
       )}
       <ClientStatusFilters selected={statusFilter} onChange={setStatusFilter} />
-      <FlatList
-        data={visibleClients}
+      <SectionList
+        sections={sections}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => <ClientListItem client={item} />}
+        renderSectionHeader={({ section }) => (
+          <Text style={styles.sectionHeader}>{section.title}</Text>
+        )}
+        stickySectionHeadersEnabled
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={
-          visibleClients.length === 0 ? styles.emptyList : undefined
+          sections.length === 0 ? styles.emptyList : undefined
         }
         ListEmptyComponent={
           <Text style={styles.empty}>
@@ -168,6 +186,16 @@ const useStyles = makeStyles((theme) => ({
   },
   searchPlaceholder: {
     color: theme.mutedForeground,
+  },
+  sectionHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 6,
+    color: theme.primary,
+    backgroundColor: theme.background,
+    fontFamily: fontFamilies.base.bold,
+    fontSize: fontSize.xs,
+    letterSpacing: 0.8,
   },
   emptyList: {
     flexGrow: 1,
