@@ -29,13 +29,22 @@ export function ClientListItem({
     client.gravida != null || client.parity != null
       ? `G${client.gravida ?? "—"}P${client.parity ?? "—"}`
       : null;
+  const hasDateLine = Boolean(dateLabel || postpartumLabel);
+  const hasMetadata = Boolean(
+    client.gbsStatus || gravidaParity || client.bloodType,
+  );
+  const supportingLines = Number(hasDateLine) + Number(hasMetadata);
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`View ${client.firstName} ${client.lastName}`}
       onPress={() => router.push(`/clients/${client.id}`)}
-      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.container,
+        { minHeight: 64 + supportingLines * 12 },
+        pressed && styles.pressed,
+      ]}
     >
       <View style={styles.content}>
         <View style={styles.headingRow}>
@@ -54,35 +63,39 @@ export function ClientListItem({
           </View>
         </View>
 
-        {(dateLabel || postpartumLabel) && (
+        {hasDateLine && (
           <Text numberOfLines={1} style={styles.dateLine}>
             {dateLabel}
             {postpartumLabel ? ` · ${postpartumLabel}` : ""}
           </Text>
         )}
 
-        <View style={styles.metadata}>
-          {client.gbsStatus && (
-            <View style={styles.metadataItem}>
-              <ShieldPlus
-                color={
-                  client.gbsStatus === "+" ? theme.destructive : theme.secondary
-                }
-                size={16}
-              />
-              <Text style={styles.metadataText}>GBS{client.gbsStatus}</Text>
-            </View>
-          )}
-          {gravidaParity && (
-            <View style={styles.metadataItem}>
-              <UsersRound color={theme.mutedForeground} size={16} />
-              <Text style={styles.metadataText}>{gravidaParity}</Text>
-            </View>
-          )}
-          {client.bloodType && (
-            <Text style={styles.metadataText}>{client.bloodType}</Text>
-          )}
-        </View>
+        {hasMetadata && (
+          <View style={styles.metadata}>
+            {client.gbsStatus && (
+              <View style={styles.metadataItem}>
+                <ShieldPlus
+                  color={
+                    client.gbsStatus === "+"
+                      ? theme.destructive
+                      : theme.secondary
+                  }
+                  size={16}
+                />
+                <Text style={styles.metadataText}>GBS{client.gbsStatus}</Text>
+              </View>
+            )}
+            {gravidaParity && (
+              <View style={styles.metadataItem}>
+                <UsersRound color={theme.mutedForeground} size={16} />
+                <Text style={styles.metadataText}>{gravidaParity}</Text>
+              </View>
+            )}
+            {client.bloodType && (
+              <Text style={styles.metadataText}>{client.bloodType}</Text>
+            )}
+          </View>
+        )}
       </View>
 
       <ChevronRight color={theme.mutedForeground} size={22} />
@@ -95,9 +108,8 @@ const useStyles = makeStyles((theme) => {
 
   return {
     container: {
-      minHeight: 92,
       paddingHorizontal: 20,
-      paddingVertical: 12,
+      paddingVertical: 10,
       flexDirection: "row" as const,
       alignItems: "center" as const,
       gap: 14,
