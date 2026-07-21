@@ -1,6 +1,7 @@
 import {
   deriveClientStatus,
   getClientDateSummary,
+  isClientVisible,
   matchesClientName,
 } from "../client-list";
 
@@ -46,6 +47,25 @@ describe("deriveClientStatus", () => {
     expect(
       deriveClientStatus({ isActive: 1, actualDeliveryDate: "2026-07-01" }),
     ).toBe("postpartum");
+  });
+});
+
+describe("isClientVisible", () => {
+  const prenatalOlivia = {
+    ...names,
+    isActive: 1,
+    actualDeliveryDate: null,
+  };
+
+  it("requires both the name query and selected status to match", () => {
+    expect(isClientVisible(prenatalOlivia, "martin", "prenatal")).toBe(true);
+    expect(isClientVisible(prenatalOlivia, "martin", "postpartum")).toBe(false);
+    expect(isClientVisible(prenatalOlivia, "amina", "prenatal")).toBe(false);
+  });
+
+  it("lets the All Clients filter bypass status without bypassing search", () => {
+    expect(isClientVisible(prenatalOlivia, "jordan", "all")).toBe(true);
+    expect(isClientVisible(prenatalOlivia, "amina", "all")).toBe(false);
   });
 });
 

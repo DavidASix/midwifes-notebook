@@ -11,12 +11,13 @@ import { Search, UserRoundPlus, X } from "lucide-react-native";
 
 import { getDb } from "@/db";
 import { clients } from "@/db/schema";
-import { matchesClientName } from "@/lib/client-list";
+import { isClientVisible, type ClientStatusFilter } from "@/lib/client-list";
 import { makeStyles } from "@/lib/make-styles";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";
 
 import { ClientListItem } from "@/components/ClientListItem";
+import { ClientStatusFilters } from "@/components/ClientStatusFilters";
 import { Text } from "@/components/ui/Text";
 
 export function HeaderRightButton({ onSearch }: { onSearch: () => void }) {
@@ -50,6 +51,7 @@ export default function ClientsScreen() {
   const [data, setData] = useState<(typeof clients.$inferSelect)[]>([]);
   const [query, setQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<ClientStatusFilter>("all");
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -68,8 +70,8 @@ export default function ClientsScreen() {
   }, [fetchClients]);
 
   const visibleClients = useMemo(
-    () => data.filter((client) => matchesClientName(client, query)),
-    [data, query],
+    () => data.filter((client) => isClientVisible(client, query, statusFilter)),
+    [data, query, statusFilter],
   );
 
   function closeSearch() {
@@ -104,6 +106,7 @@ export default function ClientsScreen() {
           </Pressable>
         </View>
       )}
+      <ClientStatusFilters selected={statusFilter} onChange={setStatusFilter} />
       <FlatList
         data={visibleClients}
         keyExtractor={(item) => String(item.id)}
@@ -115,7 +118,9 @@ export default function ClientsScreen() {
         }
         ListEmptyComponent={
           <Text style={styles.empty}>
-            {query.trim() ? "No matching clients." : "No clients yet."}
+            {query.trim() || statusFilter !== "all"
+              ? "No matching clients."
+              : "No clients yet."}
           </Text>
         }
       />

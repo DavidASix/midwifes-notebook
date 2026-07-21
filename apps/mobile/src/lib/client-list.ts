@@ -7,7 +7,13 @@ export const clientStatuses = [
 ] as const;
 
 export type ClientStatus = (typeof clientStatuses)[number];
+export type ClientStatusFilter = "all" | ClientStatus;
 type ClientRecord = typeof clients.$inferSelect;
+type ClientNameFields = Pick<
+  ClientRecord,
+  "firstName" | "middleName" | "lastName" | "preferredName" | "partnerName"
+>;
+type ClientStatusFields = Pick<ClientRecord, "isActive" | "actualDeliveryDate">;
 
 function normalizeName(value: string): string {
   return value
@@ -18,10 +24,7 @@ function normalizeName(value: string): string {
 
 /** Matches one query against all name forms associated with a client. */
 export function matchesClientName(
-  client: Pick<
-    ClientRecord,
-    "firstName" | "middleName" | "lastName" | "preferredName" | "partnerName"
-  >,
+  client: ClientNameFields,
   query: string,
   relatedNames: readonly string[] = [],
 ): boolean {
@@ -46,10 +49,20 @@ export function matchesClientName(
   );
 }
 
+/** Applies the selected status and name constraints to one client-list record. */
+export function isClientVisible(
+  client: ClientNameFields & ClientStatusFields,
+  query: string,
+  statusFilter: ClientStatusFilter,
+  relatedNames: readonly string[] = [],
+): boolean {
+  const matchesStatus =
+    statusFilter === "all" || deriveClientStatus(client) === statusFilter;
+  return matchesStatus && matchesClientName(client, query, relatedNames);
+}
+
 /** Derives the display status, giving an inactive care relationship priority over pregnancy dates. */
-export function deriveClientStatus(
-  client: Pick<ClientRecord, "isActive" | "actualDeliveryDate">,
-): ClientStatus {
+export function deriveClientStatus(client: ClientStatusFields): ClientStatus {
   if (!client.isActive) return "out-of-care";
   return client.actualDeliveryDate ? "postpartum" : "prenatal";
 }
