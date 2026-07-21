@@ -16,6 +16,8 @@ const statusLabels = {
   "out-of-care": "Out of Care",
 } as const;
 
+const missingClinicalDetailsFallback = "No clinical details recorded";
+
 export function ClientListItem({
   client,
 }: {
@@ -33,7 +35,11 @@ export function ClientListItem({
   const hasMetadata = Boolean(
     client.gbsStatus || gravidaParity || client.bloodType,
   );
-  const supportingLines = Number(hasDateLine) + Number(hasMetadata);
+  const showsMissingClinicalDetailsFallback = !hasDateLine && !hasMetadata;
+  const supportingLines =
+    Number(hasDateLine) +
+    Number(hasMetadata) +
+    Number(showsMissingClinicalDetailsFallback);
 
   return (
     <Pressable
@@ -95,6 +101,12 @@ export function ClientListItem({
               <Text style={styles.metadataText}>{client.bloodType}</Text>
             )}
           </View>
+        )}
+
+        {showsMissingClinicalDetailsFallback && (
+          <Text numberOfLines={1} style={styles.fallbackMetadataText}>
+            {missingClinicalDetailsFallback}
+          </Text>
         )}
       </View>
 
@@ -161,6 +173,11 @@ const useStyles = makeStyles((theme) => {
     metadataText: {
       color: theme.mutedForeground,
       fontSize: fontSize.sm,
+    },
+    fallbackMetadataText: {
+      color: theme.mutedForeground,
+      fontSize: fontSize.sm,
+      fontStyle: "italic" as const,
     },
     badge: {
       borderRadius: radius["4xl"],

@@ -108,6 +108,9 @@ A scrollable contact-style list of all clients. Clients are always sorted by las
 clients group them beneath small alphabetical section headers matching the first letter of each last name; smaller views
 omit the headers while retaining alphabetical order.
 
+Client rows show available pregnancy and clinical details. When neither is recorded, the row displays
+"No clinical details recorded" as a fallback so every client retains a supporting information line.
+
 **Client views** at the top of the screen are presented as horizontally scrollable tabs:
 - All Clients
 - Prenatal
