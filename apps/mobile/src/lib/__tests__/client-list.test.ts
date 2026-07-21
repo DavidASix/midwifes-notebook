@@ -1,4 +1,36 @@
-import { deriveClientStatus, getClientDateSummary } from "../client-list";
+import {
+  deriveClientStatus,
+  getClientDateSummary,
+  matchesClientName,
+} from "../client-list";
+
+const names = {
+  firstName: "Olivia",
+  middleName: "Rose",
+  lastName: "Martin",
+  preferredName: "Liv",
+  partnerName: "Jordan Martin",
+};
+
+describe("matchesClientName", () => {
+  it("matches normalized client names in either display order", () => {
+    expect(matchesClientName(names, "  OLIVIA   ro ")).toBe(true);
+    expect(matchesClientName(names, "martin, oliv")).toBe(true);
+  });
+
+  it("includes preferred, partner, and future related baby names in one search", () => {
+    expect(matchesClientName(names, "liv mar")).toBe(true);
+    expect(matchesClientName(names, "jordan mar")).toBe(true);
+    expect(matchesClientName(names, "baby june", ["Baby June Martin"])).toBe(
+      true,
+    );
+  });
+
+  it("keeps clients visible for an empty query and excludes unrelated names", () => {
+    expect(matchesClientName(names, "   ")).toBe(true);
+    expect(matchesClientName(names, "Amina")).toBe(false);
+  });
+});
 
 describe("deriveClientStatus", () => {
   it("keeps inactive clients out of care even when they have a delivery date", () => {

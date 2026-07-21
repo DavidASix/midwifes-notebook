@@ -2,7 +2,6 @@ import { Tabs } from "expo-router";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize, screenOptions } from "@/lib/themes";
 import { HeaderRightButton as ToolsHeaderRight } from "./tools";
-import { HeaderRightButton as ClientsHeaderRight } from "./clients";
 import { HeaderRightButton as CalendarHeaderRight } from "./calendar";
 import { HeaderRightButton as StatisticsHeaderRight } from "./statistics";
 
@@ -18,7 +17,6 @@ export default function TabsLayout() {
         name="clients"
         options={{
           title: "Clients",
-          headerRight: () => <ClientsHeaderRight />,
           headerTitleStyle: {
             color: theme.primary,
             fontFamily: fontFamilies.heading.bold,

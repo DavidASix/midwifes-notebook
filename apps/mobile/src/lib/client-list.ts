@@ -9,6 +9,43 @@ export const clientStatuses = [
 export type ClientStatus = (typeof clientStatuses)[number];
 type ClientRecord = typeof clients.$inferSelect;
 
+function normalizeName(value: string): string {
+  return value
+    .toLocaleLowerCase()
+    .trim()
+    .replace(/[\s,]+/g, " ");
+}
+
+/** Matches one query against all name forms associated with a client. */
+export function matchesClientName(
+  client: Pick<
+    ClientRecord,
+    "firstName" | "middleName" | "lastName" | "preferredName" | "partnerName"
+  >,
+  query: string,
+  relatedNames: readonly string[] = [],
+): boolean {
+  const normalizedQuery = normalizeName(query);
+  if (!normalizedQuery) return true;
+
+  const givenNames = [client.firstName, client.middleName]
+    .filter((name): name is string => Boolean(name))
+    .join(" ");
+  const candidates = [
+    `${givenNames} ${client.lastName}`,
+    `${client.lastName} ${givenNames}`,
+    client.preferredName ? `${client.preferredName} ${client.lastName}` : null,
+    client.preferredName ? `${client.lastName} ${client.preferredName}` : null,
+    client.partnerName,
+    ...relatedNames,
+  ];
+
+  return candidates.some(
+    (candidate) =>
+      candidate != null && normalizeName(candidate).includes(normalizedQuery),
+  );
+}
+
 /** Derives the display status, giving an inactive care relationship priority over pregnancy dates. */
 export function deriveClientStatus(
   client: Pick<ClientRecord, "isActive" | "actualDeliveryDate">,

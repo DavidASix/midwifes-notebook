@@ -112,7 +112,8 @@ A scrollable contact-style list of all clients.
 - Postpartum
 - Out of Care
 
-**Search** — search icon in the header opens an inline search bar to filter by name.
+**Search** — search icon in the header opens an inline search bar. The single field searches client and partner names;
+baby names use the same matching path once baby records are implemented.
 
 **Add client** — person+ icon in the header navigates to the Add Client form (pushed as a stack screen).
 
