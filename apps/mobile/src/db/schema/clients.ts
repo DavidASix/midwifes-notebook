@@ -1,6 +1,33 @@
 import { sql } from "drizzle-orm";
 import { check, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
+export const bloodTypes = [
+  "A+",
+  "A-",
+  "B+",
+  "B-",
+  "AB+",
+  "AB-",
+  "O+",
+  "O-",
+] as const;
+export const rhStatuses = ["+", "-"] as const;
+export const gbsStatuses = ["+", "-"] as const;
+export const deliveryMethods = ["SVD", "AVD", "C-Section"] as const;
+export const tearDegrees = [1, 2, 3, 4] as const;
+export const activeStates = [0, 1] as const;
+
+/** Joins static schema values into an escaped list suitable for a SQLite `IN` constraint. */
+function joinSqlValues(values: readonly (string | number)[]) {
+  return values
+    .map((value) =>
+      typeof value === "string"
+        ? `'${value.replace(/'/g, "''")}'`
+        : String(value),
+    )
+    .join(", ");
+}
+
 export const clients = sqliteTable(
   "clients",
   {
@@ -23,17 +50,17 @@ export const clients = sqliteTable(
     gravida: integer("gravida"),
     parity: integer("parity"),
 
-    bloodType: text("blood_type"),
-    rhStatus: text("rh_status"),
-    gbsStatus: text("gbs_status"),
-    deliveryMethod: text("delivery_method"),
+    bloodType: text("blood_type", { enum: bloodTypes }),
+    rhStatus: text("rh_status", { enum: rhStatuses }),
+    gbsStatus: text("gbs_status", { enum: gbsStatuses }),
+    deliveryMethod: text("delivery_method", { enum: deliveryMethods }),
     tearDegree: integer("tear_degree"),
     riskFactors: text("risk_factors"),
 
     partnerName: text("partner_name"),
     partnerRelationship: text("partner_relationship"),
     partnerPhone: text("partner_phone"),
-    partnerBloodType: text("partner_blood_type"),
+    partnerBloodType: text("partner_blood_type", { enum: bloodTypes }),
 
     isActive: integer("is_active").notNull().default(1),
 
@@ -48,22 +75,31 @@ export const clients = sqliteTable(
   (table) => [
     check(
       "clients_blood_type_check",
-      sql`${table.bloodType} IN ('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-')`,
+      sql`${table.bloodType} IN (${sql.raw(joinSqlValues(bloodTypes))})`,
     ),
-    check("clients_rh_status_check", sql`${table.rhStatus} IN ('+', '-')`),
-    check("clients_gbs_status_check", sql`${table.gbsStatus} IN ('+', '-')`),
+    check(
+      "clients_rh_status_check",
+      sql`${table.rhStatus} IN (${sql.raw(joinSqlValues(rhStatuses))})`,
+    ),
+    check(
+      "clients_gbs_status_check",
+      sql`${table.gbsStatus} IN (${sql.raw(joinSqlValues(gbsStatuses))})`,
+    ),
     check(
       "clients_delivery_method_check",
-      sql`${table.deliveryMethod} IN ('SVD', 'AVD', 'C-Section')`,
+      sql`${table.deliveryMethod} IN (${sql.raw(joinSqlValues(deliveryMethods))})`,
     ),
     check(
       "clients_tear_degree_check",
-      sql`${table.tearDegree} IN (1, 2, 3, 4)`,
+      sql`${table.tearDegree} IN (${sql.raw(joinSqlValues(tearDegrees))})`,
     ),
     check(
       "clients_partner_blood_type_check",
-      sql`${table.partnerBloodType} IN ('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-')`,
+      sql`${table.partnerBloodType} IN (${sql.raw(joinSqlValues(bloodTypes))})`,
     ),
-    check("clients_is_active_check", sql`${table.isActive} IN (0, 1)`),
+    check(
+      "clients_is_active_check",
+      sql`${table.isActive} IN (${sql.raw(joinSqlValues(activeStates))})`,
+    ),
   ],
 );
