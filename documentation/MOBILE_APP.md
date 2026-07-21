@@ -28,6 +28,7 @@ After onboarding completes, the user lands on the **Clients** screen. On all sub
 When enabled in Settings, the app requires the user to authenticate via their device's configured method (Face ID, Touch ID, fingerprint, or PIN/passcode) before accessing content.
 
 - The full app UI is hidden behind a lock screen until auth succeeds
+- When no app lock is enabled, the lock route initializes the database without an authentication prompt and immediately continues to the app
 
 ---
 
@@ -230,7 +231,7 @@ Pushed as a stack screen from the Statistics screen gear icon.
 
 | Setting | Description |
 |---|---|
-| App Lock | Toggle biometric/PIN lock on/off |
+| App Lock | Toggle biometric/PIN lock on/off; the manual Lock button is disabled when App Lock is off |
 | Accent Color | Color picker to select the app's primary accent color |
 | Theme | Light / Dark mode toggle |
 | Mailing List | Enter or update email address for app update notifications |

@@ -81,7 +81,7 @@ export default function SettingsScreen() {
         )}
       </View>
 
-      <Button title="Lock" onPress={lock} />
+      <Button title="Lock" onPress={lock} disabled={!lockEnabled || updating} />
     </View>
   );
 }

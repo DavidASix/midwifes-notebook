@@ -53,6 +53,8 @@ When the user selects **No lock**:
 - `db_encryption_key` remains in SecureStore, with authentication not required.
 - SecureStore can release the key without presenting an authentication prompt.
 - The SQLite database remains encrypted.
+- If navigation reaches the lock route, it opens the database and immediately
+  continues into the app without displaying the authentication action.
 
 "No lock" therefore disables the authentication prompt; it does not move the
 database key into AsyncStorage or make the database unencrypted.
@@ -66,3 +68,6 @@ While the app is running:
 
 Locking the app clears the in-memory database reference. It does not delete the
 SQLite database or the encryption key stored in SecureStore.
+
+The manual **Lock** action in Settings is disabled while the authentication
+preference is `unsecure`, because there is no authentication gate to engage.

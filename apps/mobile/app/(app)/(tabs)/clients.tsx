@@ -3,7 +3,6 @@ import { router } from "expo-router";
 import { Text } from "@/components/ui/Text";
 import { ClientsTest } from "@/components/ClientsTest";
 import { useTheme } from "@/lib/theme-context";
-import { useLock } from "@/lib/lock-context";
 
 export function HeaderRightButton() {
   const theme = useTheme();
