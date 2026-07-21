@@ -1,6 +1,8 @@
 import { sql } from "drizzle-orm";
 import { check, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
+import { joinSqlValues } from "../utils";
+
 export const bloodTypes = [
   "A+",
   "A-",
@@ -16,17 +18,6 @@ export const gbsStatuses = ["+", "-"] as const;
 export const deliveryMethods = ["SVD", "AVD", "C-Section"] as const;
 export const tearDegrees = [1, 2, 3, 4] as const;
 export const activeStates = [0, 1] as const;
-
-/** Joins static schema values into an escaped list suitable for a SQLite `IN` constraint. */
-function joinSqlValues(values: readonly (string | number)[]) {
-  return values
-    .map((value) =>
-      typeof value === "string"
-        ? `'${value.replace(/'/g, "''")}'`
-        : String(value),
-    )
-    .join(", ");
-}
 
 export const clients = sqliteTable(
   "clients",
