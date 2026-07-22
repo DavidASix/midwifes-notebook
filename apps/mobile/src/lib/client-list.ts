@@ -56,7 +56,12 @@ export function groupClientsByLastName<
 
   for (const client of sortedClients) {
     const title = getLastNameInitial(client.lastName);
-    grouped.set(title, [...(grouped.get(title) ?? []), client]);
+    const section = grouped.get(title);
+    if (section) {
+      section.push(client);
+    } else {
+      grouped.set(title, [client]);
+    }
   }
 
   return [...grouped.entries()]
