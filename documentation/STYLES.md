@@ -46,6 +46,8 @@ Clean, clinical minimalism with warm undertones. Intentionally approachable for 
   and optional supporting message; they follow the active theme and use a restrained shadow
 - Form choices: outlined segmented buttons when unset and primary-filled when selected; nullable choices reveal a subtle
   clearing hint and can be returned to the unset state by tapping the selection again
+- Form controls: standard inputs and actions use a compact 44-point height; segmented choices use a denser 36-point
+  visual height while disclosure headers retain a 44-point touch target
 - Form actions: a persistent bottom action bar above the safe area, with equal-width secondary Cancel and primary Save
   actions
 - Skeleton loaders: used wherever load time may exceed 200ms — match the geometry of the content they replace (row height, label width, badge width), colored in a `#96a5b9`-tinted pulse

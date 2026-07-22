@@ -68,13 +68,13 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
   },
   default: {
-    minHeight: 48,
-    paddingVertical: 12,
+    minHeight: 44,
+    paddingVertical: 9,
     paddingHorizontal: 20,
   },
   compact: {
-    minHeight: 40,
-    paddingVertical: 8,
+    minHeight: 36,
+    paddingVertical: 6,
     paddingHorizontal: 13,
   },
   bare: {
