@@ -38,6 +38,12 @@ Clean, clinical minimalism with warm undertones. Intentionally approachable for 
 - Status badges: pill-shaped, uppercase, small text, low-contrast fill
 - Bottom tab bar: icon + label, active state in `#1a4331`
 - Detail view tabs: underline indicator, inactive labels in `#96a5b9`
+- Forms: one scrollable column of softly bordered section cards, each with a compact tinted icon, serif title, and short
+  supporting description; related short fields may share a row while long-form inputs remain full width
+- Form choices: outlined segmented buttons when unset and primary-filled when selected; nullable choices reveal a subtle
+  clearing hint and can be returned to the unset state by tapping the selection again
+- Form actions: a persistent bottom action bar above the safe area, with equal-width secondary Cancel and primary Save
+  actions
 - Skeleton loaders: used wherever load time may exceed 200ms — match the geometry of the content they replace (row height, label width, badge width), colored in a `#96a5b9`-tinted pulse
 - Onboarding: full-width horizontal pages with a single primary action, centered copy, and pagination dots fixed above the device's bottom safe area; the active dot is elongated and uses the primary accent
 

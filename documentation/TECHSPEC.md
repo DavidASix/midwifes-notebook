@@ -53,6 +53,9 @@ For complex interactive components with non-trivial logic or accessibility requi
 
 **`@gorhom/bottom-sheet`** is used for slide-up sheet UI (see Navigation below).
 
+**`@react-native-community/datetimepicker`** provides native calendar-date controls for nullable client dates. Form state
+stores selected calendar dates as `YYYY-MM-DD` strings before passing them to Drizzle.
+
 ### Fonts
 
 **`@expo-google-fonts/*`** packages are used for Google Fonts. No manual font file management is required. Fonts are loaded at app startup using `expo-font`, with `SplashScreen.preventAutoHideAsync()` used to prevent render before fonts are ready.

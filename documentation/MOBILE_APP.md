@@ -186,11 +186,17 @@ The tab shows a chronological list of notes. Tapping a note opens it for viewing
 
 Pushed as a stack screen on top of the Client Detail modal when `EDIT` is tapped.
 
-- Full scrollable form with all editable client fields
+- Full scrollable form with section cards for identity/contact, pregnancy/care, clinical details, and partner details
+- Text, multiline, phone, numeric, native date, switch, and segmented-choice controls match each field's data type
+- Only first and last name are required; all other nullable fields start unset and selected choices can be cleared
+- Date of birth and manual age are mutually exclusive, with age used only when the birth date is unknown
 - Save button commits changes and pops back to the detail modal
 - Cancel discards changes and pops back
 
-Same form is used for **Add Client** (reached from the client list header), with all fields empty.
+The same form is used for **Add Client** (reached from the client list header), with optional fields unset and active care
+enabled. It is presented as a full-screen modal that slides up from the bottom. Saving inserts the client into the local
+database, dismisses the modal, and refreshes the alphabetically sorted client list. Validation and database errors leave
+the entered values in place so they can be corrected or retried.
 
 ---
 
