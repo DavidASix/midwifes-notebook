@@ -327,10 +327,13 @@ export function ClientForm({
         </FormSection>
 
         <View style={styles.privacyNote}>
-          <CalendarDays color={theme.secondary} size={18} />
-          <Text style={styles.privacyText}>
-            Client information stays encrypted on this device.
-          </Text>
+          <View style={styles.privacyDivider} />
+          <View style={styles.privacyContent}>
+            <CalendarDays color={theme.secondary} size={18} />
+            <Text style={styles.privacyText}>
+              Client information stays encrypted on this device.
+            </Text>
+          </View>
         </View>
       </ScrollView>
 
@@ -445,7 +448,17 @@ const useStyles = makeStyles((theme) => ({
     gap: 7,
   },
   privacyNote: {
+    paddingTop: 4,
     paddingHorizontal: 12,
+    alignItems: "center",
+    gap: 14,
+  },
+  privacyDivider: {
+    width: "100%",
+    height: 1,
+    backgroundColor: theme.border,
+  },
+  privacyContent: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
