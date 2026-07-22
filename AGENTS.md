@@ -62,6 +62,14 @@ Coding conventions for the repository. Covers:
 
 ---
 
+## Mobile App UI Work
+
+When working on the mobile app's user interface, take screenshots of the running emulator as you work. Review the screenshots to understand the current UI and verify that your changes look good.
+
+Only do this when an ADB device is already running and available. If no ADB devices are connected, do not start an emulator or device.
+
+---
+
 ## Gotchas
 
 - **`expo-dev-client` versioning** — never install with `npm install` or `pnpm add`. Always use `npx expo install expo-dev-client` so Expo resolves the version compatible with the current SDK. Installing manually grabbed v56 against SDK 55 and caused a Kotlin compilation failure.
