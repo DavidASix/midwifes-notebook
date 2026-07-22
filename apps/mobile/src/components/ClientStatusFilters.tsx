@@ -50,6 +50,7 @@ export function ClientStatusFilters({
   return (
     <View style={styles.border}>
       <ScrollView
+        accessibilityRole="tablist"
         ref={scrollViewRef}
         horizontal
         showsHorizontalScrollIndicator={false}
