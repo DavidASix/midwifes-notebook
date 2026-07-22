@@ -1,15 +1,5 @@
 import { useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  TextInput,
-  View,
-  type KeyboardTypeOptions,
-} from "react-native";
-import DateTimePicker, {
-  type DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import {
   CalendarDays,
   ChevronDown,
@@ -22,8 +12,6 @@ import {
 
 import { bloodTypes, gbsStatuses, rhStatuses } from "@/db/schema";
 import {
-  fromIsoDate,
-  toIsoDate,
   type ClientFormErrors,
   type ClientFormValues,
 } from "@/lib/client-form";
@@ -32,6 +20,9 @@ import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize, radius } from "@/lib/themes";
 
 import { Button } from "@/components/ui/Button";
+import { FormChoiceGroup } from "@/components/ui/FormChoiceGroup";
+import { FormDateField } from "@/components/ui/FormDateField";
+import { FormTextField } from "@/components/ui/FormTextField";
 import { Text } from "@/components/ui/Text";
 
 type ClientFormProps = {
@@ -45,190 +36,6 @@ type ClientFormProps = {
   onSubmit: () => void;
   onCancel: () => void;
 };
-
-type TextFieldProps = {
-  label: string;
-  value?: string;
-  onChangeText: (value: string) => void;
-  placeholder?: string;
-  error?: string;
-  required?: boolean;
-  keyboardType?: KeyboardTypeOptions;
-  multiline?: boolean;
-  accessibilityLabel?: string;
-};
-
-function TextField({
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  error,
-  required,
-  keyboardType,
-  multiline,
-  accessibilityLabel,
-}: TextFieldProps) {
-  const styles = useStyles();
-  return (
-    <View style={styles.field}>
-      <Text style={styles.fieldLabel}>
-        {label}
-        {required && <Text style={styles.required}> *</Text>}
-      </Text>
-      <TextInput
-        accessibilityLabel={accessibilityLabel ?? label}
-        autoCapitalize={keyboardType === "phone-pad" ? "none" : "sentences"}
-        keyboardType={keyboardType}
-        multiline={multiline}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={styles.placeholder.color}
-        style={[
-          styles.input,
-          multiline && styles.multilineInput,
-          error && styles.inputError,
-        ]}
-        textAlignVertical={multiline ? "top" : "center"}
-        value={value ?? ""}
-      />
-      {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
-  );
-}
-
-type ChoiceGroupProps<T extends string | number> = {
-  label: string;
-  values: readonly T[];
-  value?: T;
-  onChange: (value: T | undefined) => void;
-  getLabel?: (value: T) => string;
-  error?: string;
-};
-
-function ChoiceGroup<T extends string | number>({
-  label,
-  values,
-  value,
-  onChange,
-  getLabel = String,
-  error,
-}: ChoiceGroupProps<T>) {
-  const styles = useStyles();
-  return (
-    <View style={styles.field}>
-      <View style={styles.choiceLabelRow}>
-        <Text style={styles.fieldLabel}>{label}</Text>
-        {value !== undefined && (
-          <Text style={styles.optionalHint}>Tap again to clear</Text>
-        )}
-      </View>
-      <View
-        accessibilityLabel={label}
-        accessibilityRole="radiogroup"
-        style={styles.choiceRow}
-      >
-        {values.map((option) => {
-          const selected = option === value;
-          return (
-            <Button
-              key={String(option)}
-              accessibilityLabel={`${label}: ${getLabel(option)}`}
-              accessibilityRole="radio"
-              accessibilityState={{ checked: selected }}
-              onPress={() => onChange(selected ? undefined : option)}
-              size="compact"
-              style={styles.choiceButton}
-              title={getLabel(option)}
-              variant={selected ? "primary" : "secondary"}
-            />
-          );
-        })}
-      </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
-  );
-}
-
-type DateFieldProps = {
-  label: string;
-  value?: string;
-  onChange: (value: string | undefined) => void;
-  error?: string;
-  maximumDate?: Date;
-  defaultDate?: Date;
-};
-
-function DateField({
-  label,
-  value,
-  onChange,
-  error,
-  maximumDate,
-  defaultDate,
-}: DateFieldProps) {
-  const styles = useStyles();
-  const theme = useTheme();
-  const [isOpen, setIsOpen] = useState(false);
-
-  function handleDateChange(event: DateTimePickerEvent, selected?: Date) {
-    if (Platform.OS === "android") setIsOpen(false);
-    if (event.type === "set" && selected) onChange(toIsoDate(selected));
-  }
-
-  const displayValue = value
-    ? fromIsoDate(value).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
-    : "Not set";
-
-  return (
-    <View style={styles.field}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      <View style={styles.dateRow}>
-        <Button
-          accessibilityLabel={`${label}: ${displayValue}`}
-          onPress={() => setIsOpen(true)}
-          style={styles.dateButton}
-          title={displayValue}
-          variant="secondary"
-        />
-        {value && (
-          <Button
-            accessibilityLabel={`Clear ${label}`}
-            onPress={() => onChange(undefined)}
-            size="compact"
-            title="Clear"
-            variant="ghost"
-          />
-        )}
-      </View>
-      {isOpen && (
-        <View style={styles.datePicker}>
-          <DateTimePicker
-            accentColor={theme.primary}
-            display={Platform.OS === "ios" ? "inline" : "default"}
-            maximumDate={maximumDate}
-            mode="date"
-            onChange={handleDateChange}
-            value={value ? fromIsoDate(value) : (defaultDate ?? new Date())}
-          />
-          {Platform.OS === "ios" && (
-            <Button
-              onPress={() => setIsOpen(false)}
-              size="compact"
-              title="Done"
-              variant="ghost"
-            />
-          )}
-        </View>
-      )}
-      {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
-  );
-}
 
 function SectionCard({
   icon,
@@ -331,7 +138,7 @@ export function ClientForm({
         >
           <View style={styles.twoColumnRow}>
             <View style={styles.column}>
-              <TextField
+              <FormTextField
                 error={errors.firstName}
                 label="First name"
                 onChangeText={(value) => onChange("firstName", value)}
@@ -341,7 +148,7 @@ export function ClientForm({
               />
             </View>
             <View style={styles.column}>
-              <TextField
+              <FormTextField
                 error={errors.lastName}
                 label="Last name"
                 onChangeText={(value) => onChange("lastName", value)}
@@ -353,7 +160,7 @@ export function ClientForm({
           </View>
           <View style={styles.twoColumnRow}>
             <View style={styles.column}>
-              <TextField
+              <FormTextField
                 label="Middle name"
                 onChangeText={(value) => onChange("middleName", value)}
                 placeholder="Optional"
@@ -361,7 +168,7 @@ export function ClientForm({
               />
             </View>
             <View style={styles.column}>
-              <TextField
+              <FormTextField
                 label="Preferred name"
                 onChangeText={(value) => onChange("preferredName", value)}
                 placeholder="Optional"
@@ -369,14 +176,14 @@ export function ClientForm({
               />
             </View>
           </View>
-          <TextField
+          <FormTextField
             label="Address"
             multiline
             onChangeText={(value) => onChange("address", value)}
             placeholder="Street, city, province"
             value={values.address}
           />
-          <TextField
+          <FormTextField
             accessibilityLabel="Primary phone number"
             keyboardType="phone-pad"
             label="Primary phone"
@@ -389,7 +196,7 @@ export function ClientForm({
           <Text style={styles.helperText}>
             Choose a birth date, or enter an age only when the date is unknown.
           </Text>
-          <DateField
+          <FormDateField
             defaultDate={typicalBirthDate}
             error={errors.dateOfBirth}
             label="Date of birth"
@@ -400,7 +207,7 @@ export function ClientForm({
             }}
             value={values.dateOfBirth}
           />
-          <TextField
+          <FormTextField
             error={errors.age}
             keyboardType="number-pad"
             label="Age, if birth date is unknown"
@@ -419,14 +226,14 @@ export function ClientForm({
           icon={<HeartPulse color={theme.primary} size={20} />}
           title="Clinical"
         >
-          <DateField
+          <FormDateField
             label="Estimated delivery date"
             onChange={(value) => onChange("estimatedDeliveryDate", value)}
             value={values.estimatedDeliveryDate}
           />
           <View style={styles.twoColumnRow}>
             <View style={styles.column}>
-              <TextField
+              <FormTextField
                 error={errors.gravida}
                 keyboardType="number-pad"
                 label="Gravida"
@@ -436,7 +243,7 @@ export function ClientForm({
               />
             </View>
             <View style={styles.column}>
-              <TextField
+              <FormTextField
                 error={errors.parity}
                 keyboardType="number-pad"
                 label="Parity"
@@ -446,7 +253,7 @@ export function ClientForm({
               />
             </View>
           </View>
-          <ChoiceGroup
+          <FormChoiceGroup
             label="Blood type"
             onChange={(value) => onChange("bloodType", value)}
             value={values.bloodType}
@@ -454,7 +261,7 @@ export function ClientForm({
           />
           <View style={styles.twoColumnRow}>
             <View style={styles.column}>
-              <ChoiceGroup
+              <FormChoiceGroup
                 getLabel={(value) => (value === "+" ? "Positive" : "Negative")}
                 label="Rh status"
                 onChange={(value) => onChange("rhStatus", value)}
@@ -463,7 +270,7 @@ export function ClientForm({
               />
             </View>
             <View style={styles.column}>
-              <ChoiceGroup
+              <FormChoiceGroup
                 getLabel={(value) => (value === "+" ? "Positive" : "Negative")}
                 label="GBS status"
                 onChange={(value) => onChange("gbsStatus", value)}
@@ -472,7 +279,7 @@ export function ClientForm({
               />
             </View>
           </View>
-          <TextField
+          <FormTextField
             label="Risk factors"
             multiline
             onChangeText={(value) => onChange("riskFactors", value)}
@@ -487,13 +294,13 @@ export function ClientForm({
           icon={<UsersRound color={theme.primary} size={20} />}
           title="Partner"
         >
-          <TextField
+          <FormTextField
             label="Partner name"
             onChangeText={(value) => onChange("partnerName", value)}
             placeholder="Full name"
             value={values.partnerName}
           />
-          <TextField
+          <FormTextField
             label="Relationship"
             onChangeText={(value) => onChange("partnerRelationship", value)}
             placeholder="Partner, spouse, support person…"
@@ -503,7 +310,7 @@ export function ClientForm({
             <Phone color={theme.mutedForeground} size={16} />
             <Text style={styles.subheading}>Emergency contact</Text>
           </View>
-          <TextField
+          <FormTextField
             accessibilityLabel="Partner phone number"
             keyboardType="phone-pad"
             label="Partner phone"
@@ -511,7 +318,7 @@ export function ClientForm({
             placeholder="(416) 555-0123"
             value={values.partnerPhone}
           />
-          <ChoiceGroup
+          <FormChoiceGroup
             label="Partner blood type"
             onChange={(value) => onChange("partnerBloodType", value)}
             value={values.partnerBloodType}
@@ -609,43 +416,6 @@ const useStyles = makeStyles((theme) => ({
   sectionFields: {
     gap: 15,
   },
-  field: {
-    gap: 7,
-  },
-  fieldLabel: {
-    color: theme.foreground,
-    fontFamily: fontFamilies.base.semiBold,
-    fontSize: fontSize.sm,
-  },
-  required: {
-    color: theme.destructive,
-  },
-  input: {
-    minHeight: 48,
-    paddingHorizontal: 13,
-    paddingVertical: 11,
-    borderWidth: 1,
-    borderColor: theme.input,
-    borderRadius: radius.xl,
-    backgroundColor: theme.background,
-    color: theme.foreground,
-    fontFamily: fontFamilies.base.regular,
-    fontSize: fontSize.md,
-  },
-  multilineInput: {
-    minHeight: 88,
-    lineHeight: 21,
-  },
-  inputError: {
-    borderColor: theme.destructive,
-  },
-  placeholder: {
-    color: theme.mutedForeground,
-  },
-  errorText: {
-    color: theme.destructive,
-    fontSize: fontSize.sm,
-  },
   twoColumnRow: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -654,38 +424,6 @@ const useStyles = makeStyles((theme) => ({
   column: {
     flex: 1,
     minWidth: 0,
-  },
-  choiceLabelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
-  },
-  optionalHint: {
-    color: theme.mutedForeground,
-    fontSize: fontSize.xs,
-  },
-  choiceRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  choiceButton: {
-    flexGrow: 1,
-    minWidth: 68,
-  },
-  dateRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  dateButton: {
-    flex: 1,
-  },
-  datePicker: {
-    overflow: "hidden",
-    borderRadius: radius.xl,
-    backgroundColor: theme.background,
   },
   divider: {
     height: 1,
