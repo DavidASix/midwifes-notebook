@@ -38,10 +38,10 @@ Clean, clinical minimalism with warm undertones. Intentionally approachable for 
 - Status badges: pill-shaped, uppercase, small text, low-contrast fill
 - Bottom tab bar: icon + label, active state in `#1a4331`
 - Detail view tabs: underline indicator, inactive labels in `#96a5b9`
-- Forms: one scrollable column of softly bordered section cards, each with a compact tinted icon, serif title, and short
-  supporting description; related short fields may share a row while long-form inputs remain full width
-- Collapsible form sections: collapsed cards show only their icon, title, description, and a trailing down chevron;
-  expanding switches it to an up chevron and reveals the fields without changing the card's visual treatment
+- Forms: one scrollable column of open sections directly on the page background, each with a compact tinted icon, serif
+  title, and short supporting description; related short fields may share a row while long-form inputs remain full width
+- Collapsible form sections: collapsed sections show only their icon, title, description, and a trailing down chevron;
+  expanding switches it to an up chevron and reveals the fields below the same header
 - Toasts: compact rounded cards that float above navigation and fixed actions, pairing a semantic icon with a short title
   and optional supporting message; they follow the active theme and use a restrained shadow
 - Form choices: outlined segmented buttons when unset and primary-filled when selected; nullable choices reveal a subtle

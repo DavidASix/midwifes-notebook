@@ -17,7 +17,7 @@ import {
 } from "@/lib/client-form";
 import { makeStyles } from "@/lib/make-styles";
 import { useTheme } from "@/lib/theme-context";
-import { fontFamilies, fontSize, radius } from "@/lib/themes";
+import { fontFamilies, fontSize } from "@/lib/themes";
 
 import { Button } from "@/components/ui/Button";
 import { FormChoiceGroup } from "@/components/ui/FormChoiceGroup";
@@ -37,7 +37,7 @@ type ClientFormProps = {
   onCancel: () => void;
 };
 
-function SectionCard({
+function FormSection({
   icon,
   title,
   description,
@@ -72,7 +72,7 @@ function SectionCard({
   );
 
   return (
-    <View style={styles.sectionCard}>
+    <View style={[styles.section, collapsible && styles.collapsibleSection]}>
       {collapsible ? (
         <Button
           accessibilityLabel={`${isExpanded ? "Collapse" : "Expand"} ${title} section`}
@@ -131,7 +131,7 @@ export function ClientForm({
           </Text>
         </View>
 
-        <SectionCard
+        <FormSection
           description="Names and ways to get in touch"
           icon={<UserRound color={theme.primary} size={20} />}
           title="Identity"
@@ -218,9 +218,9 @@ export function ClientForm({
             placeholder="Not set"
             value={values.age}
           />
-        </SectionCard>
+        </FormSection>
 
-        <SectionCard
+        <FormSection
           collapsible
           description="Pregnancy and clinical details"
           icon={<HeartPulse color={theme.primary} size={20} />}
@@ -286,9 +286,9 @@ export function ClientForm({
             placeholder="Clinical considerations, history, or concerns"
             value={values.riskFactors}
           />
-        </SectionCard>
+        </FormSection>
 
-        <SectionCard
+        <FormSection
           collapsible
           description="Partner or emergency-contact information"
           icon={<UsersRound color={theme.primary} size={20} />}
@@ -324,7 +324,7 @@ export function ClientForm({
             value={values.partnerBloodType}
             values={bloodTypes}
           />
-        </SectionCard>
+        </FormSection>
 
         <View style={styles.privacyNote}>
           <CalendarDays color={theme.secondary} size={18} />
@@ -378,13 +378,13 @@ const useStyles = makeStyles((theme) => ({
     fontSize: fontSize.md,
     lineHeight: 22,
   },
-  sectionCard: {
-    padding: 16,
+  section: {
     gap: 18,
-    borderWidth: 1,
-    borderColor: theme.border,
-    borderRadius: radius["3xl"],
-    backgroundColor: theme.card,
+  },
+  collapsibleSection: {
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: theme.border,
   },
   sectionHeader: {
     flexDirection: "row",
