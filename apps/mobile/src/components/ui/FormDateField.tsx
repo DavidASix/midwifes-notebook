@@ -110,6 +110,7 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     flex: 1,
+    borderRadius: radius.xl,
   },
   picker: {
     overflow: "hidden",
