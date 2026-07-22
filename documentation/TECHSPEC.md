@@ -23,13 +23,16 @@ This project is a monorepo containing three applications: a React Native mobile 
 ## App 1: Mobile (React Native / Expo)
 
 ### Platform Targets
+
 - iOS
 - Android
 
 ### Core Framework
+
 **Expo** (managed workflow). The managed workflow is the recommended starting point — it has fewer limitations than it historically did and simplifies the development and deployment process significantly.
 
 ### Builds & Deployment
+
 **EAS (Expo Application Services)** handles the full deployment lifecycle:
 
 - `eas build` — Cloud-based builds for iOS and Android. No local Xcode or Android Studio required for producing distributable builds.
@@ -39,9 +42,11 @@ This project is a monorepo containing three applications: a React Native mobile 
 OTA updates are the primary update mechanism for non-native changes. Full app store builds are reserved for native dependency changes, new permissions, or major version releases.
 
 ### Styling
+
 React Native's built-in **`StyleSheet`** API is the only styling system used in the mobile app. No utility-class or CSS-in-JS library is used.
 
 ### UI Components
+
 Simple, stateless components (buttons, badges, cards, avatars, etc.) are built in-house using `StyleSheet`. There is no dependency on a component library for these.
 
 For complex interactive components with non-trivial logic or accessibility requirements (dropdowns, dialogs, tooltips, popovers), a dedicated library or React Native Reusables may be used on a case-by-case basis.
@@ -49,27 +54,33 @@ For complex interactive components with non-trivial logic or accessibility requi
 **`@gorhom/bottom-sheet`** is used for slide-up sheet UI (see Navigation below).
 
 ### Fonts
+
 **`@expo-google-fonts/*`** packages are used for Google Fonts. No manual font file management is required. Fonts are loaded at app startup using `expo-font`, with `SplashScreen.preventAutoHideAsync()` used to prevent render before fonts are ready.
 
 ### Navigation
+
 Navigation is handled by **Expo Router** (file-system based routing, built on React Navigation). The following navigation patterns are used:
 
-| Pattern | Name | Implementation |
-|---|---|---|
-| Bottom tab bar | Tab Navigator | `(tabs)` directory in Expo Router |
-| Screen pushed on top of current | Stack Navigator | Default Expo Router navigation |
+| Pattern                          | Name                 | Implementation                                                                                                            |
+| -------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Bottom tab bar                   | Tab Navigator        | `(tabs)` directory in Expo Router                                                                                         |
+| Screen pushed on top of current  | Stack Navigator      | Default Expo Router navigation                                                                                            |
 | Slide-up screen with drag handle | Modal / Bottom Sheet | `presentation: 'modal'` for full-screen modals; `@gorhom/bottom-sheet` for partial-height, snapping, or scrollable sheets |
 
 ### Local Database
+
 **`expo-sqlite`** (v14+) is used for local on-device storage. It provides a modern async API and integrates directly with Drizzle ORM.
 
 **Drizzle ORM** is used as the database interface layer:
+
 - Schema is defined in TypeScript
 - `drizzle-kit` manages migrations
 - Migrations are run on app startup
+- Generated mobile migrations live in `apps/mobile/drizzle`. Its `migrations.js` manifest must statically import every generated SQL file so Metro can bundle them.
 - `expo-drizzle-studio-plugin` is available for inspecting the database in Expo DevTools during development
 
 ### Local Authentication (App Lock)
+
 The app supports an optional lock feature. When enabled, the user must authenticate via their device's configured method (Face ID, Touch ID, fingerprint, or PIN/passcode) to access the app.
 
 **`expo-local-authentication`** handles this entirely on-device — no server involvement. Implementation details:
@@ -80,6 +91,7 @@ The app supports an optional lock feature. When enabled, the user must authentic
 - Biometric methods fall back gracefully to device PIN/passcode if biometrics fail or are unavailable
 
 ### TypeScript
+
 TypeScript is used throughout. Expo scaffolds with TypeScript by default. Expo Router provides fully typed routes — navigating to a non-existent route path is a compile-time error. All libraries in the mobile stack (Drizzle, tRPC) are TypeScript-first.
 
 ---
@@ -87,9 +99,11 @@ TypeScript is used throughout. Expo scaffolds with TypeScript by default. Expo R
 ## App 2: Server (Fastify + tRPC)
 
 ### Framework
+
 **Fastify** — chosen for its performance, TypeScript-first design, and plugin ecosystem.
 
 ### API Layer
+
 **tRPC** is used to define the API surface. tRPC provides end-to-end type safety between the server and all clients (mobile app and web) without code generation.
 
 The tRPC instance is initialized within the server app. All routers and procedures are defined under `apps/server/routers/`. The `AppRouter` type is exported from `@midwifes-notebook/server/router` and imported by clients — this is a type-only import, so nothing from the server is bundled into the client at runtime.
@@ -97,6 +111,7 @@ The tRPC instance is initialized within the server app. All routers and procedur
 tRPC is the exclusive API protocol between the server and clients. REST endpoints are not defined unless required by a third-party integration.
 
 ### tRPC Structure
+
 ```
 apps/server/
   routers/
@@ -105,8 +120,9 @@ apps/server/
 ```
 
 Clients import the shared type like so:
+
 ```ts
-import type { AppRouter } from '@midwifes-notebook/server/router';
+import type { AppRouter } from "@midwifes-notebook/server/router";
 ```
 
 ---
@@ -114,9 +130,11 @@ import type { AppRouter } from '@midwifes-notebook/server/router';
 ## App 3: Web (Astro)
 
 ### Purpose
+
 The Astro site serves as the public-facing web frontend: marketing pages, changelog, privacy policy, terms of service, and similar static or semi-static content.
 
 ### API Connectivity
+
 The site connects to the Fastify server via tRPC when dynamic server interaction is needed. All tRPC calls are made server-side in Astro page frontmatter using the configured client in `src/lib/trpc.ts`. The `AppRouter` type is imported from `@midwifes-notebook/server/router` for full type safety.
 
 ### Icons & SVGs
@@ -150,6 +168,7 @@ import AppleLogo from "../assets/apple-logo.svg";
 Never copy-paste SVG markup inline — either add the file to `src/assets/` and import it, or use an `astro-icon` icon.
 
 ### TypeScript
+
 TypeScript is used throughout. Astro ships with TypeScript support built in, with the project configured to use Astro's `strict` tsconfig preset.
 
 ---
@@ -180,11 +199,11 @@ E2E tests are not in scope at this stage.
 
 ### Per-App Setup
 
-| App | Test Runner | Key Libraries |
-|---|---|---|
-| Mobile (Expo/RN) | Jest + `jest-expo` preset | `@testing-library/react-native` |
-| Server (Fastify) | Jest | `supertest` for HTTP integration tests |
-| Web (Astro) | Jest | — |
+| App              | Test Runner               | Key Libraries                          |
+| ---------------- | ------------------------- | -------------------------------------- |
+| Mobile (Expo/RN) | Jest + `jest-expo` preset | `@testing-library/react-native`        |
+| Server (Fastify) | Jest                      | `supertest` for HTTP integration tests |
+| Web (Astro)      | Jest                      | —                                      |
 
 ### Running Tests
 

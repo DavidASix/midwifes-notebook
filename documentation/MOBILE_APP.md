@@ -104,22 +104,30 @@ Settings are **not** in the tab bar. A gear icon is shown only on the Statistics
 
 ### Clients Screen
 
-A scrollable contact-style list of all clients.
+A scrollable contact-style list of all clients. Clients are always sorted by last name. Views with 10 or more visible
+clients group them beneath small alphabetical section headers matching the first letter of each last name; smaller views
+omit the headers while retaining alphabetical order.
 
-**Filter tabs** at the top of the screen (horizontal scroll):
+Client rows show available pregnancy and clinical details. When neither is recorded, the row displays
+"No clinical details recorded" as a fallback so every client retains a supporting information line.
+
+**Client views** at the top of the screen are presented as horizontally scrollable tabs:
 - All Clients
 - Prenatal
 - Postpartum
 - Out of Care
 
-**Search** — search icon in the header opens an inline search bar to filter by name.
+Each tab represents a full-width list page. Users can swipe horizontally between pages or tap a tab to scroll directly
+to that view; each page keeps its own independent vertical client-list scroll.
+
+**Search** — search icon in the header opens an inline search bar. The single field searches client and partner names;
+baby names use the same matching path once baby records are implemented.
 
 **Add client** — person+ icon in the header navigates to the Add Client form (pushed as a stack screen).
 
 #### Client List Row
 
 Each row displays:
-- **Avatar** — circular; shows client photo if set, otherwise a default placeholder
 - **Name** — `Last, First` format; last name in heavier serif weight, given name in regular serif weight (Newsreader)
 - **Date line** — `EDD: YYYY-MM-DD` if prenatal; `DD: YYYY-MM-DD` if postpartum. If postpartum, also show **days postpartum** (e.g. `· 4 days postpartum`)
 - **GBS status icon** — shield icon; filled/accented if GBS+, outline/muted if GBS−

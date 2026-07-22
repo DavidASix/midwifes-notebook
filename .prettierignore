@@ -18,3 +18,5 @@ tsconfig.json
 **/drizzle/
 
 apps/mobile/android/*
+apps/mobile/coverage/*
+apps/mobile/drizzle

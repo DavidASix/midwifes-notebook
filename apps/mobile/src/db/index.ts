@@ -4,6 +4,7 @@ import { open } from "@op-engineering/op-sqlite";
 
 import * as schema from "./schema";
 import migrations from "../../drizzle/migrations";
+import { seedDatabase } from "../../scripts/seed";
 
 const DB_NAME = "midwifes_notebook.db";
 
@@ -21,6 +22,7 @@ export async function initDb(key: string): Promise<void> {
   const sqlite = open({ name: DB_NAME, encryptionKey: key });
   _db = drizzle(sqlite, { schema });
   await migrate(_db, migrations);
+  if (__DEV__) await seedDatabase(_db);
 }
 
 /**
