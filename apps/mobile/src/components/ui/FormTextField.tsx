@@ -71,9 +71,9 @@ const useStyles = makeStyles((theme) => ({
     color: theme.destructive,
   },
   input: {
-    minHeight: 44,
+    minHeight: 40,
     paddingHorizontal: 13,
-    paddingVertical: 8,
+    paddingVertical: 6,
     borderWidth: 1,
     borderColor: theme.input,
     borderRadius: radius.xl,
@@ -83,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: fontSize.md,
   },
   multilineInput: {
-    minHeight: 76,
+    minHeight: 68,
     lineHeight: 21,
   },
   inputError: {

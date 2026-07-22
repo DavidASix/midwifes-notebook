@@ -54,6 +54,7 @@ export function FormDateField({
         <Button
           accessibilityLabel={`${label}: ${displayValue}`}
           onPress={() => setIsOpen(true)}
+          size="compact"
           style={styles.button}
           title={displayValue}
           variant="secondary"
