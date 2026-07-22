@@ -33,6 +33,11 @@
       }
     },
     "owner": "davidasix",
-    "plugins": ["expo-router", "expo-font", "expo-secure-store"]
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store",
+      "@react-native-community/datetimepicker"
+    ]
   }
 }

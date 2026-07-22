@@ -1,4 +1,10 @@
-import { Pressable } from "react-native";
+import {
+  Pressable,
+  type AccessibilityRole,
+  type AccessibilityState,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import { makeStyles } from "@/lib/make-styles";
 import { Text } from "@/components/ui/Text";
 
@@ -6,7 +12,13 @@ type ButtonProps = {
   title: string;
   onPress?: () => void;
   disabled?: boolean;
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "default" | "compact";
+  style?: StyleProp<ViewStyle>;
+  accessibilityLabel?: string;
+  accessibilityRole?: AccessibilityRole;
+  accessibilityState?: AccessibilityState;
+  testID?: string;
 };
 
 export function Button({
@@ -14,18 +26,30 @@ export function Button({
   onPress,
   disabled,
   variant = "primary",
+  size = "default",
+  style,
+  accessibilityLabel,
+  accessibilityRole = "button",
+  accessibilityState,
+  testID,
 }: ButtonProps) {
   const styles = useStyles();
 
   return (
     <Pressable
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole={accessibilityRole}
+      accessibilityState={{ ...accessibilityState, disabled }}
       onPress={onPress}
       disabled={disabled}
+      testID={testID}
       style={({ pressed }) => [
         styles.base,
+        styles[size],
         styles[variant],
         pressed && styles.pressed,
         disabled && styles.disabled,
+        style,
       ]}
     >
       <Text style={[styles.label, styles[`${variant}Label`]]}>{title}</Text>
@@ -35,10 +59,18 @@ export function Button({
 const useStyles = makeStyles((theme) => ({
   base: {
     borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
     alignItems: "center",
     justifyContent: "center",
+  },
+  default: {
+    minHeight: 48,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  compact: {
+    minHeight: 40,
+    paddingVertical: 8,
+    paddingHorizontal: 13,
   },
   primary: {
     backgroundColor: theme.primary,
@@ -47,6 +79,9 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: theme.primary,
+  },
+  ghost: {
+    backgroundColor: "transparent",
   },
   pressed: {
     opacity: 0.8,
@@ -62,6 +97,9 @@ const useStyles = makeStyles((theme) => ({
     color: theme.primaryForeground,
   },
   secondaryLabel: {
+    color: theme.primary,
+  },
+  ghostLabel: {
     color: theme.primary,
   },
 }));
