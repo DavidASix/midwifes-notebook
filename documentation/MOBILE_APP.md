@@ -190,6 +190,9 @@ Pushed as a stack screen on top of the Client Detail modal when `EDIT` is tapped
 - Text, multiline, phone, numeric, native date, switch, and segmented-choice controls match each field's data type
 - Only first and last name are required; all other nullable fields start unset and selected choices can be cleared
 - Date of birth and manual age are mutually exclusive, with age used only when the birth date is unknown
+- New-client entry excludes delivery outcome fields; actual delivery date, delivery method, and tear degree are recorded
+  through the birth workflow after delivery
+- New clients are active by default; care status is changed later from the client record rather than during creation
 - Save button commits changes and pops back to the detail modal
 - Cancel discards changes and pops back
 

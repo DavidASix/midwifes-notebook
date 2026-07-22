@@ -89,7 +89,6 @@ describe("NewClientScreen", () => {
         expect.objectContaining({
           firstName: "Zara",
           lastName: "Okafor",
-          isActive: 1,
           bloodType: undefined,
           middleName: undefined,
         }),

@@ -13,7 +13,6 @@ function validValues(
   return {
     firstName: "Amina",
     lastName: "Yusuf",
-    isActive: true,
     ...overrides,
   };
 }
@@ -54,7 +53,6 @@ describe("buildClientInsert", () => {
         middleName: undefined,
         address: "72 Willow Street",
         partnerName: undefined,
-        isActive: 1,
       }),
     });
   });
@@ -65,10 +63,7 @@ describe("buildClientInsert", () => {
         bloodType: "AB-",
         rhStatus: "-",
         gbsStatus: "+",
-        deliveryMethod: "C-Section",
-        tearDegree: 3,
         partnerBloodType: "O+",
-        isActive: false,
       }),
       today,
     );
@@ -79,10 +74,7 @@ describe("buildClientInsert", () => {
         bloodType: "AB-",
         rhStatus: "-",
         gbsStatus: "+",
-        deliveryMethod: "C-Section",
-        tearDegree: 3,
         partnerBloodType: "O+",
-        isActive: 0,
       }),
     });
   });
@@ -99,21 +91,15 @@ describe("buildClientInsert", () => {
     });
   });
 
-  it("rejects future dates that would create impossible history", () => {
+  it("rejects a future date of birth", () => {
     const result = buildClientInsert(
-      validValues({
-        dateOfBirth: "2026-07-23",
-        actualDeliveryDate: "2026-08-01",
-      }),
+      validValues({ dateOfBirth: "2026-07-23" }),
       today,
     );
 
     expect(result).toEqual({
       success: false,
-      errors: {
-        dateOfBirth: "Date of birth cannot be in the future.",
-        actualDeliveryDate: "Delivery date cannot be in the future.",
-      },
+      errors: { dateOfBirth: "Date of birth cannot be in the future." },
     });
   });
 

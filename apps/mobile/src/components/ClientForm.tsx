@@ -3,7 +3,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Switch,
   TextInput,
   View,
   type KeyboardTypeOptions,
@@ -20,13 +19,7 @@ import {
   UsersRound,
 } from "lucide-react-native";
 
-import {
-  bloodTypes,
-  deliveryMethods,
-  gbsStatuses,
-  rhStatuses,
-  tearDegrees,
-} from "@/db/schema";
+import { bloodTypes, gbsStatuses, rhStatuses } from "@/db/schema";
 import {
   fromIsoDate,
   toIsoDate,
@@ -410,13 +403,6 @@ export function ClientForm({
             onChange={(value) => onChange("estimatedDeliveryDate", value)}
             value={values.estimatedDeliveryDate}
           />
-          <DateField
-            error={errors.actualDeliveryDate}
-            label="Actual delivery date"
-            maximumDate={today}
-            onChange={(value) => onChange("actualDeliveryDate", value)}
-            value={values.actualDeliveryDate}
-          />
           <View style={styles.twoColumnRow}>
             <View style={styles.column}>
               <TextField
@@ -438,21 +424,6 @@ export function ClientForm({
                 value={values.parity}
               />
             </View>
-          </View>
-          <View style={styles.switchRow}>
-            <View style={styles.switchCopy}>
-              <Text style={styles.switchTitle}>Currently in care</Text>
-              <Text style={styles.helperText}>
-                Turn off to create this client as out of care.
-              </Text>
-            </View>
-            <Switch
-              accessibilityLabel="Currently in care"
-              onValueChange={(value) => onChange("isActive", value)}
-              thumbColor={theme.primaryForeground}
-              trackColor={{ false: theme.muted, true: theme.secondary }}
-              value={values.isActive}
-            />
           </View>
         </SectionCard>
 
@@ -487,26 +458,6 @@ export function ClientForm({
               />
             </View>
           </View>
-          <ChoiceGroup
-            getLabel={(value) =>
-              value === "SVD"
-                ? "Spontaneous"
-                : value === "AVD"
-                  ? "Assisted"
-                  : "C-section"
-            }
-            label="Delivery method"
-            onChange={(value) => onChange("deliveryMethod", value)}
-            value={values.deliveryMethod}
-            values={deliveryMethods}
-          />
-          <ChoiceGroup
-            getLabel={(value) => `Degree ${value}`}
-            label="Tear degree"
-            onChange={(value) => onChange("tearDegree", value)}
-            value={values.tearDegree}
-            values={tearDegrees}
-          />
           <TextField
             label="Risk factors"
             multiline
@@ -747,27 +698,6 @@ const useStyles = makeStyles((theme) => ({
     color: theme.mutedForeground,
     fontSize: fontSize.sm,
     lineHeight: 18,
-  },
-  switchRow: {
-    minHeight: 58,
-    paddingHorizontal: 13,
-    paddingVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    borderWidth: 1,
-    borderColor: theme.input,
-    borderRadius: radius.xl,
-    backgroundColor: theme.background,
-  },
-  switchCopy: {
-    flex: 1,
-    gap: 2,
-  },
-  switchTitle: {
-    color: theme.foreground,
-    fontFamily: fontFamilies.base.semiBold,
-    fontSize: fontSize.md,
   },
   phoneLabel: {
     flexDirection: "row",

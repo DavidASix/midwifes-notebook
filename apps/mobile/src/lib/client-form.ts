@@ -1,11 +1,4 @@
-import {
-  bloodTypes,
-  clients,
-  deliveryMethods,
-  gbsStatuses,
-  rhStatuses,
-  tearDegrees,
-} from "@/db/schema";
+import { bloodTypes, clients, gbsStatuses, rhStatuses } from "@/db/schema";
 
 export type ClientFormValues = {
   firstName?: string;
@@ -17,27 +10,21 @@ export type ClientFormValues = {
   dateOfBirth?: string;
   age?: string;
   estimatedDeliveryDate?: string;
-  actualDeliveryDate?: string;
   gravida?: string;
   parity?: string;
   bloodType?: (typeof bloodTypes)[number];
   rhStatus?: (typeof rhStatuses)[number];
   gbsStatus?: (typeof gbsStatuses)[number];
-  deliveryMethod?: (typeof deliveryMethods)[number];
-  tearDegree?: (typeof tearDegrees)[number];
   riskFactors?: string;
   partnerName?: string;
   partnerRelationship?: string;
   partnerPhone?: string;
   partnerBloodType?: (typeof bloodTypes)[number];
-  isActive: boolean;
 };
 
 export type ClientFormErrors = Partial<Record<keyof ClientFormValues, string>>;
 
-export const initialClientFormValues: ClientFormValues = {
-  isActive: true,
-};
+export const initialClientFormValues: ClientFormValues = {};
 
 export type ClientFormResult =
   | { success: true; data: typeof clients.$inferInsert }
@@ -106,9 +93,6 @@ export function buildClientInsert(
   if (values.dateOfBirth && values.dateOfBirth > todayIso) {
     errors.dateOfBirth = "Date of birth cannot be in the future.";
   }
-  if (values.actualDeliveryDate && values.actualDeliveryDate > todayIso) {
-    errors.actualDeliveryDate = "Delivery date cannot be in the future.";
-  }
   if (gravida !== undefined && parity !== undefined && parity > gravida) {
     errors.parity = "Parity cannot be greater than gravida.";
   }
@@ -129,20 +113,16 @@ export function buildClientInsert(
       dateOfBirth: values.dateOfBirth,
       age,
       estimatedDeliveryDate: values.estimatedDeliveryDate,
-      actualDeliveryDate: values.actualDeliveryDate,
       gravida,
       parity,
       bloodType: values.bloodType,
       rhStatus: values.rhStatus,
       gbsStatus: values.gbsStatus,
-      deliveryMethod: values.deliveryMethod,
-      tearDegree: values.tearDegree,
       riskFactors: trimOptional(values.riskFactors),
       partnerName: trimOptional(values.partnerName),
       partnerRelationship: trimOptional(values.partnerRelationship),
       partnerPhone: trimOptional(values.partnerPhone),
       partnerBloodType: values.partnerBloodType,
-      isActive: values.isActive ? 1 : 0,
     },
   };
 }
