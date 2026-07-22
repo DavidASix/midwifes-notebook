@@ -113,6 +113,15 @@ describe("NewClientScreen", () => {
     });
   });
 
+  it("groups pregnancy and clinical inputs in one Clinical section", () => {
+    renderWithTheme(<NewClientScreen />);
+
+    expect(screen.getByText("Clinical")).toBeTruthy();
+    expect(screen.getByText("Estimated delivery date")).toBeTruthy();
+    expect(screen.getByText("Blood type")).toBeTruthy();
+    expect(screen.queryByText("Pregnancy & care")).toBeNull();
+  });
+
   it("retains entered data and stays open when the database rejects the insert", async () => {
     mockValues.mockRejectedValueOnce(new Error("database unavailable"));
     renderWithTheme(<NewClientScreen />);

@@ -11,7 +11,6 @@ import DateTimePicker, {
   type DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import {
-  Baby,
   CalendarDays,
   HeartPulse,
   Phone,
@@ -394,9 +393,9 @@ export function ClientForm({
         </SectionCard>
 
         <SectionCard
-          description="Dates, pregnancy history, and care status"
-          icon={<Baby color={theme.primary} size={20} />}
-          title="Pregnancy & care"
+          description="Pregnancy and clinical details"
+          icon={<HeartPulse color={theme.primary} size={20} />}
+          title="Clinical"
         >
           <DateField
             label="Estimated delivery date"
@@ -425,13 +424,6 @@ export function ClientForm({
               />
             </View>
           </View>
-        </SectionCard>
-
-        <SectionCard
-          description="Optional clinical details and delivery history"
-          icon={<HeartPulse color={theme.primary} size={20} />}
-          title="Clinical"
-        >
           <ChoiceGroup
             label="Blood type"
             onChange={(value) => onChange("bloodType", value)}
