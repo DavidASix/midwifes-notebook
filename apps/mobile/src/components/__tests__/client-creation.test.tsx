@@ -100,6 +100,7 @@ describe("NewClientScreen", () => {
   it("lets nullable clinical choices return to an unset value", async () => {
     renderWithTheme(<NewClientScreen />);
     enterRequiredNames();
+    fireEvent.press(screen.getByLabelText("Expand Clinical section"));
     const oPositive = screen.getByLabelText("Blood type: O+");
     fireEvent.press(oPositive);
     fireEvent.press(oPositive);
@@ -113,13 +114,28 @@ describe("NewClientScreen", () => {
     });
   });
 
-  it("groups pregnancy and clinical inputs in one Clinical section", () => {
+  it("keeps Identity open and reveals the combined Clinical section on demand", () => {
     renderWithTheme(<NewClientScreen />);
 
+    expect(screen.getByLabelText("First name")).toBeTruthy();
     expect(screen.getByText("Clinical")).toBeTruthy();
+    expect(screen.queryByText("Estimated delivery date")).toBeNull();
+    expect(screen.queryByText("Blood type")).toBeNull();
+    expect(screen.queryByText("Pregnancy & care")).toBeNull();
+
+    fireEvent.press(screen.getByLabelText("Expand Clinical section"));
+
     expect(screen.getByText("Estimated delivery date")).toBeTruthy();
     expect(screen.getByText("Blood type")).toBeTruthy();
-    expect(screen.queryByText("Pregnancy & care")).toBeNull();
+    expect(screen.getByLabelText("Collapse Clinical section")).toBeTruthy();
+  });
+
+  it("keeps Partner details collapsed until requested", () => {
+    renderWithTheme(<NewClientScreen />);
+
+    expect(screen.queryByLabelText("Partner phone number")).toBeNull();
+    fireEvent.press(screen.getByLabelText("Expand Partner section"));
+    expect(screen.getByLabelText("Partner phone number")).toBeTruthy();
   });
 
   it("retains entered data and stays open when the database rejects the insert", async () => {

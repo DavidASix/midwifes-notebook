@@ -5,15 +5,17 @@ import {
   type StyleProp,
   type ViewStyle,
 } from "react-native";
+import type { ReactNode } from "react";
 import { makeStyles } from "@/lib/make-styles";
 import { Text } from "@/components/ui/Text";
 
 type ButtonProps = {
-  title: string;
+  title?: string;
+  children?: ReactNode;
   onPress?: () => void;
   disabled?: boolean;
   variant?: "primary" | "secondary" | "ghost";
-  size?: "default" | "compact";
+  size?: "default" | "compact" | "bare";
   style?: StyleProp<ViewStyle>;
   accessibilityLabel?: string;
   accessibilityRole?: AccessibilityRole;
@@ -23,6 +25,7 @@ type ButtonProps = {
 
 export function Button({
   title,
+  children,
   onPress,
   disabled,
   variant = "primary",
@@ -52,7 +55,9 @@ export function Button({
         style,
       ]}
     >
-      <Text style={[styles.label, styles[`${variant}Label`]]}>{title}</Text>
+      {children ?? (
+        <Text style={[styles.label, styles[`${variant}Label`]]}>{title}</Text>
+      )}
     </Pressable>
   );
 }
@@ -71,6 +76,9 @@ const useStyles = makeStyles((theme) => ({
     minHeight: 40,
     paddingVertical: 8,
     paddingHorizontal: 13,
+  },
+  bare: {
+    minHeight: 44,
   },
   primary: {
     backgroundColor: theme.primary,

@@ -12,6 +12,7 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import {
   CalendarDays,
+  ChevronDown,
   HeartPulse,
   Phone,
   UserRound,
@@ -234,25 +235,53 @@ function SectionCard({
   title,
   description,
   children,
+  collapsible = false,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
   children: React.ReactNode;
+  collapsible?: boolean;
 }) {
   const styles = useStyles();
+  const theme = useTheme();
+  const [isExpanded, setIsExpanded] = useState(!collapsible);
+  const heading = (
+    <>
+      <View style={styles.sectionIcon}>{icon}</View>
+      <View style={styles.sectionHeading}>
+        <Text header style={styles.sectionTitle}>
+          {title}
+        </Text>
+        <Text style={styles.sectionDescription}>{description}</Text>
+      </View>
+      {collapsible && (
+        <ChevronDown
+          color={theme.primary}
+          size={22}
+          style={isExpanded ? styles.expandedChevron : undefined}
+        />
+      )}
+    </>
+  );
+
   return (
     <View style={styles.sectionCard}>
-      <View style={styles.sectionHeader}>
-        <View style={styles.sectionIcon}>{icon}</View>
-        <View style={styles.sectionHeading}>
-          <Text header style={styles.sectionTitle}>
-            {title}
-          </Text>
-          <Text style={styles.sectionDescription}>{description}</Text>
-        </View>
-      </View>
-      <View style={styles.sectionFields}>{children}</View>
+      {collapsible ? (
+        <Button
+          accessibilityLabel={`${isExpanded ? "Collapse" : "Expand"} ${title} section`}
+          accessibilityState={{ expanded: isExpanded }}
+          onPress={() => setIsExpanded((current) => !current)}
+          size="bare"
+          style={styles.sectionHeader}
+          variant="ghost"
+        >
+          {heading}
+        </Button>
+      ) : (
+        <View style={styles.sectionHeader}>{heading}</View>
+      )}
+      {isExpanded && <View style={styles.sectionFields}>{children}</View>}
     </View>
   );
 }
@@ -393,6 +422,7 @@ export function ClientForm({
         </SectionCard>
 
         <SectionCard
+          collapsible
           description="Pregnancy and clinical details"
           icon={<HeartPulse color={theme.primary} size={20} />}
           title="Clinical"
@@ -460,6 +490,7 @@ export function ClientForm({
         </SectionCard>
 
         <SectionCard
+          collapsible
           description="Partner or emergency-contact information"
           icon={<UsersRound color={theme.primary} size={20} />}
           title="Partner"
@@ -585,6 +616,9 @@ const useStyles = makeStyles((theme) => ({
   sectionHeading: {
     flex: 1,
     gap: 1,
+  },
+  expandedChevron: {
+    transform: [{ rotate: "180deg" }],
   },
   sectionTitle: {
     color: theme.foreground,
