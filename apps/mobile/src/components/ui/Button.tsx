@@ -1,5 +1,6 @@
 import {
   Pressable,
+  View,
   type AccessibilityRole,
   type AccessibilityState,
   type StyleProp,
@@ -11,6 +12,7 @@ import { Text } from "@/components/ui/Text";
 
 type ButtonProps = {
   title?: string;
+  icon?: ReactNode;
   children?: ReactNode;
   onPress?: () => void;
   disabled?: boolean;
@@ -25,6 +27,7 @@ type ButtonProps = {
 
 export function Button({
   title,
+  icon,
   children,
   onPress,
   disabled,
@@ -56,7 +59,10 @@ export function Button({
       ]}
     >
       {children ?? (
-        <Text style={[styles.label, styles[`${variant}Label`]]}>{title}</Text>
+        <View style={styles.content}>
+          {icon}
+          <Text style={[styles.label, styles[`${variant}Label`]]}>{title}</Text>
+        </View>
       )}
     </Pressable>
   );
@@ -66,6 +72,12 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+  },
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
   },
   default: {
     minHeight: 44,

@@ -7,6 +7,7 @@ import {
   HeartPulse,
   Phone,
   UserRound,
+  UserRoundPlus,
   UsersRound,
 } from "lucide-react-native";
 
@@ -341,13 +342,16 @@ export function ClientForm({
         <Button
           disabled={isSubmitting}
           onPress={onCancel}
+          size="compact"
           style={styles.footerButton}
           title="Cancel"
           variant="secondary"
         />
         <Button
           disabled={isSubmitting}
+          icon={<UserRoundPlus color={theme.primaryForeground} size={17} />}
           onPress={onSubmit}
+          size="compact"
           style={styles.footerButton}
           title={isSubmitting ? "Adding client…" : "Add client"}
         />
