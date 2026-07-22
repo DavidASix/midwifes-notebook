@@ -1,0 +1,1 @@
+ALTER TABLE `clients` DROP COLUMN `photo_path`;

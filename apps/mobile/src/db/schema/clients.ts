@@ -34,7 +34,6 @@ export const clients = sqliteTable(
 
     dateOfBirth: text("date_of_birth"),
     age: integer("age"),
-    photoPath: text("photo_path"),
 
     estimatedDeliveryDate: text("estimated_delivery_date"),
     actualDeliveryDate: text("actual_delivery_date"),

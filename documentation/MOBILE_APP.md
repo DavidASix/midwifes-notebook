@@ -187,7 +187,6 @@ The tab shows a chronological list of notes. Tapping a note opens it for viewing
 Pushed as a stack screen on top of the Client Detail modal when `EDIT` is tapped.
 
 - Full scrollable form with all editable client fields
-- Photo field: tap to choose from library or take a new photo (`expo-image-picker`)
 - Save button commits changes and pops back to the detail modal
 - Cancel discards changes and pops back
 
