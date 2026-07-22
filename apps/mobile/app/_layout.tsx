@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { Pressable } from "react-native";
 import { ArrowBigLeft } from "lucide-react-native";
 
+import { AppToast } from "@/components/AppToast";
 import { useAppFonts } from "@/hooks/useAppFonts";
 
 import { ThemeProvider, useTheme } from "@/lib/theme-context";
@@ -34,6 +35,7 @@ function RootLayoutContent() {
         <Stack.Screen name="(app)" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style={theme.statusBarIcons} />
+      <AppToast />
     </>
   );
 }

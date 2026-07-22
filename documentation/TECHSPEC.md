@@ -56,6 +56,9 @@ For complex interactive components with non-trivial logic or accessibility requi
 **`@react-native-community/datetimepicker`** provides native calendar-date controls for nullable client dates. Form state
 stores selected calendar dates as `YYYY-MM-DD` strings before passing them to Drizzle.
 
+**`react-native-toast-message`** provides app-wide transient feedback. A single themed presenter is mounted above the
+root navigator, and feature code invokes typed helpers for success, error, and informational messages.
+
 ### Fonts
 
 **`@expo-google-fonts/*`** packages are used for Google Fonts. No manual font file management is required. Fonts are loaded at app startup using `expo-font`, with `SplashScreen.preventAutoHideAsync()` used to prevent render before fonts are ready.

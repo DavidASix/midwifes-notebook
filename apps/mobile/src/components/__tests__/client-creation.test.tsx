@@ -50,6 +50,10 @@ jest.mock("@/db", () => {
   return { __esModule: true, db, from, getDb: () => db, values };
 });
 
+jest.mock("@/lib/toast", () => ({
+  showErrorToast: jest.fn(),
+}));
+
 const mockExpoRouter = jest.requireMock("expo-router");
 const mockRouter = mockExpoRouter.router as {
   back: jest.Mock;
@@ -63,6 +67,8 @@ const mockDb = mockDatabaseModule.db as {
 };
 const mockFrom = mockDatabaseModule.from as jest.Mock;
 const mockValues = mockDatabaseModule.values as jest.Mock;
+const mockShowErrorToast = jest.requireMock("@/lib/toast")
+  .showErrorToast as jest.Mock;
 
 function enterRequiredNames() {
   fireEvent.changeText(screen.getByLabelText("First name"), "  Zara ");
@@ -95,6 +101,20 @@ describe("NewClientScreen", () => {
       ),
     );
     await waitFor(() => expect(mockRouter.back).toHaveBeenCalledTimes(1));
+  });
+
+  it("shows an app-wide toast and inline errors when required names are missing", () => {
+    renderWithTheme(<NewClientScreen />);
+
+    fireEvent.press(screen.getByText("Add client"));
+
+    expect(mockShowErrorToast).toHaveBeenCalledWith(
+      "Review highlighted fields",
+      "First and last name are required.",
+    );
+    expect(screen.getByText("First name is required.")).toBeTruthy();
+    expect(screen.getByText("Last name is required.")).toBeTruthy();
+    expect(mockValues).not.toHaveBeenCalled();
   });
 
   it("lets nullable clinical choices return to an unset value", async () => {
@@ -145,11 +165,12 @@ describe("NewClientScreen", () => {
 
     fireEvent.press(screen.getByText("Add client"));
 
-    expect(
-      await screen.findByText(
-        "We couldn't add this client. Your entries are still here—please try again.",
+    await waitFor(() =>
+      expect(mockShowErrorToast).toHaveBeenCalledWith(
+        "Couldn't add client",
+        "Your entries are still here. Please try again.",
       ),
-    ).toBeTruthy();
+    );
     expect(screen.getByLabelText("First name").props.value).toBe("  Zara ");
     expect(mockRouter.back).not.toHaveBeenCalled();
   });

@@ -11,6 +11,7 @@ import {
   type ClientFormErrors,
   type ClientFormValues,
 } from "@/lib/client-form";
+import { showErrorToast } from "@/lib/toast";
 
 export default function NewClientScreen() {
   const db = getDb();
@@ -20,7 +21,6 @@ export default function NewClientScreen() {
     initialClientFormValues,
   );
   const [errors, setErrors] = useState<ClientFormErrors>({});
-  const [submitError, setSubmitError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isDirty = useMemo(
     () => JSON.stringify(values) !== JSON.stringify(initialClientFormValues),
@@ -54,7 +54,6 @@ export default function NewClientScreen() {
   ) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
-    setSubmitError(undefined);
   }
 
   async function submit() {
@@ -62,22 +61,23 @@ export default function NewClientScreen() {
     const result = buildClientInsert(values);
     if (!result.success) {
       setErrors(result.errors);
-      setSubmitError(
-        "Review the highlighted fields before adding this client.",
+      showErrorToast(
+        "Review highlighted fields",
+        "First and last name are required.",
       );
       return;
     }
 
     setIsSubmitting(true);
     setErrors({});
-    setSubmitError(undefined);
     try {
       await db.insert(clients).values(result.data);
       savedRef.current = true;
       router.back();
     } catch {
-      setSubmitError(
-        "We couldn't add this client. Your entries are still here—please try again.",
+      showErrorToast(
+        "Couldn't add client",
+        "Your entries are still here. Please try again.",
       );
       setIsSubmitting(false);
     }
@@ -98,7 +98,6 @@ export default function NewClientScreen() {
         onCancel={() => router.back()}
         onChange={changeValue}
         onSubmit={submit}
-        submitError={submitError}
         values={values}
       />
     </>

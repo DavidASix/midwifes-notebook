@@ -13,6 +13,7 @@ import DateTimePicker, {
 import {
   CalendarDays,
   ChevronDown,
+  ChevronUp,
   HeartPulse,
   Phone,
   UserRound,
@@ -36,7 +37,6 @@ import { Text } from "@/components/ui/Text";
 type ClientFormProps = {
   values: ClientFormValues;
   errors: ClientFormErrors;
-  submitError?: string;
   isSubmitting: boolean;
   onChange: <K extends keyof ClientFormValues>(
     field: K,
@@ -255,13 +255,12 @@ function SectionCard({
         </Text>
         <Text style={styles.sectionDescription}>{description}</Text>
       </View>
-      {collapsible && (
-        <ChevronDown
-          color={theme.primary}
-          size={22}
-          style={isExpanded ? styles.expandedChevron : undefined}
-        />
-      )}
+      {collapsible &&
+        (isExpanded ? (
+          <ChevronUp color={theme.primary} size={22} />
+        ) : (
+          <ChevronDown color={theme.primary} size={22} />
+        ))}
     </>
   );
 
@@ -290,7 +289,6 @@ function SectionCard({
 export function ClientForm({
   values,
   errors,
-  submitError,
   isSubmitting,
   onChange,
   onSubmit,
@@ -325,12 +323,6 @@ export function ClientForm({
             added now or later.
           </Text>
         </View>
-
-        {submitError && (
-          <View accessibilityRole="alert" style={styles.submitError}>
-            <Text style={styles.submitErrorText}>{submitError}</Text>
-          </View>
-        )}
 
         <SectionCard
           description="Names and ways to get in touch"
@@ -579,19 +571,6 @@ const useStyles = makeStyles((theme) => ({
     fontSize: fontSize.md,
     lineHeight: 22,
   },
-  submitError: {
-    padding: 13,
-    borderWidth: 1,
-    borderColor: theme.destructive,
-    borderRadius: radius.xl,
-    backgroundColor: theme.card,
-  },
-  submitErrorText: {
-    color: theme.destructive,
-    fontFamily: fontFamilies.base.medium,
-    fontSize: fontSize.sm,
-    lineHeight: 19,
-  },
   sectionCard: {
     padding: 16,
     gap: 18,
@@ -616,9 +595,6 @@ const useStyles = makeStyles((theme) => ({
   sectionHeading: {
     flex: 1,
     gap: 1,
-  },
-  expandedChevron: {
-    transform: [{ rotate: "180deg" }],
   },
   sectionTitle: {
     color: theme.foreground,

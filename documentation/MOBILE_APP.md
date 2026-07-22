@@ -200,7 +200,8 @@ Pushed as a stack screen on top of the Client Detail modal when `EDIT` is tapped
 The same form is used for **Add Client** (reached from the client list header), with optional fields unset and active care
 enabled. It is presented as a full-screen modal that slides up from the bottom. Saving inserts the client into the local
 database, dismisses the modal, and refreshes the alphabetically sorted client list. Validation and database errors leave
-the entered values in place so they can be corrected or retried.
+the entered values in place so they can be corrected or retried. App-wide toast notifications surface both error types
+above the current screen, while invalid fields also retain their inline guidance.
 
 ---
 
