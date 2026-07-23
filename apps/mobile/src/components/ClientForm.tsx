@@ -363,7 +363,6 @@ export function ClientForm({
 const useStyles = makeStyles((theme) => ({
   container: {
     flex: 1,
-    backgroundColor: theme.background,
   },
   content: {
     paddingHorizontal: 16,
@@ -475,7 +474,7 @@ const useStyles = makeStyles((theme) => ({
   footer: {
     paddingHorizontal: 16,
     paddingTop: 12,
-    paddingBottom: Platform.OS === "ios" ? 26 : 14,
+    paddingBottom: Platform.OS === "ios" ? 26 : 20,
     flexDirection: "row",
     gap: 12,
     borderTopWidth: 1,
