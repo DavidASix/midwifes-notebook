@@ -90,7 +90,7 @@ export default function NewClientScreen() {
     <>
       <Stack.Screen
         options={{
-          gestureEnabled: !isDirty,
+          gestureEnabled: true,
           headerShown: false,
           presentation: "formSheet",
           sheetAllowedDetents: [0.93],
