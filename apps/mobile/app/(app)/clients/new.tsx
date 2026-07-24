@@ -66,7 +66,7 @@ export default function NewClientScreen() {
       setErrors(result.errors);
       showErrorToast(
         "Review highlighted fields",
-        "First and last name are required.",
+        "Correct the highlighted fields and try again.",
       );
       return;
     }
