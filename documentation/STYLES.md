@@ -38,6 +38,22 @@ Clean, clinical minimalism with warm undertones. Intentionally approachable for 
 - Status badges: pill-shaped, uppercase, small text, low-contrast fill
 - Bottom tab bar: icon + label, active state in `#1a4331`
 - Detail view tabs: underline indicator, inactive labels in `#96a5b9`
+- Forms: one scrollable column of open sections directly on the page background, each with a compact tinted icon, serif
+  title, and short supporting description; related short fields may share a row while long-form inputs remain full width
+- Collapsible form sections: collapsed sections show only their icon, title, description, and a trailing down chevron;
+  expanding switches it to an up chevron and reveals the fields below the same header
+- Toasts: compact rounded cards that float above navigation and fixed actions, pairing a semantic icon with a short title
+  and optional supporting message; they follow the active theme and use a restrained shadow
+- Form choices: outlined segmented buttons when unset and primary-filled when selected; nullable choices reveal a subtle
+  clearing hint and can be returned to the unset state by tapping the selection again
+- Form controls: text inputs use a compact 40-point height; date selectors, segmented choices, and footer actions use a
+  denser 36-point visual height, while disclosure headers retain a 44-point touch target
+- Form actions: a persistent bottom action bar above the safe area, with equal-width secondary Cancel and primary Save
+  actions
+- Add-client sheet: a tall, rounded native form sheet over a dimmed client list, with a compact centered drag handle and
+  enough space above the sheet to preserve the originating-screen context; it does not use a stack navigation header.
+  Modal surface styling and chrome belong to the route that configures the stack presentation, while feature content is
+  composed inside that surface
 - Skeleton loaders: used wherever load time may exceed 200ms — match the geometry of the content they replace (row height, label width, badge width), colored in a `#96a5b9`-tinted pulse
 - Onboarding: full-width horizontal pages with a single primary action, centered copy, and pagination dots fixed above the device's bottom safe area; the active dot is elongated and uses the primary accent
 

@@ -31,7 +31,6 @@ CREATE TABLE clients (
   -- Identity
   date_of_birth           TEXT,                          -- ISO 8601 (YYYY-MM-DD); nullable if unknown
   age                     INTEGER,                       -- Only populated when date_of_birth is unavailable
-  photo_path              TEXT,                          -- Local filesystem path to client photo
 
   -- Pregnancy
   estimated_delivery_date TEXT,                          -- ISO 8601

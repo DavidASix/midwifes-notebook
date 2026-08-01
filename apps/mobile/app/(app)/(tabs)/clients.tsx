@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   Pressable,
@@ -14,7 +7,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { router, useNavigation } from "expo-router";
+import { router, useFocusEffect, useNavigation } from "expo-router";
 import { Search, UserRoundPlus, X } from "lucide-react-native";
 
 import { getDb } from "@/db";
@@ -87,9 +80,11 @@ export default function ClientsScreen() {
     setData(await db.select().from(clients));
   }, [db]);
 
-  useEffect(() => {
-    fetchClients();
-  }, [fetchClients]);
+  useFocusEffect(
+    useCallback(() => {
+      void fetchClients();
+    }, [fetchClients]),
+  );
 
   const clientViews = useMemo<ClientView[]>(
     () =>

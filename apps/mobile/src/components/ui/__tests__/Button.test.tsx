@@ -1,6 +1,7 @@
 import React from "react";
 import { fireEvent, renderWithTheme, screen } from "@/test-utils";
 import { Button } from "@/components/ui/Button";
+import { Text } from "@/components/ui/Text";
 
 describe("Button", () => {
   it("renders the title", () => {
@@ -25,5 +26,13 @@ describe("Button", () => {
   it("renders secondary variant without crashing", () => {
     renderWithTheme(<Button title="Cancel" variant="secondary" />);
     expect(screen.getByText("Cancel")).toBeTruthy();
+  });
+
+  it("renders an icon beside its title", () => {
+    renderWithTheme(
+      <Button icon={<Text testID="save-icon">icon</Text>} title="Save" />,
+    );
+    expect(screen.getByTestId("save-icon")).toBeTruthy();
+    expect(screen.getByText("Save")).toBeTruthy();
   });
 });

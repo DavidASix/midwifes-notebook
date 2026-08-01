@@ -77,7 +77,7 @@ export const themes: Record<Theme, ColorTheme> = {
     accentForeground: "#1a4331",
     destructive: "#dc2626",
     border: "#e2e0d8",
-    input: "#e2e0d8",
+    input: "#fefffa",
     ring: "#1a4331",
     statusBarIcons: "dark",
   },

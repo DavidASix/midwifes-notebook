@@ -18,6 +18,8 @@ Before reaching for a React Native primitive (`Pressable`, `Text`, `View`, etc.)
 
 - Use `<Button>` from `@/components/ui/Button` for any tappable button — do not use a raw `Pressable` with inline styles.
 - Use `<Text>` from `@/components/ui/Text` instead of the React Native `Text` primitive.
+- Use the form primitives in `src/components/ui/` (`FormTextField`, `FormDateField`, and `FormChoiceGroup`) instead of
+  defining styled inputs inside a screen or feature component.
 - For any other element, check `src/components/ui/` first before writing a new styled primitive.
 
 ---
