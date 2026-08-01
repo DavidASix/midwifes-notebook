@@ -68,6 +68,8 @@ When working on the mobile app's user interface, take screenshots of the running
 
 Only do this when an ADB device is already running and available. If no ADB devices are connected, do not start an emulator or device.
 
+When creating a PR with many visual changes, take screenshots and place them in `../screenshots`. Use descriptive filenames that match the screenshot details, and include a table in the PR description listing each filename and its details. The user will drag and drop the screenshots into the PR description.
+
 ---
 
 ## Gotchas
