@@ -66,7 +66,7 @@ export default function NewClientScreen() {
       setErrors(result.errors);
       showErrorToast(
         "Review highlighted fields",
-        "First and last name are required.",
+        "Correct the highlighted fields and try again.",
       );
       return;
     }
@@ -90,7 +90,7 @@ export default function NewClientScreen() {
     <>
       <Stack.Screen
         options={{
-          gestureEnabled: !isDirty,
+          gestureEnabled: true,
           headerShown: false,
           presentation: "formSheet",
           sheetAllowedDetents: [0.93],

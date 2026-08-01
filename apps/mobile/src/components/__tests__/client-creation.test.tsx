@@ -1,4 +1,5 @@
 import React from "react";
+import { Alert } from "react-native";
 
 import { act, fireEvent, renderWithTheme, screen, waitFor } from "@/test-utils";
 
@@ -15,9 +16,7 @@ jest.mock("expo-router", () => {
     dispatch: jest.fn(),
     setOptions: jest.fn(),
   };
-  MockStack.Screen = function MockStackScreen() {
-    return null;
-  };
+  MockStack.Screen = jest.fn(() => null);
   return {
     __esModule: true,
     router: {
@@ -84,6 +83,10 @@ describe("NewClientScreen", () => {
     mockDb.select.mockReturnValue({ from: mockFrom });
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("inserts a minimal client and dismisses only after persistence succeeds", async () => {
     renderWithTheme(<NewClientScreen />);
     enterRequiredNames();
@@ -110,11 +113,58 @@ describe("NewClientScreen", () => {
 
     expect(mockShowErrorToast).toHaveBeenCalledWith(
       "Review highlighted fields",
-      "First and last name are required.",
+      "Correct the highlighted fields and try again.",
     );
     expect(screen.getByText("First name is required.")).toBeTruthy();
     expect(screen.getByText("Last name is required.")).toBeTruthy();
     expect(mockValues).not.toHaveBeenCalled();
+  });
+
+  it("uses generic toast guidance for non-name validation errors", () => {
+    renderWithTheme(<NewClientScreen />);
+    enterRequiredNames();
+    fireEvent.press(screen.getByLabelText("Expand Clinical section"));
+    fireEvent.changeText(screen.getByLabelText("Gravida"), "1");
+    fireEvent.changeText(screen.getByLabelText("Parity"), "2");
+
+    fireEvent.press(screen.getByText("Add client"));
+
+    expect(mockShowErrorToast).toHaveBeenCalledWith(
+      "Review highlighted fields",
+      "Correct the highlighted fields and try again.",
+    );
+    expect(
+      screen.getByText("Parity cannot be greater than gravida."),
+    ).toBeTruthy();
+    expect(mockValues).not.toHaveBeenCalled();
+  });
+
+  it("keeps native dismissal enabled and confirms dirty navigation attempts", () => {
+    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation();
+    renderWithTheme(<NewClientScreen />);
+
+    const screenOptions =
+      mockExpoRouter.Stack.Screen.mock.calls.at(-1)[0].options;
+    expect(screenOptions.gestureEnabled).toBe(true);
+
+    fireEvent.changeText(screen.getByLabelText("First name"), "Zara");
+
+    const beforeRemove = mockExpoRouter.navigation.addListener.mock.calls
+      .filter(([eventName]: [string]) => eventName === "beforeRemove")
+      .at(-1)[1];
+    const action = { type: "GO_BACK" };
+    const event = { data: { action }, preventDefault: jest.fn() };
+    act(() => beforeRemove(event));
+
+    expect(event.preventDefault).toHaveBeenCalledTimes(1);
+    expect(alertSpy).toHaveBeenCalledWith(
+      "Discard this client?",
+      "Your changes have not been saved.",
+      expect.any(Array),
+    );
+    const buttons = alertSpy.mock.calls[0][2];
+    act(() => buttons?.[1].onPress?.());
+    expect(mockExpoRouter.navigation.dispatch).toHaveBeenCalledWith(action);
   });
 
   it("lets nullable clinical choices return to an unset value", async () => {
