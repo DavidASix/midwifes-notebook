@@ -1,9 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, View } from "react-native";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  type BottomSheetBackdropProps,
+} from "@gorhom/bottom-sheet";
 import { router, Stack, useNavigation } from "expo-router";
 
 import { ClientForm } from "@/components/ClientForm";
-import { SheetHandle } from "@/components/ui/SheetHandle";
 import { getDb } from "@/db";
 import { clients } from "@/db/schema";
 import {
@@ -19,7 +22,10 @@ export default function NewClientScreen() {
   const styles = useStyles();
   const db = getDb();
   const navigation = useNavigation();
+  const bottomSheetRef = useRef<BottomSheet>(null);
   const savedRef = useRef(false);
+  const allowDismissRef = useRef(false);
+  const discardPromptOpenRef = useRef(false);
   const [values, setValues] = useState<ClientFormValues>(
     initialClientFormValues,
   );
@@ -30,25 +36,86 @@ export default function NewClientScreen() {
     [values],
   );
 
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  );
+
+  const confirmDiscard = useCallback((onDiscard: () => void) => {
+    if (discardPromptOpenRef.current) return;
+    discardPromptOpenRef.current = true;
+
+    const closePrompt = () => {
+      discardPromptOpenRef.current = false;
+    };
+
+    Alert.alert(
+      "Discard this client?",
+      "Your changes have not been saved.",
+      [
+        { text: "Keep editing", style: "cancel", onPress: closePrompt },
+        {
+          text: "Discard",
+          style: "destructive",
+          onPress: () => {
+            closePrompt();
+            onDiscard();
+          },
+        },
+      ],
+      { cancelable: true, onDismiss: closePrompt },
+    );
+  }, []);
+
+  const closeSheet = useCallback(() => {
+    allowDismissRef.current = true;
+    bottomSheetRef.current?.close();
+  }, []);
+
+  const requestClose = useCallback(() => {
+    if (isDirty && !savedRef.current) {
+      confirmDiscard(closeSheet);
+      return;
+    }
+
+    closeSheet();
+  }, [closeSheet, confirmDiscard, isDirty]);
+
+  const handleSheetAnimate = useCallback(
+    (_fromIndex: number, toIndex: number) => {
+      if (
+        toIndex !== -1 ||
+        allowDismissRef.current ||
+        savedRef.current ||
+        !isDirty
+      ) {
+        return;
+      }
+
+      bottomSheetRef.current?.snapToIndex(0);
+      confirmDiscard(closeSheet);
+    },
+    [closeSheet, confirmDiscard, isDirty],
+  );
+
   useEffect(
     () =>
       navigation.addListener("beforeRemove", (event) => {
         if (!isDirty || savedRef.current) return;
         event.preventDefault();
-        Alert.alert(
-          "Discard this client?",
-          "Your changes have not been saved.",
-          [
-            { text: "Keep editing", style: "cancel" },
-            {
-              text: "Discard",
-              style: "destructive",
-              onPress: () => navigation.dispatch(event.data.action),
-            },
-          ],
-        );
+        confirmDiscard(() => {
+          allowDismissRef.current = true;
+          navigation.dispatch(event.data.action);
+        });
       }),
-    [isDirty, navigation],
+    [confirmDiscard, isDirty, navigation],
   );
 
   function changeValue<K extends keyof ClientFormValues>(
@@ -76,7 +143,7 @@ export default function NewClientScreen() {
     try {
       await db.insert(clients).values(result.data);
       savedRef.current = true;
-      router.back();
+      closeSheet();
     } catch {
       showErrorToast(
         "Couldn't add client",
@@ -90,34 +157,48 @@ export default function NewClientScreen() {
     <>
       <Stack.Screen
         options={{
-          gestureEnabled: true,
+          animation: "fade",
+          contentStyle: { backgroundColor: "transparent" },
+          gestureEnabled: false,
           headerShown: false,
-          presentation: "formSheet",
-          sheetAllowedDetents: [0.93],
-          sheetCornerRadius: 24,
-          sheetElevation: 16,
-          sheetInitialDetentIndex: 0,
-          sheetShouldOverflowTopInset: false,
+          presentation: "transparentModal",
         }}
       />
-      <View style={styles.sheetSurface}>
-        <SheetHandle />
-        <ClientForm
-          errors={errors}
-          isSubmitting={isSubmitting}
-          onCancel={() => router.back()}
-          onChange={changeValue}
-          onSubmit={submit}
-          values={values}
-        />
+      <View style={styles.container}>
+        <BottomSheet
+          backdropComponent={renderBackdrop}
+          backgroundStyle={styles.sheetSurface}
+          enableDynamicSizing={false}
+          enablePanDownToClose
+          handleIndicatorStyle={styles.handleIndicator}
+          index={0}
+          onAnimate={handleSheetAnimate}
+          onClose={() => router.back()}
+          ref={bottomSheetRef}
+          snapPoints={["93%"]}
+        >
+          <ClientForm
+            errors={errors}
+            isSubmitting={isSubmitting}
+            onCancel={requestClose}
+            onChange={changeValue}
+            onSubmit={submit}
+            values={values}
+          />
+        </BottomSheet>
       </View>
     </>
   );
 }
 
 const useStyles = makeStyles((theme) => ({
-  sheetSurface: {
+  container: {
     flex: 1,
+  },
+  sheetSurface: {
     backgroundColor: theme.background,
+  },
+  handleIndicator: {
+    backgroundColor: theme.mutedForeground,
   },
 }));

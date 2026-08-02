@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { Platform, View } from "react-native";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import {
   CalendarDays,
   ChevronDown,
@@ -113,14 +114,12 @@ export function ClientForm({
   );
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={styles.container}
-    >
-      <ScrollView
+    <>
+      <BottomSheetScrollView
         contentContainerStyle={styles.content}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
+        style={styles.container}
       >
         <View style={styles.intro}>
           <Text header style={styles.introTitle}>
@@ -336,7 +335,7 @@ export function ClientForm({
             </Text>
           </View>
         </View>
-      </ScrollView>
+      </BottomSheetScrollView>
 
       <View style={styles.footer}>
         <Button
@@ -356,7 +355,7 @@ export function ClientForm({
           title={isSubmitting ? "Adding client…" : "Add client"}
         />
       </View>
-    </KeyboardAvoidingView>
+    </>
   );
 }
 
