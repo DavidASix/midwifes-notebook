@@ -62,6 +62,7 @@ export function SlideUpScreen({
           onClose={controller.onClose}
           ref={controller.sheetRef}
           snapPoints={snapPoints}
+          style={styles.sheet}
         >
           {children}
         </BottomSheet>
@@ -76,6 +77,9 @@ const useStyles = makeStyles((theme) => ({
   },
   sheetSurface: {
     backgroundColor: theme.background,
+  },
+  sheet: {
+    marginHorizontal: 8,
   },
   handleIndicator: {
     backgroundColor: theme.mutedForeground,
