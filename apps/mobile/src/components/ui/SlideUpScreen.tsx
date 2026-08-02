@@ -6,6 +6,7 @@ import BottomSheet, {
   type BottomSheetProps,
 } from "@gorhom/bottom-sheet";
 import { Stack } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { SlideUpScreenController } from "@/hooks/useSlideUpScreen";
 import { makeStyles } from "@/lib/make-styles";
@@ -27,6 +28,7 @@ export function SlideUpScreen({
   snapPoints = defaultSnapPoints,
 }: SlideUpScreenProps) {
   const styles = useStyles();
+  const insets = useSafeAreaInsets();
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop
@@ -54,6 +56,7 @@ export function SlideUpScreen({
         <BottomSheet
           backdropComponent={renderBackdrop}
           backgroundStyle={styles.sheetSurface}
+          bottomInset={insets.bottom}
           enableDynamicSizing={enableDynamicSizing}
           enablePanDownToClose
           handleIndicatorStyle={styles.handleIndicator}
