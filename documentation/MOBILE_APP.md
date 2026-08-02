@@ -198,17 +198,17 @@ Pushed as a stack screen on top of the Client Detail modal when `EDIT` is tapped
 - Cancel discards changes and pops back
 
 The same form is used for **Add Client** (reached from the client list header), with optional fields unset and active care
-enabled. It is presented as a tall native form sheet that slides up over the dimmed client list, leaves context visible
-above its rounded top edge, and can be pulled down to dismiss. When values have been entered, pull-down, Cancel, and the
-platform back action keep the sheet in place and present the discard confirmation. The sheet has no stack header; its
-opening copy provides the page title. Saving inserts the client into the local database, dismisses the sheet, and
-refreshes the alphabetically sorted client list. Validation and database errors leave the entered values in place so they
-can be corrected or retried. App-wide toast notifications surface both error types above the current screen, while
-invalid fields also retain their inline guidance.
+enabled. It is presented in a tall, route-backed Gorhom bottom sheet that slides up over the dimmed client list, leaves
+context above its rounded top edge and along both sides, and can be pulled down to dismiss. When values have been entered,
+pull-down, backdrop press, Cancel, and the platform back action keep the sheet in place and present the discard
+confirmation. The sheet has no stack header; its opening copy provides the page title. Saving inserts the client into the
+local database, dismisses the sheet, and refreshes the alphabetically sorted client list. Validation and database errors
+leave the entered values in place so they can be corrected or retried. App-wide toast notifications surface both error
+types above the current screen, while invalid fields also retain their inline guidance.
 
-For modal and form-sheet routes, keep presentation controls and sheet chrome—such as `Stack.Screen` options, the surface
-background, and drag handle—in the route component beside the stack declaration. Reusable feature content, such as a
-form, should be rendered inside that route-owned surface rather than owning the modal material itself.
+For bottom-sheet routes, render reusable feature content inside the shared `SlideUpScreen` route surface and use
+`useSlideUpScreen` for guarded or immediate dismissal. Feature content, such as a form, should not own the modal material
+or manipulate router history itself. See [`BOTTOM_SHEETS.md`](BOTTOM_SHEETS.md) for the implementation pattern.
 
 ---
 

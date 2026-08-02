@@ -51,7 +51,8 @@ Simple, stateless components (buttons, badges, cards, avatars, etc.) are built i
 
 For complex interactive components with non-trivial logic or accessibility requirements (dropdowns, dialogs, tooltips, popovers), a dedicated library or React Native Reusables may be used on a case-by-case basis.
 
-**`@gorhom/bottom-sheet`** is used for slide-up sheet UI (see Navigation below).
+**`@gorhom/bottom-sheet`** is used for slide-up sheet UI (see Navigation below). The route integration, dismissal
+contract, scrolling pattern, and test setup are documented in [`BOTTOM_SHEETS.md`](BOTTOM_SHEETS.md).
 
 **`@react-native-community/datetimepicker`** provides native calendar-date controls for nullable client dates. Form state
 stores selected calendar dates as `YYYY-MM-DD` strings before passing them to Drizzle.
@@ -71,7 +72,7 @@ Navigation is handled by **Expo Router** (file-system based routing, built on Re
 | -------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Bottom tab bar                   | Tab Navigator        | `(tabs)` directory in Expo Router                                                                                         |
 | Screen pushed on top of current  | Stack Navigator      | Default Expo Router navigation                                                                                            |
-| Slide-up screen with drag handle | Modal / Bottom Sheet | `presentation: 'modal'` for full-screen modals; `@gorhom/bottom-sheet` for partial-height, snapping, or scrollable sheets |
+| Slide-up screen with drag handle | Modal / Bottom Sheet | A `transparentModal` Expo Router route containing `@gorhom/bottom-sheet`; see [`BOTTOM_SHEETS.md`](BOTTOM_SHEETS.md) |
 
 ### Local Database
 

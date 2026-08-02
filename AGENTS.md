@@ -62,6 +62,17 @@ Coding conventions for the repository. Covers:
 
 ---
 
+### [`documentation/BOTTOM_SHEETS.md`](documentation/BOTTOM_SHEETS.md)
+The implementation guide for slide-up screens in the mobile app. Covers:
+- Expo Router and `@gorhom/bottom-sheet` ownership boundaries
+- App-level gesture setup and route presentation options
+- Closing, navigation, and unsaved-change protection
+- Sheet-aware scrolling and Jest mocking
+
+**Update when:** changing the bottom-sheet library, route presentation pattern, dismissal lifecycle, or sheet test setup.
+
+---
+
 ## Mobile App UI Work
 
 When working on the mobile app's user interface, take screenshots of the running emulator as you work. Review the screenshots to understand the current UI and verify that your changes look good.
