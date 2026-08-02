@@ -1,31 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, View } from "react-native";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  type BottomSheetBackdropProps,
-} from "@gorhom/bottom-sheet";
-import { router, Stack, useNavigation } from "expo-router";
+import { useMemo, useState } from "react";
 
 import { ClientForm } from "@/components/ClientForm";
+import { SlideUpScreen } from "@/components/ui/SlideUpScreen";
 import { getDb } from "@/db";
 import { clients } from "@/db/schema";
+import { useSlideUpScreen } from "@/hooks/useSlideUpScreen";
 import {
   buildClientInsert,
   initialClientFormValues,
   type ClientFormErrors,
   type ClientFormValues,
 } from "@/lib/client-form";
-import { makeStyles } from "@/lib/make-styles";
 import { showErrorToast } from "@/lib/toast";
 
 export default function NewClientScreen() {
-  const styles = useStyles();
   const db = getDb();
-  const navigation = useNavigation();
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const savedRef = useRef(false);
-  const allowDismissRef = useRef(false);
-  const discardPromptOpenRef = useRef(false);
   const [values, setValues] = useState<ClientFormValues>(
     initialClientFormValues,
   );
@@ -35,88 +24,13 @@ export default function NewClientScreen() {
     () => JSON.stringify(values) !== JSON.stringify(initialClientFormValues),
     [values],
   );
-
-  const renderBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...props}
-        appearsOnIndex={0}
-        disappearsOnIndex={-1}
-        pressBehavior="close"
-      />
-    ),
-    [],
-  );
-
-  const confirmDiscard = useCallback((onDiscard: () => void) => {
-    if (discardPromptOpenRef.current) return;
-    discardPromptOpenRef.current = true;
-
-    const closePrompt = () => {
-      discardPromptOpenRef.current = false;
-    };
-
-    Alert.alert(
-      "Discard this client?",
-      "Your changes have not been saved.",
-      [
-        { text: "Keep editing", style: "cancel", onPress: closePrompt },
-        {
-          text: "Discard",
-          style: "destructive",
-          onPress: () => {
-            closePrompt();
-            onDiscard();
-          },
-        },
-      ],
-      { cancelable: true, onDismiss: closePrompt },
-    );
-  }, []);
-
-  const closeSheet = useCallback(() => {
-    allowDismissRef.current = true;
-    bottomSheetRef.current?.close();
-  }, []);
-
-  const requestClose = useCallback(() => {
-    if (isDirty && !savedRef.current) {
-      confirmDiscard(closeSheet);
-      return;
-    }
-
-    closeSheet();
-  }, [closeSheet, confirmDiscard, isDirty]);
-
-  const handleSheetAnimate = useCallback(
-    (_fromIndex: number, toIndex: number) => {
-      if (
-        toIndex !== -1 ||
-        allowDismissRef.current ||
-        savedRef.current ||
-        !isDirty
-      ) {
-        return;
-      }
-
-      bottomSheetRef.current?.snapToIndex(0);
-      confirmDiscard(closeSheet);
+  const sheet = useSlideUpScreen({
+    shouldConfirmDismiss: isDirty,
+    confirmation: {
+      title: "Discard this client?",
+      message: "Your changes have not been saved.",
     },
-    [closeSheet, confirmDiscard, isDirty],
-  );
-
-  useEffect(
-    () =>
-      navigation.addListener("beforeRemove", (event) => {
-        if (!isDirty || savedRef.current) return;
-        event.preventDefault();
-        confirmDiscard(() => {
-          allowDismissRef.current = true;
-          navigation.dispatch(event.data.action);
-        });
-      }),
-    [confirmDiscard, isDirty, navigation],
-  );
+  });
 
   function changeValue<K extends keyof ClientFormValues>(
     field: K,
@@ -142,8 +56,7 @@ export default function NewClientScreen() {
     setErrors({});
     try {
       await db.insert(clients).values(result.data);
-      savedRef.current = true;
-      closeSheet();
+      sheet.dismiss();
     } catch {
       showErrorToast(
         "Couldn't add client",
@@ -154,51 +67,15 @@ export default function NewClientScreen() {
   }
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          animation: "fade",
-          contentStyle: { backgroundColor: "transparent" },
-          gestureEnabled: false,
-          headerShown: false,
-          presentation: "transparentModal",
-        }}
+    <SlideUpScreen controller={sheet}>
+      <ClientForm
+        errors={errors}
+        isSubmitting={isSubmitting}
+        onCancel={sheet.requestDismiss}
+        onChange={changeValue}
+        onSubmit={submit}
+        values={values}
       />
-      <View style={styles.container}>
-        <BottomSheet
-          backdropComponent={renderBackdrop}
-          backgroundStyle={styles.sheetSurface}
-          enableDynamicSizing={false}
-          enablePanDownToClose
-          handleIndicatorStyle={styles.handleIndicator}
-          index={0}
-          onAnimate={handleSheetAnimate}
-          onClose={() => router.back()}
-          ref={bottomSheetRef}
-          snapPoints={["93%"]}
-        >
-          <ClientForm
-            errors={errors}
-            isSubmitting={isSubmitting}
-            onCancel={requestClose}
-            onChange={changeValue}
-            onSubmit={submit}
-            values={values}
-          />
-        </BottomSheet>
-      </View>
-    </>
+    </SlideUpScreen>
   );
 }
-
-const useStyles = makeStyles((theme) => ({
-  container: {
-    flex: 1,
-  },
-  sheetSurface: {
-    backgroundColor: theme.background,
-  },
-  handleIndicator: {
-    backgroundColor: theme.mutedForeground,
-  },
-}));
