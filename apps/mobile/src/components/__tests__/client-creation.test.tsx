@@ -6,6 +6,32 @@ import { act, fireEvent, renderWithTheme, screen, waitFor } from "@/test-utils";
 import ClientsScreen from "../../../app/(app)/(tabs)/clients";
 import NewClientScreen from "../../../app/(app)/clients/new";
 
+jest.mock("react-native-keyboard-controller", () =>
+  jest.requireActual("react-native-keyboard-controller/jest"),
+);
+jest.mock("react-native-reanimated", () => ({
+  __esModule: true,
+  default: {
+    createAnimatedComponent: (Component: React.ComponentType) => Component,
+  },
+}));
+
+jest.mock("@gorhom/bottom-sheet", () => {
+  const bottomSheetMock = jest.requireActual("@gorhom/bottom-sheet/mock");
+
+  class MockBottomSheet extends bottomSheetMock.default {
+    close() {
+      this.props.onClose?.();
+    }
+  }
+
+  return {
+    __esModule: true,
+    ...bottomSheetMock,
+    default: MockBottomSheet,
+  };
+});
+
 jest.mock("expo-router", () => {
   const ReactForMock = jest.requireActual<typeof import("react")>("react");
   function MockStack() {
@@ -139,13 +165,13 @@ describe("NewClientScreen", () => {
     expect(mockValues).not.toHaveBeenCalled();
   });
 
-  it("keeps native dismissal enabled and confirms dirty navigation attempts", () => {
+  it("disables native dismissal and confirms dirty navigation attempts", () => {
     const alertSpy = jest.spyOn(Alert, "alert").mockImplementation();
     renderWithTheme(<NewClientScreen />);
 
     const screenOptions =
       mockExpoRouter.Stack.Screen.mock.calls.at(-1)[0].options;
-    expect(screenOptions.gestureEnabled).toBe(true);
+    expect(screenOptions.gestureEnabled).toBe(false);
 
     fireEvent.changeText(screen.getByLabelText("First name"), "Zara");
 
@@ -161,6 +187,10 @@ describe("NewClientScreen", () => {
       "Discard this client?",
       "Your changes have not been saved.",
       expect.any(Array),
+      expect.objectContaining({
+        cancelable: true,
+        onDismiss: expect.any(Function),
+      }),
     );
     const buttons = alertSpy.mock.calls[0][2];
     act(() => buttons?.[1].onPress?.());

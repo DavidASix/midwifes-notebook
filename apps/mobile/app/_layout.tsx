@@ -1,8 +1,11 @@
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
+
 import { StatusBar } from "expo-status-bar";
 import { router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { Pressable } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import { ArrowBigLeft } from "lucide-react-native";
 
 import { AppToast } from "@/components/AppToast";
@@ -52,10 +55,20 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <ThemeProvider>
-      <LockProvider>
-        <RootLayoutContent />
-      </LockProvider>
-    </ThemeProvider>
+    <KeyboardProvider>
+      <GestureHandlerRootView style={styles.container}>
+        <ThemeProvider>
+          <LockProvider>
+            <RootLayoutContent />
+          </LockProvider>
+        </ThemeProvider>
+      </GestureHandlerRootView>
+    </KeyboardProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

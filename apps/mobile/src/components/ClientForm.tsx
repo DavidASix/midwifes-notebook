@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { Platform, View } from "react-native";
 import {
   CalendarDays,
   ChevronDown,
@@ -21,6 +21,7 @@ import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";
 
 import { Button } from "@/components/ui/Button";
+import { BottomSheetKeyboardAwareScrollView } from "@/components/ui/BottomSheetKeyboardAwareScrollView";
 import { FormChoiceGroup } from "@/components/ui/FormChoiceGroup";
 import { FormDateField } from "@/components/ui/FormDateField";
 import { FormTextField } from "@/components/ui/FormTextField";
@@ -113,14 +114,13 @@ export function ClientForm({
   );
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={styles.container}
-    >
-      <ScrollView
+    <>
+      <BottomSheetKeyboardAwareScrollView
+        bottomOffset={12}
         contentContainerStyle={styles.content}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
+        style={styles.container}
       >
         <View style={styles.intro}>
           <Text header style={styles.introTitle}>
@@ -336,7 +336,7 @@ export function ClientForm({
             </Text>
           </View>
         </View>
-      </ScrollView>
+      </BottomSheetKeyboardAwareScrollView>
 
       <View style={styles.footer}>
         <Button
@@ -356,7 +356,7 @@ export function ClientForm({
           title={isSubmitting ? "Adding client…" : "Add client"}
         />
       </View>
-    </KeyboardAvoidingView>
+    </>
   );
 }
 

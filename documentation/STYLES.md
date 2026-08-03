@@ -50,10 +50,11 @@ Clean, clinical minimalism with warm undertones. Intentionally approachable for 
   denser 36-point visual height, while disclosure headers retain a 44-point touch target
 - Form actions: a persistent bottom action bar above the safe area, with equal-width secondary Cancel and primary Save
   actions
-- Add-client sheet: a tall, rounded native form sheet over a dimmed client list, with a compact centered drag handle and
-  enough space above the sheet to preserve the originating-screen context; it does not use a stack navigation header.
-  Modal surface styling and chrome belong to the route that configures the stack presentation, while feature content is
-  composed inside that surface
+- Slide-up screens: tall, rounded Gorhom sheets over a dimmed originating screen, inset 8 points from both horizontal
+  edges so the underlying context remains visible at the sides as well as above; they use a compact centered drag handle
+  and no stack navigation header. Their bottom edge respects the device safe area so actions remain above system
+  navigation controls. Shared surface styling and chrome belong to `SlideUpScreen`, while feature content is composed
+  inside that surface
 - Skeleton loaders: used wherever load time may exceed 200ms — match the geometry of the content they replace (row height, label width, badge width), colored in a `#96a5b9`-tinted pulse
 - Onboarding: full-width horizontal pages with a single primary action, centered copy, and pagination dots fixed above the device's bottom safe area; the active dot is elongated and uses the primary accent
 

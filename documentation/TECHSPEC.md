@@ -51,7 +51,12 @@ Simple, stateless components (buttons, badges, cards, avatars, etc.) are built i
 
 For complex interactive components with non-trivial logic or accessibility requirements (dropdowns, dialogs, tooltips, popovers), a dedicated library or React Native Reusables may be used on a case-by-case basis.
 
-**`@gorhom/bottom-sheet`** is used for slide-up sheet UI (see Navigation below).
+**`@gorhom/bottom-sheet`** is used for slide-up sheet UI (see Navigation below). The route integration, dismissal
+contract, scrolling pattern, and test setup are documented in [`BOTTOM_SHEETS.md`](BOTTOM_SHEETS.md).
+
+**`react-native-keyboard-controller`** provides Android keyboard-frame and focused-input tracking. Its keyboard-aware
+scroll view is registered as a Gorhom scrollable for forms inside slide-up sheets, keeping focused fields visible above
+the software keyboard without screen-specific measurements.
 
 **`@react-native-community/datetimepicker`** provides native calendar-date controls for nullable client dates. Form state
 stores selected calendar dates as `YYYY-MM-DD` strings before passing them to Drizzle.
@@ -67,11 +72,11 @@ root navigator, and feature code invokes typed helpers for success, error, and i
 
 Navigation is handled by **Expo Router** (file-system based routing, built on React Navigation). The following navigation patterns are used:
 
-| Pattern                          | Name                 | Implementation                                                                                                            |
-| -------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Bottom tab bar                   | Tab Navigator        | `(tabs)` directory in Expo Router                                                                                         |
-| Screen pushed on top of current  | Stack Navigator      | Default Expo Router navigation                                                                                            |
-| Slide-up screen with drag handle | Modal / Bottom Sheet | `presentation: 'modal'` for full-screen modals; `@gorhom/bottom-sheet` for partial-height, snapping, or scrollable sheets |
+| Pattern                          | Name                 | Implementation                                                                                                       |
+| -------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Bottom tab bar                   | Tab Navigator        | `(tabs)` directory in Expo Router                                                                                    |
+| Screen pushed on top of current  | Stack Navigator      | Default Expo Router navigation                                                                                       |
+| Slide-up screen with drag handle | Modal / Bottom Sheet | A `transparentModal` Expo Router route containing `@gorhom/bottom-sheet`; see [`BOTTOM_SHEETS.md`](BOTTOM_SHEETS.md) |
 
 ### Local Database
 
