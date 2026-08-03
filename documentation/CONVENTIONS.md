@@ -85,8 +85,6 @@ describe("formatDate", () => {
 });
 ```
 
----
-
 ### Example
 
 ```ts
@@ -107,3 +105,18 @@ describe("formatDate", () => {
  */
 export function makeStyles<T extends NamedStyles>(factory: (theme: ColorTheme) => T) { ... }
 ```
+
+---
+
+## Runtime validation
+
+- Validate data at runtime whenever it crosses an untyped boundary, including route parameters, external payloads, and
+  database query results. Use Zod schemas instead of ad hoc `typeof` checks or manual regular expressions.
+- Generate database row schemas from the Drizzle schema with `drizzle-zod`, then refine fields whose SQL constraints or
+  domain formats cannot be inferred automatically.
+- Declare each generated row schema immediately after its Drizzle table and keep reusable field schemas in the schema
+  directory's `shared.ts` module. Name it by appending `Schema` to the table export name, such as `clientsSchema` for
+  `clients`.
+- Call `safeParse` at the boundary before data enters application state or domain logic. Handle validation failures as
+  controlled load/input errors rather than allowing malformed data to propagate.
+- Infer application data types from the runtime schema when practical so static and runtime contracts remain aligned.

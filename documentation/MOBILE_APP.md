@@ -4,6 +4,11 @@
 
 A mobile app for midwives and doulas to manage client records, track pregnancies, and access clinical tools. All data is stored locally on-device (SQLite). No account or internet connection is required to use the app.
 
+### Supported Platforms
+
+The app is released for Android and iOS phones only. Tablet form factors and web builds are not supported. The app is
+locked to portrait orientation, with device rotation disabled.
+
 ---
 
 ## First Launch & Onboarding

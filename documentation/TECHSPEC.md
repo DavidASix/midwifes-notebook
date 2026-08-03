@@ -90,6 +90,12 @@ Navigation is handled by **Expo Router** (file-system based routing, built on Re
 - Generated mobile migrations live in `apps/mobile/drizzle`. Its `migrations.js` manifest must statically import every generated SQL file so Metro can bundle them.
 - `expo-drizzle-studio-plugin` is available for inspecting the database in Expo DevTools during development
 
+**Zod** provides runtime validation at untyped boundaries. Database row schemas are generated from Drizzle definitions
+with **`drizzle-zod`** and refined for formats or SQLite constraints that Drizzle cannot express in its inferred runtime
+schema. Generated row schemas are colocated with their Drizzle tables, while reusable field schemas live in
+`apps/mobile/src/db/schema/shared.ts`. Query results must pass `safeParse` before entering application state; malformed
+persisted data is surfaced as a controlled load error.
+
 ### Local Authentication (App Lock)
 
 The app supports an optional lock feature. When enabled, the user must authenticate via their device's configured method (Face ID, Touch ID, fingerprint, or PIN/passcode) to access the app.
