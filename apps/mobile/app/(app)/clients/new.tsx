@@ -36,7 +36,8 @@ export default function NewClientScreen() {
     field: K,
     value: ClientFormValues[K],
   ) {
-    setValues((current) => ({ ...current, [field]: value }));
+    const nextValue = value === "" ? undefined : value;
+    setValues((current) => ({ ...current, [field]: nextValue }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 

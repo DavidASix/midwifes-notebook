@@ -113,6 +113,9 @@ A scrollable contact-style list of all clients. Clients are always sorted by las
 clients group them beneath small alphabetical section headers matching the first letter of each last name; smaller views
 omit the headers while retaining alphabetical order.
 
+Client rows are runtime-validated before display. A database or validation failure replaces the list with an in-place
+error state and Retry action rather than rendering malformed records.
+
 Client rows show available pregnancy and clinical details. When neither is recorded, the row displays
 "No clinical details recorded" as a fallback so every client retains a supporting information line.
 

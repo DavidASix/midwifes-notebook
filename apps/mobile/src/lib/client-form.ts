@@ -1,25 +1,41 @@
-import { bloodTypes, clients, gbsStatuses, rhStatuses } from "@/db/schema";
+import { z } from "zod";
+
+import { clients, clientsSchema } from "@/db/schema";
+import { optionalIntegerSchema } from "@/lib/types";
+
+const clientFormFieldsSchema = clientsSchema
+  .omit({
+    id: true,
+    actualDeliveryDate: true,
+    deliveryMethod: true,
+    tearDegree: true,
+    isActive: true,
+    createdAt: true,
+    updatedAt: true,
+    deletedAt: true,
+  })
+  .partial()
+  .extend({
+    firstName: z
+      .string({ error: "First name is required." })
+      .trim()
+      .min(1, "First name is required."),
+    lastName: z
+      .string({ error: "Last name is required." })
+      .trim()
+      .min(1, "Last name is required."),
+    age: optionalIntegerSchema,
+    gravida: optionalIntegerSchema,
+    parity: optionalIntegerSchema,
+  });
+
+type ClientFormSchemaInput = z.input<typeof clientFormFieldsSchema>;
 
 export type ClientFormValues = {
-  firstName?: string;
-  lastName?: string;
-  middleName?: string;
-  preferredName?: string;
-  address?: string;
-  primaryPhone?: string;
-  dateOfBirth?: string;
-  age?: string;
-  estimatedDeliveryDate?: string;
-  gravida?: string;
-  parity?: string;
-  bloodType?: (typeof bloodTypes)[number];
-  rhStatus?: (typeof rhStatuses)[number];
-  gbsStatus?: (typeof gbsStatuses)[number];
-  riskFactors?: string;
-  partnerName?: string;
-  partnerRelationship?: string;
-  partnerPhone?: string;
-  partnerBloodType?: (typeof bloodTypes)[number];
+  [Field in keyof ClientFormSchemaInput]?: Exclude<
+    ClientFormSchemaInput[Field],
+    null
+  >;
 };
 
 export type ClientFormErrors = Partial<Record<keyof ClientFormValues, string>>;
@@ -29,33 +45,6 @@ export const initialClientFormValues: ClientFormValues = {};
 export type ClientFormResult =
   | { success: true; data: typeof clients.$inferInsert }
   | { success: false; errors: ClientFormErrors };
-
-function trimOptional(value: string | undefined): string | undefined {
-  const trimmed = value?.trim();
-  return trimmed || undefined;
-}
-
-function parseInteger(
-  value: string | undefined,
-  field: "age" | "gravida" | "parity",
-  errors: ClientFormErrors,
-): number | undefined {
-  const normalized = trimOptional(value);
-  if (normalized === undefined) return undefined;
-  if (!/^\d+$/.test(normalized)) {
-    errors[field] = "Enter a whole number.";
-    return undefined;
-  }
-
-  const parsed = Number(normalized);
-  const maximum = field === "age" ? 130 : 99;
-  const minimum = field === "age" ? 1 : 0;
-  if (parsed < minimum || parsed > maximum) {
-    errors[field] = `Enter a number from ${minimum} to ${maximum}.`;
-    return undefined;
-  }
-  return parsed;
-}
 
 /** Converts a Date to an ISO calendar date without applying a UTC timezone shift. */
 export function toIsoDate(date: Date): string {
@@ -71,58 +60,59 @@ export function fromIsoDate(value: string): Date {
   return new Date(year, month - 1, day, 12);
 }
 
+/** Builds the runtime form contract using the current date for time-dependent rules. */
+function createClientFormSchema(today: Date) {
+  const todayIso = toIsoDate(today);
+
+  return clientFormFieldsSchema.superRefine((values, context) => {
+    if (values.dateOfBirth && values.age !== undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["age"],
+        message: "Use either date of birth or age, not both.",
+      });
+    }
+    if (values.dateOfBirth && values.dateOfBirth > todayIso) {
+      context.addIssue({
+        code: "custom",
+        path: ["dateOfBirth"],
+        message: "Date of birth cannot be in the future.",
+      });
+    }
+    if (
+      values.gravida !== undefined &&
+      values.parity !== undefined &&
+      values.parity > values.gravida
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["parity"],
+        message: "Parity cannot be greater than gravida.",
+      });
+    }
+  });
+}
+
 /** Validates form decisions and produces a database-ready client insert without blank nullable values. */
 export function buildClientInsert(
   values: ClientFormValues,
   today = new Date(),
 ): ClientFormResult {
+  const result = createClientFormSchema(today).safeParse(values);
+  if (result.success) {
+    return { success: true, data: result.data };
+  }
+
   const errors: ClientFormErrors = {};
-  const firstName = trimOptional(values.firstName);
-  const lastName = trimOptional(values.lastName);
-  if (!firstName) errors.firstName = "First name is required.";
-  if (!lastName) errors.lastName = "Last name is required.";
-
-  const age = parseInteger(values.age, "age", errors);
-  const gravida = parseInteger(values.gravida, "gravida", errors);
-  const parity = parseInteger(values.parity, "parity", errors);
-
-  if (values.dateOfBirth && trimOptional(values.age)) {
-    errors.age = "Use either date of birth or age, not both.";
+  for (const issue of result.error.issues) {
+    const field = issue.path[0] as keyof ClientFormValues | undefined;
+    if (field !== undefined && errors[field] === undefined) {
+      errors[field] =
+        issue.code === "invalid_format" &&
+        (field === "dateOfBirth" || field === "estimatedDeliveryDate")
+          ? "Enter a valid date."
+          : issue.message;
+    }
   }
-  const todayIso = toIsoDate(today);
-  if (values.dateOfBirth && values.dateOfBirth > todayIso) {
-    errors.dateOfBirth = "Date of birth cannot be in the future.";
-  }
-  if (gravida !== undefined && parity !== undefined && parity > gravida) {
-    errors.parity = "Parity cannot be greater than gravida.";
-  }
-
-  if (Object.keys(errors).length > 0 || !firstName || !lastName) {
-    return { success: false, errors };
-  }
-
-  return {
-    success: true,
-    data: {
-      firstName,
-      lastName,
-      middleName: trimOptional(values.middleName),
-      preferredName: trimOptional(values.preferredName),
-      address: trimOptional(values.address),
-      primaryPhone: trimOptional(values.primaryPhone),
-      dateOfBirth: values.dateOfBirth,
-      age,
-      estimatedDeliveryDate: values.estimatedDeliveryDate,
-      gravida,
-      parity,
-      bloodType: values.bloodType,
-      rhStatus: values.rhStatus,
-      gbsStatus: values.gbsStatus,
-      riskFactors: trimOptional(values.riskFactors),
-      partnerName: trimOptional(values.partnerName),
-      partnerRelationship: trimOptional(values.partnerRelationship),
-      partnerPhone: trimOptional(values.partnerPhone),
-      partnerBloodType: values.partnerBloodType,
-    },
-  };
+  return { success: false, errors };
 }
