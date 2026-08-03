@@ -11,7 +11,7 @@ import { router, useFocusEffect, useNavigation } from "expo-router";
 import { Search, UserRoundPlus, X } from "lucide-react-native";
 
 import { getDb } from "@/db";
-import { clients } from "@/db/schema";
+import { clients, clientsSchema, type ClientRecord } from "@/db/schema";
 import {
   clientStatusFilters,
   getClientStatusFilterForOffset,
@@ -26,8 +26,11 @@ import { fontFamilies, fontSize } from "@/lib/themes";
 
 import { ClientListView } from "@/components/ClientListView";
 import { ClientStatusFilters } from "@/components/ClientStatusFilters";
+import { Button } from "@/components/ui/Button";
+import { Text } from "@/components/ui/Text";
 
-type ClientRecord = typeof clients.$inferSelect;
+const clientListSchema = clientsSchema.array();
+
 type ClientView = {
   filter: ClientStatusFilter;
   sections: ClientListSection<ClientRecord>[];
@@ -63,7 +66,8 @@ export default function ClientsScreen() {
   const { width: pageWidth } = useWindowDimensions();
   const styles = useStyles();
   const pagerRef = useRef<FlatList<ClientView>>(null);
-  const [data, setData] = useState<(typeof clients.$inferSelect)[]>([]);
+  const [data, setData] = useState<ClientRecord[]>([]);
+  const [hasLoadError, setHasLoadError] = useState(false);
   const [query, setQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<ClientStatusFilter>("all");
@@ -77,7 +81,19 @@ export default function ClientsScreen() {
   }, [navigation]);
 
   const fetchClients = useCallback(async () => {
-    setData(await db.select().from(clients));
+    try {
+      const rows = await db.select().from(clients);
+      const result = clientListSchema.safeParse(rows);
+      if (!result.success) {
+        setHasLoadError(true);
+        return;
+      }
+
+      setData(result.data);
+      setHasLoadError(false);
+    } catch {
+      setHasLoadError(true);
+    }
   }, [db]);
 
   useFocusEffect(
@@ -141,45 +157,57 @@ export default function ClientsScreen() {
         selected={statusFilter}
         onChange={selectStatusFilter}
       />
-      <FlatList
-        ref={pagerRef}
-        horizontal
-        pagingEnabled
-        bounces={false}
-        data={clientViews}
-        decelerationRate="fast"
-        getItemLayout={(_, index) => ({
-          length: pageWidth,
-          offset: pageWidth * index,
-          index,
-        })}
-        initialNumToRender={clientStatusFilters.length}
-        keyExtractor={(view) => view.filter}
-        keyboardDismissMode="on-drag"
-        maxToRenderPerBatch={clientStatusFilters.length}
-        onMomentumScrollEnd={({ nativeEvent }) => {
-          setStatusFilter(
-            getClientStatusFilterForOffset(
-              nativeEvent.contentOffset.x,
-              pageWidth,
-            ),
-          );
-        }}
-        removeClippedSubviews={false}
-        renderItem={({ item }) => (
-          <ClientListView
-            sections={item.sections}
-            emptyMessage={
-              query.trim() || item.filter !== "all"
-                ? "No matching clients."
-                : "No clients yet."
-            }
-            width={pageWidth}
-          />
-        )}
-        showsHorizontalScrollIndicator={false}
-        windowSize={clientStatusFilters.length + 1}
-      />
+      {hasLoadError ? (
+        <View style={styles.errorState}>
+          <Text header style={styles.errorTitle}>
+            Couldn’t load clients
+          </Text>
+          <Text style={styles.errorText}>
+            Check the database and try again.
+          </Text>
+          <Button onPress={() => void fetchClients()} title="Retry" />
+        </View>
+      ) : (
+        <FlatList
+          ref={pagerRef}
+          horizontal
+          pagingEnabled
+          bounces={false}
+          data={clientViews}
+          decelerationRate="fast"
+          getItemLayout={(_, index) => ({
+            length: pageWidth,
+            offset: pageWidth * index,
+            index,
+          })}
+          initialNumToRender={clientStatusFilters.length}
+          keyExtractor={(view) => view.filter}
+          keyboardDismissMode="on-drag"
+          maxToRenderPerBatch={clientStatusFilters.length}
+          onMomentumScrollEnd={({ nativeEvent }) => {
+            setStatusFilter(
+              getClientStatusFilterForOffset(
+                nativeEvent.contentOffset.x,
+                pageWidth,
+              ),
+            );
+          }}
+          removeClippedSubviews={false}
+          renderItem={({ item }) => (
+            <ClientListView
+              sections={item.sections}
+              emptyMessage={
+                query.trim() || item.filter !== "all"
+                  ? "No matching clients."
+                  : "No clients yet."
+              }
+              width={pageWidth}
+            />
+          )}
+          showsHorizontalScrollIndicator={false}
+          windowSize={clientStatusFilters.length + 1}
+        />
+      )}
     </View>
   );
 }
@@ -198,6 +226,25 @@ const useStyles = makeStyles((theme) => ({
   container: {
     flex: 1,
     backgroundColor: theme.background,
+  },
+  errorState: {
+    flex: 1,
+    padding: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+  },
+  errorTitle: {
+    color: theme.primary,
+    fontFamily: fontFamilies.heading.bold,
+    fontSize: fontSize["2xl"],
+    textAlign: "center",
+  },
+  errorText: {
+    color: theme.mutedForeground,
+    fontSize: fontSize.md,
+    lineHeight: 22,
+    textAlign: "center",
   },
   searchContainer: {
     marginHorizontal: 16,

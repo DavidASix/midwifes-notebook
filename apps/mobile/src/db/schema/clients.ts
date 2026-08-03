@@ -1,7 +1,10 @@
 import { sql } from "drizzle-orm";
 import { check, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 import { joinSqlValues } from "../utils";
+import { isoCalendarDateSchema, isoTimestampSchema } from "./shared";
 
 export const bloodTypes = [
   "A+",
@@ -18,6 +21,9 @@ export const gbsStatuses = ["+", "-"] as const;
 export const deliveryMethods = ["SVD", "AVD", "C-Section"] as const;
 export const tearDegrees = [1, 2, 3, 4] as const;
 export const activeStates = [0, 1] as const;
+
+const tearDegreeSchema = z.literal(tearDegrees);
+const activeStateSchema = z.literal(activeStates);
 
 export const clients = sqliteTable(
   "clients",
@@ -93,3 +99,18 @@ export const clients = sqliteTable(
     ),
   ],
 );
+
+/** Validates a client row after it crosses the SQLite read boundary. */
+export const clientsSchema = createSelectSchema(clients, {
+  id: z.int().positive(),
+  dateOfBirth: isoCalendarDateSchema.nullable(),
+  estimatedDeliveryDate: isoCalendarDateSchema.nullable(),
+  actualDeliveryDate: isoCalendarDateSchema.nullable(),
+  tearDegree: tearDegreeSchema.nullable(),
+  isActive: activeStateSchema,
+  createdAt: isoTimestampSchema,
+  updatedAt: isoTimestampSchema,
+  deletedAt: isoTimestampSchema.nullable(),
+});
+
+export type ClientRecord = z.infer<typeof clientsSchema>;

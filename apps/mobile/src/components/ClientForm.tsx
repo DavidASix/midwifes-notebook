@@ -228,6 +228,7 @@ export function ClientForm({
           title="Clinical"
         >
           <FormDateField
+            error={errors.estimatedDeliveryDate}
             label="Estimated delivery date"
             onChange={(value) => onChange("estimatedDeliveryDate", value)}
             value={values.estimatedDeliveryDate}

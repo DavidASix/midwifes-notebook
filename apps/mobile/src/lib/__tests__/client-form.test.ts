@@ -33,7 +33,7 @@ describe("buildClientInsert", () => {
     });
   });
 
-  it("trims entered text and preserves blank nullable fields as undefined", () => {
+  it("trims required names without normalizing optional text", () => {
     const result = buildClientInsert(
       validValues({
         firstName: "  Amina ",
@@ -50,9 +50,9 @@ describe("buildClientInsert", () => {
       data: expect.objectContaining({
         firstName: "Amina",
         lastName: "Yusuf",
-        middleName: undefined,
-        address: "72 Willow Street",
-        partnerName: undefined,
+        middleName: "   ",
+        address: "  72 Willow Street  ",
+        partnerName: "",
       }),
     });
   });
@@ -103,7 +103,25 @@ describe("buildClientInsert", () => {
     });
   });
 
-  it("rejects non-whole and out-of-range numeric values", () => {
+  it("rejects malformed client dates with field-specific errors", () => {
+    const result = buildClientInsert(
+      validValues({
+        dateOfBirth: "not-a-date",
+        estimatedDeliveryDate: "2026-02-31",
+      }),
+      today,
+    );
+
+    expect(result).toEqual({
+      success: false,
+      errors: {
+        dateOfBirth: "Enter a valid date.",
+        estimatedDeliveryDate: "Enter a valid date.",
+      },
+    });
+  });
+
+  it("rejects non-whole numeric values without enforcing arbitrary ranges", () => {
     const result = buildClientInsert(
       validValues({ age: "0", gravida: "2.5", parity: "100" }),
       today,
@@ -112,9 +130,7 @@ describe("buildClientInsert", () => {
     expect(result).toEqual({
       success: false,
       errors: {
-        age: "Enter a number from 1 to 130.",
         gravida: "Enter a whole number.",
-        parity: "Enter a number from 0 to 99.",
       },
     });
   });

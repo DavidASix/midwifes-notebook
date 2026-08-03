@@ -4,6 +4,11 @@
 
 A mobile app for midwives and doulas to manage client records, track pregnancies, and access clinical tools. All data is stored locally on-device (SQLite). No account or internet connection is required to use the app.
 
+### Supported Platforms
+
+The app is released for Android and iOS phones only. Tablet form factors and web builds are not supported. The app is
+locked to portrait orientation, with device rotation disabled.
+
 ---
 
 ## First Launch & Onboarding
@@ -108,6 +113,9 @@ A scrollable contact-style list of all clients. Clients are always sorted by las
 clients group them beneath small alphabetical section headers matching the first letter of each last name; smaller views
 omit the headers while retaining alphabetical order.
 
+Client rows are runtime-validated before display. A database or validation failure replaces the list with an in-place
+error state and Retry action rather than rendering malformed records.
+
 Client rows show available pregnancy and clinical details. When neither is recorded, the row displays
 "No clinical details recorded" as a fallback so every client retains a supporting information line.
 
@@ -152,7 +160,8 @@ Status is derived at query time (not stored):
 
 Tapping a client row opens a 93%-height bottom sheet modal with a drag handle. The background content (client list) is
 visible but dimmed behind it. Invalid, missing, and failed client loads are handled in the sheet, and database failures
-can be retried without dismissing it. The selected client is reloaded whenever the route regains focus.
+can be retried without dismissing it. Invalid or missing client links provide a direct action back to the client list.
+The selected client is reloaded whenever the route regains focus.
 
 **Header:** Close action, client full name, and `EDIT` on the right. Until the dedicated edit route is implemented,
 `EDIT` remains intentionally inactive.

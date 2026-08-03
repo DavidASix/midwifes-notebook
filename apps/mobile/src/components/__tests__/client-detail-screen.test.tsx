@@ -41,7 +41,7 @@ jest.mock("expo-router", () => {
   return {
     __esModule: true,
     Stack: MockStack,
-    router: { back: jest.fn() },
+    router: { back: jest.fn(), replace: jest.fn() },
     useFocusEffect: jest.fn((callback: () => void | (() => void)) => {
       ReactForMock.useEffect(callback, [callback]);
     }),
@@ -60,6 +60,10 @@ jest.mock("@/db", () => {
 
 const mockExpoRouter = jest.requireMock("expo-router");
 const mockUseFocusEffect = mockExpoRouter.useFocusEffect as jest.Mock;
+const mockRouter = mockExpoRouter.router as {
+  back: jest.Mock;
+  replace: jest.Mock;
+};
 const mockDatabaseModule = jest.requireMock("@/db");
 const mockDb = mockDatabaseModule.db as { select: jest.Mock };
 const mockFrom = mockDatabaseModule.from as jest.Mock;
@@ -109,12 +113,15 @@ describe("ClientDetailScreen data lifecycle", () => {
     mockDb.select.mockReturnValue({ from: mockFrom });
   });
 
-  it("does not query malformed record IDs", async () => {
-    mockRouteId = "not-an-id";
+  it("rejects coercible record IDs without querying or stranding the user", async () => {
+    mockRouteId = "4e1";
     renderWithTheme(<ClientDetailScreen />);
 
     expect(await screen.findByText("Invalid client")).toBeTruthy();
     expect(mockDb.select).not.toHaveBeenCalled();
+
+    fireEvent.press(screen.getByText("Back to clients"));
+    expect(mockRouter.replace).toHaveBeenCalledWith("/(app)/(tabs)/clients");
   });
 
   it("shows a missing state when no non-deleted client matches", async () => {
@@ -124,6 +131,9 @@ describe("ClientDetailScreen data lifecycle", () => {
     expect(await screen.findByText("Client not found")).toBeTruthy();
     expect(mockWhere).toHaveBeenCalledTimes(1);
     expect(mockLimit).toHaveBeenCalledWith(1);
+
+    fireEvent.press(screen.getByText("Back to clients"));
+    expect(mockRouter.replace).toHaveBeenCalledWith("/(app)/(tabs)/clients");
   });
 
   it("keeps the sheet open after a query failure and retries in place", async () => {
@@ -137,6 +147,17 @@ describe("ClientDetailScreen data lifecycle", () => {
 
     expect(await screen.findByText("Eleanor Rigby")).toBeTruthy();
     expect(mockLimit).toHaveBeenCalledTimes(2);
+  });
+
+  it("shows a recoverable error when a database row fails runtime validation", async () => {
+    mockLimit.mockResolvedValueOnce([
+      makeClient({ dateOfBirth: "2026-02-31" }),
+    ]);
+    renderWithTheme(<ClientDetailScreen />);
+
+    expect(await screen.findByText("Couldn’t load client")).toBeTruthy();
+    expect(screen.getByText("Retry")).toBeTruthy();
+    expect(screen.queryByText("Eleanor Rigby")).toBeNull();
   });
 
   it("reloads fresh client data whenever the detail route regains focus", async () => {

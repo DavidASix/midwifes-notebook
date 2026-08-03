@@ -18,6 +18,9 @@ describe("client detail decisions", () => {
     expect(formatClientAge({ dateOfBirth: null, age: 41 }, today)).toBe(
       "41 years (recorded)",
     );
+    expect(formatClientAge({ dateOfBirth: "1990-02-31", age: 41 }, today)).toBe(
+      "41 years (recorded)",
+    );
   });
 
   it("uses explicit language for absent and negative clinical values", () => {
