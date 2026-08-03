@@ -65,13 +65,13 @@ A `Tabs` navigator with four tabs: Tools, Clients, Calendar, Statistics. Each ta
 
 Screens at the root stack level (outside tabs) are pushed over the tab bar:
 
-| Route | Description |
-|---|---|
-| `onboarding` | First-launch onboarding flow |
-| `(tabs)` | The tab navigator (treated as a single stack entry) |
-| `clients/[id]` | Client detail |
-| `clients/new` | Add client form |
-| `settings` | Settings screen |
+| Route          | Description                                         |
+| -------------- | --------------------------------------------------- |
+| `onboarding`   | First-launch onboarding flow                        |
+| `(tabs)`       | The tab navigator (treated as a single stack entry) |
+| `clients/[id]` | Client detail                                       |
+| `clients/new`  | Add client form                                     |
+| `settings`     | Settings screen                                     |
 
 ---
 
@@ -79,22 +79,22 @@ Screens at the root stack level (outside tabs) are pushed over the tab bar:
 
 ### Bottom Tab Bar
 
-| Tab | Icon | Description |
-|---|---|---|
-| Tools | Toolbox | List of clinical calculators |
-| Clients | Person | Client list (default landing tab) |
-| Calendar | Calendar | EDD and delivery date calendar |
-| Statistics | Bar chart | Aggregated client stats |
+| Tab        | Icon      | Description                       |
+| ---------- | --------- | --------------------------------- |
+| Tools      | Toolbox   | List of clinical calculators      |
+| Clients    | Person    | Client list (default landing tab) |
+| Calendar   | Calendar  | EDD and delivery date calendar    |
+| Statistics | Bar chart | Aggregated client stats           |
 
 Settings are **not** in the tab bar. A gear icon is shown only on the Statistics screen, providing access to the Settings page.
 
 ### Navigation Patterns
 
-| Pattern | Usage |
-|---|---|
-| Bottom tab bar | Top-level navigation between the four main screens |
-| Stack push | Edit screens pushed on top of modals; Settings pushed from Statistics |
-| Bottom sheet modal (full-screen) | Client detail view, tool views, calendar day detail |
+| Pattern                          | Usage                                                                 |
+| -------------------------------- | --------------------------------------------------------------------- |
+| Bottom tab bar                   | Top-level navigation between the four main screens                    |
+| Stack push                       | Edit screens pushed on top of modals; Settings pushed from Statistics |
+| Bottom sheet modal (full-screen) | Client detail view, tool views, calendar day detail                   |
 
 ---
 
@@ -112,6 +112,7 @@ Client rows show available pregnancy and clinical details. When neither is recor
 "No clinical details recorded" as a fallback so every client retains a supporting information line.
 
 **Client views** at the top of the screen are presented as horizontally scrollable tabs:
+
 - All Clients
 - Prenatal
 - Postpartum
@@ -128,6 +129,7 @@ baby names use the same matching path once baby records are implemented.
 #### Client List Row
 
 Each row displays:
+
 - **Name** — `Last, First` format; last name in heavier serif weight, given name in regular serif weight (Newsreader)
 - **Date line** — `EDD: YYYY-MM-DD` if prenatal; `DD: YYYY-MM-DD` if postpartum. If postpartum, also show **days postpartum** (e.g. `· 4 days postpartum`)
 - **GBS status icon** — shield icon; filled/accented if GBS+, outline/muted if GBS−
@@ -138,11 +140,11 @@ Each row displays:
 
 Status is derived at query time (not stored):
 
-| Condition | Status |
-|---|---|
-| `is_active = 0` | Out of Care |
-| `is_active = 1` AND `actual_delivery_date IS NULL` | Prenatal |
-| `is_active = 1` AND `actual_delivery_date IS NOT NULL` | Postpartum |
+| Condition                                              | Status      |
+| ------------------------------------------------------ | ----------- |
+| `is_active = 0`                                        | Out of Care |
+| `is_active = 1` AND `actual_delivery_date IS NULL`     | Prenatal    |
+| `is_active = 1` AND `actual_delivery_date IS NOT NULL` | Postpartum  |
 
 ---
 
@@ -165,6 +167,7 @@ Grouped sections with labeled field pairs in a two-column grid. Should include a
 **Partner Details**
 
 **Status**
+
 - Active toggle (active = in care; inactive = Out of Care)
 
 #### Tab 2 — Children
@@ -204,7 +207,9 @@ pull-down, backdrop press, Cancel, and the platform back action keep the sheet i
 confirmation. The sheet has no stack header; its opening copy provides the page title. Saving inserts the client into the
 local database, dismisses the sheet, and refreshes the alphabetically sorted client list. Validation and database errors
 leave the entered values in place so they can be corrected or retried. App-wide toast notifications surface both error
-types above the current screen, while invalid fields also retain their inline guidance.
+types above the current screen, while invalid fields also retain their inline guidance. On Android, focusing any text,
+phone, numeric, or multiline field automatically scrolls it above the software keyboard and keeps it visible while the
+user types.
 
 For bottom-sheet routes, render reusable feature content inside the shared `SlideUpScreen` route surface and use
 `useSlideUpScreen` for guarded or immediate dismissal. Feature content, such as a form, should not own the modal material
@@ -220,11 +225,11 @@ A scrollable list of clinical calculator tools. Each tool row opens in a **botto
 
 Calculates any one value from any other single input. All three values are displayed together once a calculation is made.
 
-| Input | Derivation |
-|---|---|
+| Input                       | Derivation                             |
+| --------------------------- | -------------------------------------- |
 | LMP (Last Menstrual Period) | EDD = LMP + 280 days; GA = today − LMP |
-| Gestational Age | LMP = today − GA; EDD = LMP + 280 days |
-| EDD (Estimated Due Date) | LMP = EDD − 280 days; GA = today − LMP |
+| Gestational Age             | LMP = today − GA; EDD = LMP + 280 days |
+| EDD (Estimated Due Date)    | LMP = EDD − 280 days; GA = today − LMP |
 
 Display format for GA: `X weeks, Y days`.
 
@@ -249,6 +254,7 @@ A full-screen, vertically scrolling calendar. Scrolling is continuous — no mon
 Displays aggregated, read-only stats derived from the local SQLite database. Intended to be informative and a little fun for the midwife.
 
 Examples of stats (exact set to be defined):
+
 - Total clients seen
 - Total babies delivered
 - Most recent delivery
@@ -265,19 +271,19 @@ A **gear icon** in the Statistics screen header links to the Settings page.
 
 Pushed as a stack screen from the Statistics screen gear icon.
 
-| Setting | Description |
-|---|---|
-| App Lock | Toggle biometric/PIN lock on/off; the manual Lock button is disabled when App Lock is off |
-| Accent Color | Color picker to select the app's primary accent color |
-| Theme | Light / Dark mode toggle |
-| Mailing List | Enter or update email address for app update notifications |
-| Onboarding | Button to re-view the onboarding flow |
+| Setting      | Description                                                                               |
+| ------------ | ----------------------------------------------------------------------------------------- |
+| App Lock     | Toggle biometric/PIN lock on/off; the manual Lock button is disabled when App Lock is off |
+| Accent Color | Color picker to select the app's primary accent color                                     |
+| Theme        | Light / Dark mode toggle                                                                  |
+| Mailing List | Enter or update email address for app update notifications                                |
+| Onboarding   | Button to re-view the onboarding flow                                                     |
 
 ---
 
 ## Data Model Summary
 
-See `SCHEMA.md` for the full SQL schema. 
+See `SCHEMA.md` for the full SQL schema.
 
 ---
 

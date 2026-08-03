@@ -75,13 +75,19 @@ refs prevent overlapping alerts and ensure the route pop caused by an approved c
 
 ## Scrollable content and fixed actions
 
-Use Gorhom's scrollable primitives inside a sheet. For a form, use `BottomSheetScrollView` instead of React Native's
-`ScrollView`; this coordinates scrolling with the sheet's pan gesture. Set `keyboardDismissMode="on-drag"` and
-`keyboardShouldPersistTaps="handled"` for the current form behaviour.
+Use Gorhom's scrollable primitives inside a sheet. For a form with text inputs, use the shared
+`BottomSheetKeyboardAwareScrollView`. It combines `react-native-keyboard-controller`'s automatic focused-input
+scrolling with Gorhom's scrollable registration, preserving the sheet's pan gesture. Set
+`keyboardDismissMode="on-drag"` and `keyboardShouldPersistTaps="handled"` for the current form behaviour.
 
-Place persistent actions, such as Cancel and Save, as a sibling after `BottomSheetScrollView`. This keeps the footer
-fixed while the form body scrolls. The route still owns submission and cancellation; the form reports intent through
-callbacks.
+Text fields remain standard React Native `TextInput` controls. `SlideUpScreen` uses Gorhom's `interactive` keyboard
+behaviour with `android_keyboardInputMode="adjustPan"` and Android's matching `softwareKeyboardLayoutMode="pan"`
+setting. `BottomSheetKeyboardAwareScrollView` tracks the focused input and scrolls it above the keyboard without
+feature-specific focus handlers or keyboard-height calculations. The `restore` blur behaviour returns the sheet to its
+prior position after the keyboard closes.
+
+Place persistent actions, such as Cancel and Save, as a sibling after the scroll view. This keeps the footer fixed while
+the form body scrolls. The route still owns submission and cancellation; the form reports intent through callbacks.
 
 ## Testing
 
@@ -101,6 +107,10 @@ jest.mock("@gorhom/bottom-sheet", () => {
   return { __esModule: true, ...bottomSheetMock, default: MockBottomSheet };
 });
 ```
+
+Tests rendering a keyboard-aware sheet also use `react-native-keyboard-controller/jest`. Mock
+`react-native-reanimated`'s `createAnimatedComponent` as an identity wrapper so Gorhom can register the test scrollable
+without loading native Worklets.
 
 The controller has focused tests in `src/hooks/__tests__/useSlideUpScreen.test.ts`. They protect the ordering contract,
 duplicate-confirmation guard, pull-down restoration, and guarded and unguarded navigation paths. Feature tests should
