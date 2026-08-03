@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Platform, View } from "react-native";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import {
   CalendarDays,
   ChevronDown,
@@ -22,6 +21,7 @@ import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";
 
 import { Button } from "@/components/ui/Button";
+import { BottomSheetKeyboardAwareScrollView } from "@/components/ui/BottomSheetKeyboardAwareScrollView";
 import { FormChoiceGroup } from "@/components/ui/FormChoiceGroup";
 import { FormDateField } from "@/components/ui/FormDateField";
 import { FormTextField } from "@/components/ui/FormTextField";
@@ -115,7 +115,8 @@ export function ClientForm({
 
   return (
     <>
-      <BottomSheetScrollView
+      <BottomSheetKeyboardAwareScrollView
+        bottomOffset={12}
         contentContainerStyle={styles.content}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
@@ -335,7 +336,7 @@ export function ClientForm({
             </Text>
           </View>
         </View>
-      </BottomSheetScrollView>
+      </BottomSheetKeyboardAwareScrollView>
 
       <View style={styles.footer}>
         <Button

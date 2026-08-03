@@ -1,4 +1,5 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 import { StatusBar } from "expo-status-bar";
 import { router, Stack } from "expo-router";
@@ -54,13 +55,15 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <ThemeProvider>
-        <LockProvider>
-          <RootLayoutContent />
-        </LockProvider>
-      </ThemeProvider>
-    </GestureHandlerRootView>
+    <KeyboardProvider>
+      <GestureHandlerRootView style={styles.container}>
+        <ThemeProvider>
+          <LockProvider>
+            <RootLayoutContent />
+          </LockProvider>
+        </ThemeProvider>
+      </GestureHandlerRootView>
+    </KeyboardProvider>
   );
 }
 

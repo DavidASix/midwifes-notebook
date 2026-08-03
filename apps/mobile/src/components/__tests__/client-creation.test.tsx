@@ -6,6 +6,16 @@ import { act, fireEvent, renderWithTheme, screen, waitFor } from "@/test-utils";
 import ClientsScreen from "../../../app/(app)/(tabs)/clients";
 import NewClientScreen from "../../../app/(app)/clients/new";
 
+jest.mock("react-native-keyboard-controller", () =>
+  jest.requireActual("react-native-keyboard-controller/jest"),
+);
+jest.mock("react-native-reanimated", () => ({
+  __esModule: true,
+  default: {
+    createAnimatedComponent: (Component: React.ComponentType) => Component,
+  },
+}));
+
 jest.mock("@gorhom/bottom-sheet", () => {
   const bottomSheetMock = jest.requireActual("@gorhom/bottom-sheet/mock");
 

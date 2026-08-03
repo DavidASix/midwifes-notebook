@@ -54,6 +54,7 @@ export function SlideUpScreen({
       />
       <View style={styles.container}>
         <BottomSheet
+          android_keyboardInputMode="adjustPan"
           backdropComponent={renderBackdrop}
           backgroundStyle={styles.sheetSurface}
           bottomInset={insets.bottom}
@@ -61,6 +62,8 @@ export function SlideUpScreen({
           enablePanDownToClose
           handleIndicatorStyle={styles.handleIndicator}
           index={0}
+          keyboardBehavior="interactive"
+          keyboardBlurBehavior="restore"
           onAnimate={controller.onAnimate}
           onClose={controller.onClose}
           ref={controller.sheetRef}
