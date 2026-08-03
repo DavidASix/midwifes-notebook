@@ -290,4 +290,15 @@ describe("ClientsScreen focus refresh", () => {
 
     await waitFor(() => expect(mockFrom).toHaveBeenCalledTimes(2));
   });
+
+  it("recovers when retrying after a database row fails validation", async () => {
+    mockFrom.mockResolvedValueOnce([{ id: 1 }]).mockResolvedValueOnce([]);
+    renderWithTheme(<ClientsScreen />);
+
+    expect(await screen.findByText("Couldn’t load clients")).toBeTruthy();
+    fireEvent.press(screen.getByText("Retry"));
+
+    expect(await screen.findByText("No clients yet.")).toBeTruthy();
+    expect(mockFrom).toHaveBeenCalledTimes(2);
+  });
 });

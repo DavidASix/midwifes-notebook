@@ -103,6 +103,24 @@ describe("buildClientInsert", () => {
     });
   });
 
+  it("rejects malformed client dates with field-specific errors", () => {
+    const result = buildClientInsert(
+      validValues({
+        dateOfBirth: "not-a-date",
+        estimatedDeliveryDate: "2026-02-31",
+      }),
+      today,
+    );
+
+    expect(result).toEqual({
+      success: false,
+      errors: {
+        dateOfBirth: "Enter a valid date.",
+        estimatedDeliveryDate: "Enter a valid date.",
+      },
+    });
+  });
+
   it("rejects non-whole numeric values without enforcing arbitrary ranges", () => {
     const result = buildClientInsert(
       validValues({ age: "0", gravida: "2.5", parity: "100" }),
