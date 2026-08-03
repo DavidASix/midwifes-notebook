@@ -25,8 +25,12 @@ import { Text } from "@/components/ui/Text";
 
 const clientDetailTabs = ["client", "babies", "notes"] as const;
 
+/**
+ * Regex is included to avoid non integers from passing (like 4e1) and displaying an different client.
+ */
 const clientIdSchema = z
   .string()
+  .regex(/^[1-9]\d*$/)
   .pipe(z.coerce.number())
   .pipe(z.int().positive());
 

@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { and, eq, isNull } from "drizzle-orm";
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Pencil, X } from "lucide-react-native";
 
 import {
@@ -131,6 +131,10 @@ export default function ClientDetailScreen() {
             <Text style={styles.stateText}>
               This client link does not contain a valid record number.
             </Text>
+            <Button
+              onPress={() => router.replace("/(app)/(tabs)/clients")}
+              title="Back to clients"
+            />
           </View>
         )}
         {loadState.status === "missing" && (
@@ -141,6 +145,10 @@ export default function ClientDetailScreen() {
             <Text style={styles.stateText}>
               This client may have been removed.
             </Text>
+            <Button
+              onPress={() => router.replace("/(app)/(tabs)/clients")}
+              title="Back to clients"
+            />
           </View>
         )}
         {loadState.status === "error" && (

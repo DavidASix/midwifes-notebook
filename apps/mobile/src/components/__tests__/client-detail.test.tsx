@@ -119,9 +119,14 @@ describe("client detail navigation decisions", () => {
   it("rejects malformed route IDs before they can reach the database", () => {
     expect(parseClientId(undefined)).toBeNull();
     expect(parseClientId(["1", "2"])).toBeNull();
+    expect(parseClientId("")).toBeNull();
     expect(parseClientId("0")).toBeNull();
     expect(parseClientId("-1")).toBeNull();
     expect(parseClientId("1.5")).toBeNull();
+    expect(parseClientId("4e1")).toBeNull();
+    expect(parseClientId("0x28")).toBeNull();
+    expect(parseClientId(" 40 ")).toBeNull();
+    expect(parseClientId("040")).toBeNull();
     expect(parseClientId("12x")).toBeNull();
     expect(parseClientId("9007199254740992")).toBeNull();
     expect(parseClientId("42")).toBe(42);

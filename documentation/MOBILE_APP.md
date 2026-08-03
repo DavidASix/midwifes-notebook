@@ -160,7 +160,8 @@ Status is derived at query time (not stored):
 
 Tapping a client row opens a 93%-height bottom sheet modal with a drag handle. The background content (client list) is
 visible but dimmed behind it. Invalid, missing, and failed client loads are handled in the sheet, and database failures
-can be retried without dismissing it. The selected client is reloaded whenever the route regains focus.
+can be retried without dismissing it. Invalid or missing client links provide a direct action back to the client list.
+The selected client is reloaded whenever the route regains focus.
 
 **Header:** Close action, client full name, and `EDIT` on the right. Until the dedicated edit route is implemented,
 `EDIT` remains intentionally inactive.
