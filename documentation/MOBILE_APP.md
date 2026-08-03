@@ -150,9 +150,12 @@ Status is derived at query time (not stored):
 
 ### Client Detail (Bottom Sheet Modal)
 
-Tapping a client row opens a full-height bottom sheet modal (drag handle at top). The background content (client list) is visible but dimmed behind it.
+Tapping a client row opens a 93%-height bottom sheet modal with a drag handle. The background content (client list) is
+visible but dimmed behind it. Invalid, missing, and failed client loads are handled in the sheet, and database failures
+can be retried without dismissing it. The selected client is reloaded whenever the route regains focus.
 
-**Header:** client full name, `EDIT` on the right.
+**Header:** Close action, client full name, and `EDIT` on the right. Until the dedicated edit route is implemented,
+`EDIT` remains intentionally inactive.
 
 **Three tabs:**
 
@@ -170,18 +173,24 @@ Grouped sections with labeled field pairs in a two-column grid. Should include a
 
 - Active toggle (active = in care; inactive = Out of Care)
 
-#### Tab 2 — Children
+#### Tab 2 — Babies
 
 A list of the client's babies. Each baby entry shows all details from the babies table, some with multiple format variants (brith weight in both grams and pounds/ounces, for example)
 An **Add Baby** button at the bottom opens a form to create a new baby entry for this client.
 
 Each baby row is tappable to view/edit full baby details.
 
+The initial client-detail implementation displays a centered **Babies** placeholder until baby persistence and forms
+are implemented.
+
 #### Tab 3 — Notes
 
 A general-purpose scratchpad for the client. Notes are stored as individual entries (title, content, date) in the `notes` table.
 
 The tab shows a chronological list of notes. Tapping a note opens it for viewing/editing. A **New Note** button creates a new entry.
+
+The initial client-detail implementation displays a centered **Notes** placeholder until note persistence and forms
+are implemented.
 
 ---
 
