@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { SlideUpScreen } from "@/components/ui/SlideUpScreen";
 import { Text } from "@/components/ui/Text";
 import { getDb } from "@/db";
-import { clients } from "@/db/schema";
+import { clientsSchema, clients } from "@/db/schema";
 import { useSlideUpScreen } from "@/hooks/useSlideUpScreen";
 import { getClientFullName, type ClientRecord } from "@/lib/client-detail";
 import { makeStyles } from "@/lib/make-styles";
@@ -55,10 +55,16 @@ export default function ClientDetailScreen() {
         .where(and(eq(clients.id, clientId), isNull(clients.deletedAt)))
         .limit(1);
       if (version !== requestVersion.current) return;
+      if (!result[0]) {
+        setLoadState({ status: "missing" });
+        return;
+      }
+
+      const parsedClient = clientsSchema.safeParse(result[0]);
       setLoadState(
-        result[0]
-          ? { status: "loaded", client: result[0] }
-          : { status: "missing" },
+        parsedClient.success
+          ? { status: "loaded", client: parsedClient.data }
+          : { status: "error" },
       );
     } catch {
       if (version === requestVersion.current) {

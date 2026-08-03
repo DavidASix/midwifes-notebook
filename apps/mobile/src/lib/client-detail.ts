@@ -1,7 +1,7 @@
-import type { clients } from "@/db/schema";
+import { isoCalendarDateSchema, type ClientRecord } from "@/db/schema";
 import { deriveClientStatus, type ClientStatus } from "@/lib/client-list";
 
-export type ClientRecord = typeof clients.$inferSelect;
+export type { ClientRecord } from "@/db/schema";
 
 export const missingClientValue = "—";
 
@@ -11,7 +11,7 @@ const statusLabels: Record<ClientStatus, string> = {
   "out-of-care": "Out of Care",
 };
 
-/** Returns a display-safe value without using punctuation as a missing sentinel. */
+/** Returns a display-safe value using the shared missing-value sentinel. */
 export function formatClientDetailValue(
   value: string | number | null | undefined,
 ): string {
@@ -26,28 +26,15 @@ export function formatClientAge(
   client: Pick<ClientRecord, "dateOfBirth" | "age">,
   today = new Date(),
 ): string {
-  if (client.dateOfBirth) {
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(client.dateOfBirth);
-    if (match) {
-      const [, yearValue, monthValue, dayValue] = match;
-      const year = Number(yearValue);
-      const month = Number(monthValue);
-      const day = Number(dayValue);
-      const validDate = new Date(year, month - 1, day, 12);
-      const isValid =
-        validDate.getFullYear() === year &&
-        validDate.getMonth() === month - 1 &&
-        validDate.getDate() === day;
-
-      if (isValid) {
-        let age = today.getFullYear() - year;
-        const birthdayHasPassed =
-          today.getMonth() + 1 > month ||
-          (today.getMonth() + 1 === month && today.getDate() >= day);
-        if (!birthdayHasPassed) age -= 1;
-        if (age >= 0) return `${age} years (calculated)`;
-      }
-    }
+  const parsedDate = isoCalendarDateSchema.safeParse(client.dateOfBirth);
+  if (parsedDate.success) {
+    const [year, month, day] = parsedDate.data.split("-").map(Number);
+    let age = today.getFullYear() - year;
+    const birthdayHasPassed =
+      today.getMonth() + 1 > month ||
+      (today.getMonth() + 1 === month && today.getDate() >= day);
+    if (!birthdayHasPassed) age -= 1;
+    if (age >= 0) return `${age} years (calculated)`;
   }
 
   return client.age == null

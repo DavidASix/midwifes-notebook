@@ -139,6 +139,17 @@ describe("ClientDetailScreen data lifecycle", () => {
     expect(mockLimit).toHaveBeenCalledTimes(2);
   });
 
+  it("shows a recoverable error when a database row fails runtime validation", async () => {
+    mockLimit.mockResolvedValueOnce([
+      makeClient({ dateOfBirth: "2026-02-31" }),
+    ]);
+    renderWithTheme(<ClientDetailScreen />);
+
+    expect(await screen.findByText("Couldn’t load client")).toBeTruthy();
+    expect(screen.getByText("Retry")).toBeTruthy();
+    expect(screen.queryByText("Eleanor Rigby")).toBeNull();
+  });
+
   it("reloads fresh client data whenever the detail route regains focus", async () => {
     mockLimit
       .mockResolvedValueOnce([makeClient()])

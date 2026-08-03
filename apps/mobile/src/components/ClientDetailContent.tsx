@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { z } from "zod";
 
 import {
   formatClientAge,
@@ -24,18 +25,19 @@ import { Text } from "@/components/ui/Text";
 
 const clientDetailTabs = ["client", "babies", "notes"] as const;
 
+const clientIdSchema = z
+  .string()
+  .pipe(z.coerce.number())
+  .pipe(z.int().positive());
+
 type ClientDetailTab = (typeof clientDetailTabs)[number];
 
 /** Accepts only one positive integer Expo Router path parameter. */
 export function parseClientId(
   routeId: string | string[] | undefined,
 ): number | null {
-  if (typeof routeId !== "string" || !/^[1-9]\d*$/.test(routeId)) {
-    return null;
-  }
-
-  const parsed = Number(routeId);
-  return Number.isSafeInteger(parsed) ? parsed : null;
+  const result = clientIdSchema.safeParse(routeId);
+  return result.success ? result.data : null;
 }
 
 /** Resolves a horizontal pager offset to the nearest detail tab. */
