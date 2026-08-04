@@ -1,9 +1,5 @@
-import {
-  buildClientInsert,
-  fromIsoDate,
-  toIsoDate,
-  type ClientFormValues,
-} from "../client-form";
+import { buildClientInsert, type ClientFormValues } from "../client-form";
+import { fromIsoDate, toIsoDate } from "../dates";
 
 const today = new Date(2026, 6, 22, 12);
 
