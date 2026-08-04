@@ -38,27 +38,8 @@ const clientFormFieldsSchema = clientsSchema
     estimatedDeliveryDate: optionalDateSchema,
     gravida: optionalIntegerSchema,
     parity: optionalIntegerSchema,
-  });
-
-type ClientFormSchemaInput = z.input<typeof clientFormFieldsSchema>;
-
-export type ClientFormValues = {
-  [Field in keyof ClientFormSchemaInput]?: Exclude<
-    ClientFormSchemaInput[Field],
-    null
-  >;
-};
-
-export type ClientFormErrors = Partial<Record<keyof ClientFormValues, string>>;
-
-export const initialClientFormValues: ClientFormValues = {};
-
-export type ClientFormResult =
-  | { success: true; data: typeof clients.$inferInsert }
-  | { success: false; errors: ClientFormErrors };
-
-const refinedClientFormSchema = clientFormFieldsSchema.superRefine(
-  (values, context) => {
+  })
+  .superRefine((values, context) => {
     const todayIso = toIsoDate(new Date());
     if (values.dateOfBirth && values.age !== undefined) {
       context.addIssue({
@@ -85,12 +66,28 @@ const refinedClientFormSchema = clientFormFieldsSchema.superRefine(
         message: "Parity cannot be greater than gravida.",
       });
     }
-  },
-);
+  });
+
+type ClientFormSchemaInput = z.input<typeof clientFormFieldsSchema>;
+
+export type ClientFormValues = {
+  [Field in keyof ClientFormSchemaInput]?: Exclude<
+    ClientFormSchemaInput[Field],
+    null
+  >;
+};
+
+export type ClientFormErrors = Partial<Record<keyof ClientFormValues, string>>;
+
+export const initialClientFormValues: ClientFormValues = {};
+
+export type ClientFormResult =
+  | { success: true; data: typeof clients.$inferInsert }
+  | { success: false; errors: ClientFormErrors };
 
 /** Validates form decisions and produces a database-ready client insert without blank nullable values. */
 export function buildClientInsert(values: ClientFormValues): ClientFormResult {
-  const result = refinedClientFormSchema.safeParse(values);
+  const result = clientFormFieldsSchema.safeParse(values);
   if (result.success) {
     return { success: true, data: result.data };
   }
