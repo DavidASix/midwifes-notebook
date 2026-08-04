@@ -70,11 +70,9 @@ export function fromIsoDate(value: string): Date {
   return new Date(year, month - 1, day, 12);
 }
 
-/** Builds the runtime form contract using the current date for time-dependent rules. */
-function createClientFormSchema(today: Date) {
-  const todayIso = toIsoDate(today);
-
-  return clientFormFieldsSchema.superRefine((values, context) => {
+const refinedClientFormSchema = clientFormFieldsSchema.superRefine(
+  (values, context) => {
+    const todayIso = toIsoDate(new Date());
     if (values.dateOfBirth && values.age !== undefined) {
       context.addIssue({
         code: "custom",
@@ -100,12 +98,12 @@ function createClientFormSchema(today: Date) {
         message: "Parity cannot be greater than gravida.",
       });
     }
-  });
-}
+  },
+);
 
 /** Validates form decisions and produces a database-ready client insert without blank nullable values. */
 export function buildClientInsert(values: ClientFormValues): ClientFormResult {
-  const result = createClientFormSchema(new Date()).safeParse(values);
+  const result = refinedClientFormSchema.safeParse(values);
   if (result.success) {
     return { success: true, data: result.data };
   }
