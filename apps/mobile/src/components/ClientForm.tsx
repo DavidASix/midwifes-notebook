@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/Button";
 import { BottomSheetKeyboardAwareScrollView } from "@/components/ui/BottomSheetKeyboardAwareScrollView";
 import { FormChoiceGroup } from "@/components/ui/FormChoiceGroup";
 import { FormDateField } from "@/components/ui/FormDateField";
+import { FormIntegerField } from "@/components/ui/FormIntegerField";
 import { FormTextField } from "@/components/ui/FormTextField";
 import { Text } from "@/components/ui/Text";
 
@@ -208,13 +209,12 @@ export function ClientForm({
             }}
             value={values.dateOfBirth}
           />
-          <FormTextField
+          <FormIntegerField
             error={errors.age}
-            keyboardType="number-pad"
             label="Age, if birth date is unknown"
-            onChangeText={(value) => {
+            onChange={(value) => {
               onChange("age", value);
-              if (value.trim()) onChange("dateOfBirth", undefined);
+              if (value !== undefined) onChange("dateOfBirth", undefined);
             }}
             placeholder="Not set"
             value={values.age}
@@ -235,21 +235,19 @@ export function ClientForm({
           />
           <View style={styles.twoColumnRow}>
             <View style={styles.column}>
-              <FormTextField
+              <FormIntegerField
                 error={errors.gravida}
-                keyboardType="number-pad"
                 label="Gravida"
-                onChangeText={(value) => onChange("gravida", value)}
+                onChange={(value) => onChange("gravida", value)}
                 placeholder="Total pregnancies"
                 value={values.gravida}
               />
             </View>
             <View style={styles.column}>
-              <FormTextField
+              <FormIntegerField
                 error={errors.parity}
-                keyboardType="number-pad"
                 label="Parity"
-                onChangeText={(value) => onChange("parity", value)}
+                onChange={(value) => onChange("parity", value)}
                 placeholder="Total deliveries"
                 value={values.parity}
               />
