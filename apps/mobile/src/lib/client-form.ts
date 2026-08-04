@@ -1,7 +1,11 @@
 import { z } from "zod";
 
 import { clients, clientsSchema } from "@/db/schema";
-import { optionalIntegerSchema } from "@/lib/types";
+
+const optionalIntegerSchema = z
+  .number({ error: "Enter a whole number." })
+  .int("Enter a whole number.")
+  .optional();
 
 const clientFormFieldsSchema = clientsSchema
   .omit({

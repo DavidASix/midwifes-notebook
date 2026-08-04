@@ -81,7 +81,7 @@ describe("buildClientInsert", () => {
 
   it("rejects age alongside a birth date so the two sources cannot conflict", () => {
     const result = buildClientInsert(
-      validValues({ dateOfBirth: "1990-03-24", age: "36" }),
+      validValues({ dateOfBirth: "1990-03-24", age: 36 }),
       today,
     );
 
@@ -123,7 +123,7 @@ describe("buildClientInsert", () => {
 
   it("rejects non-whole numeric values without enforcing arbitrary ranges", () => {
     const result = buildClientInsert(
-      validValues({ age: "0", gravida: "2.5", parity: "100" }),
+      validValues({ age: 0, gravida: 2.5, parity: 100 }),
       today,
     );
 
@@ -137,13 +137,13 @@ describe("buildClientInsert", () => {
 
   it("rejects parity greater than gravida while accepting equal values", () => {
     expect(
-      buildClientInsert(validValues({ gravida: "2", parity: "3" }), today),
+      buildClientInsert(validValues({ gravida: 2, parity: 3 }), today),
     ).toEqual({
       success: false,
       errors: { parity: "Parity cannot be greater than gravida." },
     });
     expect(
-      buildClientInsert(validValues({ gravida: "3", parity: "3" }), today),
+      buildClientInsert(validValues({ gravida: 3, parity: 3 }), today),
     ).toEqual({
       success: true,
       data: expect.objectContaining({ gravida: 3, parity: 3 }),
