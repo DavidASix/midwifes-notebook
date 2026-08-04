@@ -7,6 +7,10 @@ const optionalIntegerSchema = z
   .int("Enter a whole number.")
   .optional();
 
+const optionalDateSchema = z.iso
+  .date({ error: "Enter a valid date." })
+  .optional();
+
 const clientFormFieldsSchema = clientsSchema
   .omit({
     id: true,
@@ -28,7 +32,9 @@ const clientFormFieldsSchema = clientsSchema
       .string({ error: "Last name is required." })
       .trim()
       .min(1, "Last name is required."),
+    dateOfBirth: optionalDateSchema,
     age: optionalIntegerSchema,
+    estimatedDeliveryDate: optionalDateSchema,
     gravida: optionalIntegerSchema,
     parity: optionalIntegerSchema,
   });
@@ -111,11 +117,7 @@ export function buildClientInsert(
   for (const issue of result.error.issues) {
     const field = issue.path[0] as keyof ClientFormValues | undefined;
     if (field !== undefined && errors[field] === undefined) {
-      errors[field] =
-        issue.code === "invalid_format" &&
-        (field === "dateOfBirth" || field === "estimatedDeliveryDate")
-          ? "Enter a valid date."
-          : issue.message;
+      errors[field] = issue.message;
     }
   }
   return { success: false, errors };
