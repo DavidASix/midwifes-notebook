@@ -18,10 +18,17 @@ function validValues(
 }
 
 describe("buildClientInsert", () => {
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(today);
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   it("rejects a record without both required names", () => {
     const result = buildClientInsert(
       validValues({ firstName: " ", lastName: undefined }),
-      today,
     );
 
     expect(result).toEqual({
@@ -42,7 +49,6 @@ describe("buildClientInsert", () => {
         address: "  72 Willow Street  ",
         partnerName: "",
       }),
-      today,
     );
 
     expect(result).toEqual({
@@ -65,7 +71,6 @@ describe("buildClientInsert", () => {
         gbsStatus: "+",
         partnerBloodType: "O+",
       }),
-      today,
     );
 
     expect(result).toEqual({
@@ -82,7 +87,6 @@ describe("buildClientInsert", () => {
   it("rejects age alongside a birth date so the two sources cannot conflict", () => {
     const result = buildClientInsert(
       validValues({ dateOfBirth: "1990-03-24", age: 36 }),
-      today,
     );
 
     expect(result).toEqual({
@@ -94,7 +98,6 @@ describe("buildClientInsert", () => {
   it("rejects a future date of birth", () => {
     const result = buildClientInsert(
       validValues({ dateOfBirth: "2026-07-23" }),
-      today,
     );
 
     expect(result).toEqual({
@@ -109,7 +112,6 @@ describe("buildClientInsert", () => {
         dateOfBirth: "not-a-date",
         estimatedDeliveryDate: "2026-02-31",
       }),
-      today,
     );
 
     expect(result).toEqual({
@@ -124,7 +126,6 @@ describe("buildClientInsert", () => {
   it("rejects non-whole numeric values without enforcing arbitrary ranges", () => {
     const result = buildClientInsert(
       validValues({ age: 0, gravida: 2.5, parity: 100 }),
-      today,
     );
 
     expect(result).toEqual({
@@ -136,15 +137,11 @@ describe("buildClientInsert", () => {
   });
 
   it("rejects parity greater than gravida while accepting equal values", () => {
-    expect(
-      buildClientInsert(validValues({ gravida: 2, parity: 3 }), today),
-    ).toEqual({
+    expect(buildClientInsert(validValues({ gravida: 2, parity: 3 }))).toEqual({
       success: false,
       errors: { parity: "Parity cannot be greater than gravida." },
     });
-    expect(
-      buildClientInsert(validValues({ gravida: 3, parity: 3 }), today),
-    ).toEqual({
+    expect(buildClientInsert(validValues({ gravida: 3, parity: 3 }))).toEqual({
       success: true,
       data: expect.objectContaining({ gravida: 3, parity: 3 }),
     });

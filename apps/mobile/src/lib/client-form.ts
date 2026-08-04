@@ -104,11 +104,8 @@ function createClientFormSchema(today: Date) {
 }
 
 /** Validates form decisions and produces a database-ready client insert without blank nullable values. */
-export function buildClientInsert(
-  values: ClientFormValues,
-  today = new Date(),
-): ClientFormResult {
-  const result = createClientFormSchema(today).safeParse(values);
+export function buildClientInsert(values: ClientFormValues): ClientFormResult {
+  const result = createClientFormSchema(new Date()).safeParse(values);
   if (result.success) {
     return { success: true, data: result.data };
   }
