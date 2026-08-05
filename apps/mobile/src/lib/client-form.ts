@@ -6,6 +6,7 @@ import { toIsoDate } from "./dates";
 const optionalIntegerSchema = z
   .number({ error: "Enter a whole number." })
   .int("Enter a whole number.")
+  .positive("Enter a positive number.")
   .optional();
 
 const optionalDateSchema = z.iso

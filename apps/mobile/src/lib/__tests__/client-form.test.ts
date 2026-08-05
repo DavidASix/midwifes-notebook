@@ -119,15 +119,28 @@ describe("buildClientInsert", () => {
     });
   });
 
-  it("rejects non-whole numeric values without enforcing arbitrary ranges", () => {
-    const result = buildClientInsert(
-      validValues({ age: 0, gravida: 2.5, parity: 100 }),
-    );
+  it("rejects non-whole numeric values", () => {
+    const result = buildClientInsert(validValues({ gravida: 2.5 }));
 
     expect(result).toEqual({
       success: false,
       errors: {
         gravida: "Enter a whole number.",
+      },
+    });
+  });
+
+  it("rejects zero and negative integers for optional numeric fields", () => {
+    const result = buildClientInsert(
+      validValues({ age: 0, gravida: -2, parity: 0 }),
+    );
+
+    expect(result).toEqual({
+      success: false,
+      errors: {
+        age: "Enter a positive number.",
+        gravida: "Enter a positive number.",
+        parity: "Enter a positive number.",
       },
     });
   });
