@@ -1,7 +1,17 @@
 import { z } from "zod";
 
 import { clients, clientsSchema } from "@/db/schema";
-import { optionalIntegerSchema } from "@/lib/types";
+import { toIsoDate } from "./dates";
+
+const optionalIntegerSchema = z
+  .number({ error: "Enter a whole number." })
+  .int("Enter a whole number.")
+  .positive("Enter a positive number.")
+  .optional();
+
+const optionalDateSchema = z.iso
+  .date({ error: "Enter a valid date." })
+  .optional();
 
 const clientFormFieldsSchema = clientsSchema
   .omit({
@@ -24,47 +34,14 @@ const clientFormFieldsSchema = clientsSchema
       .string({ error: "Last name is required." })
       .trim()
       .min(1, "Last name is required."),
+    dateOfBirth: optionalDateSchema,
     age: optionalIntegerSchema,
+    estimatedDeliveryDate: optionalDateSchema,
     gravida: optionalIntegerSchema,
     parity: optionalIntegerSchema,
-  });
-
-type ClientFormSchemaInput = z.input<typeof clientFormFieldsSchema>;
-
-export type ClientFormValues = {
-  [Field in keyof ClientFormSchemaInput]?: Exclude<
-    ClientFormSchemaInput[Field],
-    null
-  >;
-};
-
-export type ClientFormErrors = Partial<Record<keyof ClientFormValues, string>>;
-
-export const initialClientFormValues: ClientFormValues = {};
-
-export type ClientFormResult =
-  | { success: true; data: typeof clients.$inferInsert }
-  | { success: false; errors: ClientFormErrors };
-
-/** Converts a Date to an ISO calendar date without applying a UTC timezone shift. */
-export function toIsoDate(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-/** Parses an ISO calendar date into local midday to avoid daylight-saving boundary shifts. */
-export function fromIsoDate(value: string): Date {
-  const [year, month, day] = value.split("-").map(Number);
-  return new Date(year, month - 1, day, 12);
-}
-
-/** Builds the runtime form contract using the current date for time-dependent rules. */
-function createClientFormSchema(today: Date) {
-  const todayIso = toIsoDate(today);
-
-  return clientFormFieldsSchema.superRefine((values, context) => {
+  })
+  .superRefine((values, context) => {
+    const todayIso = toIsoDate(new Date());
     if (values.dateOfBirth && values.age !== undefined) {
       context.addIssue({
         code: "custom",
@@ -91,14 +68,27 @@ function createClientFormSchema(today: Date) {
       });
     }
   });
-}
+
+type ClientFormSchemaInput = z.input<typeof clientFormFieldsSchema>;
+
+export type ClientFormValues = {
+  [Field in keyof ClientFormSchemaInput]?: Exclude<
+    ClientFormSchemaInput[Field],
+    null
+  >;
+};
+
+export type ClientFormErrors = Partial<Record<keyof ClientFormValues, string>>;
+
+export const initialClientFormValues: ClientFormValues = {};
+
+export type ClientFormResult =
+  | { success: true; data: typeof clients.$inferInsert }
+  | { success: false; errors: ClientFormErrors };
 
 /** Validates form decisions and produces a database-ready client insert without blank nullable values. */
-export function buildClientInsert(
-  values: ClientFormValues,
-  today = new Date(),
-): ClientFormResult {
-  const result = createClientFormSchema(today).safeParse(values);
+export function buildClientInsert(values: ClientFormValues): ClientFormResult {
+  const result = clientFormFieldsSchema.safeParse(values);
   if (result.success) {
     return { success: true, data: result.data };
   }
@@ -107,11 +97,7 @@ export function buildClientInsert(
   for (const issue of result.error.issues) {
     const field = issue.path[0] as keyof ClientFormValues | undefined;
     if (field !== undefined && errors[field] === undefined) {
-      errors[field] =
-        issue.code === "invalid_format" &&
-        (field === "dateOfBirth" || field === "estimatedDeliveryDate")
-          ? "Enter a valid date."
-          : issue.message;
+      errors[field] = issue.message;
     }
   }
   return { success: false, errors };

@@ -17,7 +17,7 @@ export type FormTextFieldProps = {
   accessibilityLabel?: string;
 };
 
-/** A labeled, themed text input for single-line, numeric, phone, and multiline form values. */
+/** A labeled, themed text input for single-line, phone, and multiline form values. */
 export function FormTextField({
   label,
   value,
