@@ -24,7 +24,13 @@ export function FormIntegerField({
   );
 
   useEffect(() => {
-    setInputValue(value === undefined ? "" : String(value));
+    setInputValue((current) =>
+      current === "-" && value === undefined
+        ? current
+        : value === undefined
+          ? ""
+          : String(value),
+    );
   }, [value]);
 
   function handleChangeText(nextValue: string) {
@@ -36,6 +42,7 @@ export function FormIntegerField({
 
     if (nextValue === "-") {
       setInputValue(nextValue);
+      onChange(undefined);
       return;
     }
 

@@ -36,14 +36,15 @@ describe("FormIntegerField", () => {
     expect(screen.getByTestId("managed-value").props.children).toBe("unset");
   });
 
-  it("retains a leading minus while entering a negative integer", () => {
-    renderWithTheme(<IntegerFieldHarness initialValue={12} />);
+  it("unsets a stale negative value while retaining a minus for continued entry", () => {
+    renderWithTheme(<IntegerFieldHarness initialValue={-3} />);
 
     fireEvent.changeText(screen.getByLabelText("Count"), "-");
-    expect(screen.getByTestId("managed-value").props.children).toBe("12");
+    expect(screen.getByLabelText("Count").props.value).toBe("-");
+    expect(screen.getByTestId("managed-value").props.children).toBe("unset");
 
-    fireEvent.changeText(screen.getByLabelText("Count"), "-3");
-    expect(screen.getByTestId("managed-value").props.children).toBe("-3");
+    fireEvent.changeText(screen.getByLabelText("Count"), "-4");
+    expect(screen.getByTestId("managed-value").props.children).toBe("-4");
   });
 
   it("ignores values that are not safe integers", () => {
