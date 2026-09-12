@@ -41,7 +41,7 @@ jest.mock("expo-router", () => {
   return {
     __esModule: true,
     Stack: MockStack,
-    router: { back: jest.fn(), replace: jest.fn() },
+    router: { back: jest.fn(), push: jest.fn(), replace: jest.fn() },
     useFocusEffect: jest.fn((callback: () => void | (() => void)) => {
       ReactForMock.useEffect(callback, [callback]);
     }),
