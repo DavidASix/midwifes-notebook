@@ -46,7 +46,9 @@ function makeClient(overrides: Partial<ClientRecord> = {}): ClientRecord {
 }
 
 function renderMeasuredDetail(client = makeClient()) {
-  renderWithTheme(<ClientDetailContent client={client} />);
+  renderWithTheme(
+    <ClientDetailContent client={client} onCareStatusChange={jest.fn()} />,
+  );
   fireEvent(screen.getByTestId("client-detail-pager"), "layout", {
     nativeEvent: {
       layout: { width: 320, height: 600, x: 0, y: 0 },

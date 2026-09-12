@@ -1,4 +1,5 @@
 import React from "react";
+import { Alert } from "react-native";
 
 import ClientDetailScreen from "../../../app/(app)/clients/[id]";
 import type { ClientRecord } from "@/lib/client-detail";
@@ -54,9 +55,30 @@ jest.mock("@/db", () => {
   const limit = jest.fn();
   const where = jest.fn(() => ({ limit }));
   const from = jest.fn(() => ({ where }));
-  const db = { select: jest.fn(() => ({ from })) };
-  return { __esModule: true, db, from, getDb: () => db, limit, where };
+  const returning = jest.fn();
+  const updateWhere = jest.fn(() => ({ returning }));
+  const set = jest.fn(() => ({ where: updateWhere }));
+  const db = {
+    select: jest.fn(() => ({ from })),
+    update: jest.fn(() => ({ set })),
+  };
+  return {
+    __esModule: true,
+    db,
+    from,
+    getDb: () => db,
+    limit,
+    returning,
+    set,
+    updateWhere,
+    where,
+  };
 });
+
+jest.mock("@/lib/toast", () => ({
+  showErrorToast: jest.fn(),
+  showSuccessToast: jest.fn(),
+}));
 
 const mockExpoRouter = jest.requireMock("expo-router");
 const mockUseFocusEffect = mockExpoRouter.useFocusEffect as jest.Mock;
@@ -69,6 +91,12 @@ const mockDb = mockDatabaseModule.db as { select: jest.Mock };
 const mockFrom = mockDatabaseModule.from as jest.Mock;
 const mockLimit = mockDatabaseModule.limit as jest.Mock;
 const mockWhere = mockDatabaseModule.where as jest.Mock;
+const mockReturning = mockDatabaseModule.returning as jest.Mock;
+const mockSet = mockDatabaseModule.set as jest.Mock;
+const mockShowSuccessToast = jest.requireMock("@/lib/toast")
+  .showSuccessToast as jest.Mock;
+const mockShowErrorToast = jest.requireMock("@/lib/toast")
+  .showErrorToast as jest.Mock;
 
 function makeClient(overrides: Partial<ClientRecord> = {}): ClientRecord {
   return {
@@ -111,6 +139,9 @@ describe("ClientDetailScreen data lifecycle", () => {
     mockWhere.mockReturnValue({ limit: mockLimit });
     mockFrom.mockReturnValue({ where: mockWhere });
     mockDb.select.mockReturnValue({ from: mockFrom });
+    mockReturning.mockImplementation(async () => [
+      { ...makeClient(), ...mockSet.mock.calls.at(-1)?.[0] },
+    ]);
   });
 
   it("rejects coercible record IDs without querying or stranding the user", async () => {
@@ -179,5 +210,64 @@ describe("ClientDetailScreen data lifecycle", () => {
       },
     });
     expect(await screen.findByText("Ellie")).toBeTruthy();
+  });
+
+  it("confirms moving out of care and updates the displayed derived status", async () => {
+    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation();
+    renderWithTheme(<ClientDetailScreen />);
+    expect(await screen.findByText("Eleanor Rigby")).toBeTruthy();
+    fireEvent(screen.getByTestId("client-detail-pager"), "layout", {
+      nativeEvent: { layout: { width: 320, height: 600, x: 0, y: 0 } },
+    });
+
+    fireEvent(screen.getByLabelText("Client is in care"), "valueChange", false);
+    expect(mockSet).not.toHaveBeenCalled();
+    const buttons = alertSpy.mock.calls.at(-1)?.[2];
+    await act(async () => buttons?.[1].onPress?.());
+
+    await waitFor(() =>
+      expect(mockSet).toHaveBeenCalledWith(
+        expect.objectContaining({ isActive: 0, updatedAt: expect.any(String) }),
+      ),
+    );
+    expect(await screen.findByText("Out of Care")).toBeTruthy();
+    expect(mockShowSuccessToast).toHaveBeenCalledWith(
+      "Client moved out of care",
+    );
+  });
+
+  it("returns a client to care immediately without confirmation", async () => {
+    mockLimit.mockResolvedValueOnce([makeClient({ isActive: 0 })]);
+    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation();
+    renderWithTheme(<ClientDetailScreen />);
+    expect(await screen.findByText("Eleanor Rigby")).toBeTruthy();
+    fireEvent(screen.getByTestId("client-detail-pager"), "layout", {
+      nativeEvent: { layout: { width: 320, height: 600, x: 0, y: 0 } },
+    });
+
+    fireEvent(screen.getByLabelText("Client is in care"), "valueChange", true);
+
+    await waitFor(() =>
+      expect(mockSet).toHaveBeenCalledWith(
+        expect.objectContaining({ isActive: 1 }),
+      ),
+    );
+    expect(alertSpy).not.toHaveBeenCalled();
+  });
+
+  it("keeps the stored care status when persistence fails", async () => {
+    mockLimit.mockResolvedValueOnce([makeClient({ isActive: 0 })]);
+    mockReturning.mockRejectedValueOnce(new Error("database unavailable"));
+    renderWithTheme(<ClientDetailScreen />);
+    expect(await screen.findByText("Eleanor Rigby")).toBeTruthy();
+    fireEvent(screen.getByTestId("client-detail-pager"), "layout", {
+      nativeEvent: { layout: { width: 320, height: 600, x: 0, y: 0 } },
+    });
+
+    fireEvent(screen.getByLabelText("Client is in care"), "valueChange", true);
+
+    await waitFor(() => expect(mockShowErrorToast).toHaveBeenCalledTimes(1));
+    expect(screen.getByLabelText("Client is in care").props.value).toBe(false);
+    expect(screen.getByText("Out of Care")).toBeTruthy();
   });
 });
