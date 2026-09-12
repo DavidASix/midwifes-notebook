@@ -103,9 +103,8 @@ export default function ClientDetailScreen() {
           </Text>
           <Button
             accessibilityLabel="Edit client"
-            onPress={() => {
-              // TODO: Navigate to the shared create/edit client form route.
-            }}
+            disabled={loadState.status !== "loaded"}
+            onPress={() => router.push(`/clients/${clientId}/edit`)}
             size="bare"
             style={styles.editButton}
             variant="ghost"
