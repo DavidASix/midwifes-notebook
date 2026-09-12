@@ -19,6 +19,7 @@ export type FormDateFieldProps = {
   error?: string;
   maximumDate?: Date;
   defaultDate?: Date;
+  disabled?: boolean;
 };
 
 /** A nullable calendar-date field that presents the native date picker for the current platform. */
@@ -29,6 +30,7 @@ export function FormDateField({
   error,
   maximumDate,
   defaultDate,
+  disabled = false,
 }: FormDateFieldProps) {
   const styles = useStyles();
   const theme = useTheme();
@@ -53,6 +55,7 @@ export function FormDateField({
       <View style={styles.row}>
         <Button
           accessibilityLabel={`${label}: ${displayValue}`}
+          disabled={disabled}
           onPress={() => setIsOpen(true)}
           size="compact"
           style={styles.button}
@@ -62,6 +65,7 @@ export function FormDateField({
         {value && (
           <Button
             accessibilityLabel={`Clear ${label}`}
+            disabled={disabled}
             onPress={() => onChange(undefined)}
             size="compact"
             title="Clear"
@@ -74,6 +78,7 @@ export function FormDateField({
           <DateTimePicker
             accentColor={theme.primary}
             display={Platform.OS === "ios" ? "inline" : "default"}
+            disabled={disabled}
             maximumDate={maximumDate}
             mode="date"
             onChange={handleDateChange}
