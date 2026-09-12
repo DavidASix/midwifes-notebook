@@ -4,10 +4,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Pencil, X } from "lucide-react-native";
 
-import {
-  ClientDetailContent,
-  parseClientId,
-} from "@/components/ClientDetailContent";
+import { ClientDetailContent } from "@/components/ClientDetailContent";
 import { Button } from "@/components/ui/Button";
 import { SlideUpScreen } from "@/components/ui/SlideUpScreen";
 import { Text } from "@/components/ui/Text";
@@ -16,6 +13,7 @@ import { clientsSchema, clients } from "@/db/schema";
 import { useSlideUpScreen } from "@/hooks/useSlideUpScreen";
 import { getClientFullName, type ClientRecord } from "@/lib/client-detail";
 import { makeStyles } from "@/lib/make-styles";
+import { parsePositiveIntegerRouteParam } from "@/lib/route-params";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";
 
