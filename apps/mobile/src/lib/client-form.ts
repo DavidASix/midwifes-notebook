@@ -13,17 +13,18 @@ const optionalDateSchema = z.iso
   .date({ error: "Enter a valid date." })
   .optional();
 
-const clientFormFieldsSchema = clientsSchema
-  .omit({
-    id: true,
-    actualDeliveryDate: true,
-    deliveryMethod: true,
-    tearDegree: true,
-    isActive: true,
-    createdAt: true,
-    updatedAt: true,
-    deletedAt: true,
-  })
+const clientUpdateSchema = clientsSchema.omit({
+  id: true,
+  actualDeliveryDate: true,
+  deliveryMethod: true,
+  tearDegree: true,
+  isActive: true,
+  createdAt: true,
+  updatedAt: true,
+  deletedAt: true,
+});
+
+const clientFormFieldsSchema = clientUpdateSchema
   .partial()
   .extend({
     firstName: z
@@ -86,6 +87,14 @@ export type ClientFormResult =
   | { success: true; data: typeof clients.$inferInsert }
   | { success: false; errors: ClientFormErrors };
 
+export type ClientUpdate = z.infer<typeof clientUpdateSchema>;
+
+export type ClientUpdateResult =
+  | { success: true; data: ClientUpdate }
+  | { success: false; errors: ClientFormErrors };
+
+const editableClientFields = clientFormFieldsSchema.keyof().options;
+
 /** Validates form decisions and produces a database-ready client insert without blank nullable values. */
 export function buildClientInsert(values: ClientFormValues): ClientFormResult {
   const result = clientFormFieldsSchema.safeParse(values);
@@ -101,4 +110,33 @@ export function buildClientInsert(values: ClientFormValues): ClientFormResult {
     }
   }
   return { success: false, errors };
+}
+
+/** Converts a persisted client into form values while keeping nullable controls unset. */
+export function clientToFormValues(
+  client: z.infer<typeof clientsSchema>,
+): ClientFormValues {
+  return Object.fromEntries(
+    editableClientFields.map((field) => [field, client[field] ?? undefined]),
+  ) as ClientFormValues;
+}
+
+/** Validates an edit and explicitly clears every omitted nullable form field in SQLite. */
+export function buildClientUpdate(
+  values: ClientFormValues,
+): ClientUpdateResult {
+  const result = buildClientInsert(values);
+  if (!result.success) return result;
+
+  return {
+    success: true,
+    data: clientUpdateSchema.parse(
+      Object.fromEntries(
+        editableClientFields.map((field) => [
+          field,
+          result.data[field] ?? null,
+        ]),
+      ),
+    ),
+  };
 }

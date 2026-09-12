@@ -1,4 +1,10 @@
-import { buildClientInsert, type ClientFormValues } from "../client-form";
+import {
+  buildClientInsert,
+  buildClientUpdate,
+  clientToFormValues,
+  type ClientFormValues,
+} from "../client-form";
+import type { ClientRecord } from "@/db/schema";
 import { fromIsoDate, toIsoDate } from "../dates";
 
 const today = new Date(2026, 6, 22, 12);
@@ -154,6 +160,84 @@ describe("buildClientInsert", () => {
       success: true,
       data: expect.objectContaining({ gravida: 3, parity: 3 }),
     });
+  });
+});
+
+describe("client edit conversion", () => {
+  const client: ClientRecord = {
+    id: 7,
+    firstName: "Amina",
+    lastName: "Yusuf",
+    middleName: null,
+    preferredName: "Mina",
+    address: null,
+    primaryPhone: "555-0100",
+    dateOfBirth: null,
+    age: 32,
+    estimatedDeliveryDate: "2026-11-02",
+    actualDeliveryDate: "2026-10-30",
+    gravida: 2,
+    parity: 1,
+    bloodType: "O+",
+    rhStatus: "+",
+    gbsStatus: null,
+    deliveryMethod: "SVD",
+    tearDegree: 1,
+    riskFactors: null,
+    partnerName: null,
+    partnerRelationship: null,
+    partnerPhone: null,
+    partnerBloodType: null,
+    isActive: 1,
+    createdAt: "2026-01-01T00:00:00.000Z",
+    updatedAt: "2026-02-01T00:00:00.000Z",
+    deletedAt: null,
+  };
+
+  it("populates every editable field without exposing non-form lifecycle fields", () => {
+    expect(clientToFormValues(client)).toEqual({
+      firstName: "Amina",
+      lastName: "Yusuf",
+      middleName: undefined,
+      preferredName: "Mina",
+      address: undefined,
+      primaryPhone: "555-0100",
+      dateOfBirth: undefined,
+      age: 32,
+      estimatedDeliveryDate: "2026-11-02",
+      gravida: 2,
+      parity: 1,
+      bloodType: "O+",
+      rhStatus: "+",
+      gbsStatus: undefined,
+      riskFactors: undefined,
+      partnerName: undefined,
+      partnerRelationship: undefined,
+      partnerPhone: undefined,
+      partnerBloodType: undefined,
+    });
+  });
+
+  it("writes cleared optional values as null while preserving valid form values", () => {
+    const values = clientToFormValues(client);
+    values.preferredName = undefined;
+    const result = buildClientUpdate(values);
+
+    expect(result).toEqual({
+      success: true,
+      data: expect.objectContaining({
+        firstName: "Amina",
+        lastName: "Yusuf",
+        preferredName: null,
+        middleName: null,
+        gbsStatus: null,
+        age: 32,
+      }),
+    });
+    if (result.success) {
+      expect(result.data).not.toHaveProperty("actualDeliveryDate");
+      expect(result.data).not.toHaveProperty("isActive");
+    }
   });
 });
 
