@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   Pressable,
+  Switch,
   View,
   type LayoutChangeEvent,
 } from "react-native";
@@ -222,16 +223,33 @@ function ClientInformationPage({
           },
         ]}
       />
-      <DetailSection
-        title="Status"
-        fields={[
-          {
-            label: "Care status",
-            value: formatClientStatus(client),
-            fullWidth: true,
-          },
-        ]}
-      />
+      <View style={styles.section}>
+        <Text header style={styles.sectionTitle}>
+          Status
+        </Text>
+        <View style={styles.sectionDivider} />
+        <View style={styles.careStatusRow}>
+          <View style={styles.careStatusCopy}>
+            <Text style={styles.fieldLabel}>Care status</Text>
+            <Text style={styles.fieldValue}>{formatClientStatus(client)}</Text>
+          </View>
+          <Switch
+            accessibilityLabel="Client is in care"
+            accessibilityState={{
+              checked: client.isActive === 1,
+              disabled: isCareStatusPending,
+            }}
+            disabled={isCareStatusPending}
+            onValueChange={onCareStatusChange}
+            trackColor={{
+              false: styles.switchTrack.color,
+              true: styles.switchActive.color,
+            }}
+            thumbColor={styles.switchThumb.color}
+            value={client.isActive === 1}
+          />
+        </View>
+      </View>
     </BottomSheetScrollView>
   );
 }
@@ -251,7 +269,15 @@ function PlaceholderPage({ label, width }: { label: string; width: number }) {
 }
 
 /** Displays one client across independently scrollable, horizontally paged detail tabs. */
-export function ClientDetailContent({ client }: { client: ClientRecord }) {
+export function ClientDetailContent({
+  client,
+  onCareStatusChange,
+  isCareStatusPending = false,
+}: {
+  client: ClientRecord;
+  onCareStatusChange: (isInCare: boolean) => void;
+  isCareStatusPending?: boolean;
+}) {
   const styles = useStyles();
   const pagerRef = useRef<FlatList<ClientDetailTab>>(null);
   const [selectedTab, setSelectedTab] = useState<ClientDetailTab>("client");
@@ -354,7 +380,12 @@ export function ClientDetailContent({ client }: { client: ClientRecord }) {
               renderItem={({ item }) => {
                 if (item === "client") {
                   return (
-                    <ClientInformationPage client={client} width={pageWidth} />
+                    <ClientInformationPage
+                      client={client}
+                      isCareStatusPending={isCareStatusPending}
+                      onCareStatusChange={onCareStatusChange}
+                      width={pageWidth}
+                    />
                   );
                 }
                 return (
@@ -454,6 +485,26 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: fontFamilies.base.regular,
     fontSize: fontSize.md,
     lineHeight: 21,
+  },
+  careStatusRow: {
+    minHeight: 48,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 16,
+  },
+  careStatusCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  switchTrack: {
+    color: theme.muted,
+  },
+  switchActive: {
+    color: theme.secondary,
+  },
+  switchThumb: {
+    color: theme.primaryForeground,
   },
   placeholderPage: {
     minHeight: "100%",

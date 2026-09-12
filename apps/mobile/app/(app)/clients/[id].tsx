@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, Alert, View } from "react-native";
 import { and, eq, isNull } from "drizzle-orm";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Pencil, X } from "lucide-react-native";
@@ -16,6 +16,7 @@ import { makeStyles } from "@/lib/make-styles";
 import { parsePositiveIntegerRouteParam } from "@/lib/route-params";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 type ClientLoadState =
   | { status: "loading" }
@@ -29,14 +30,16 @@ export default function ClientDetailScreen() {
   const { id: routeId } = useLocalSearchParams<{
     id?: string | string[];
   }>();
-  const clientId = parseClientId(routeId);
+  const clientId = parsePositiveIntegerRouteParam(routeId);
   const styles = useStyles();
   const theme = useTheme();
   const sheet = useSlideUpScreen();
   const requestVersion = useRef(0);
+  const careStatusMutationPending = useRef(false);
   const [loadState, setLoadState] = useState<ClientLoadState>(() =>
     clientId == null ? { status: "invalid" } : { status: "loading" },
   );
+  const [isCareStatusPending, setIsCareStatusPending] = useState(false);
 
   const loadClient = useCallback(async () => {
     const version = ++requestVersion.current;
@@ -84,6 +87,61 @@ export default function ClientDetailScreen() {
     loadState.status === "loaded"
       ? getClientFullName(loadState.client)
       : "Client details";
+
+  /** Persists a care-status change and keeps the displayed record synchronized with SQLite. */
+  const persistCareStatus = useCallback(
+    async (isInCare: boolean) => {
+      if (clientId == null || careStatusMutationPending.current) return;
+      careStatusMutationPending.current = true;
+      setIsCareStatusPending(true);
+      const updatedAt = new Date().toISOString();
+      try {
+        const rows = await db
+          .update(clients)
+          .set({ isActive: isInCare ? 1 : 0, updatedAt })
+          .where(and(eq(clients.id, clientId), isNull(clients.deletedAt)))
+          .returning();
+        const parsedClient = clientsSchema.safeParse(rows[0]);
+        if (!parsedClient.success) throw new Error("Client update failed");
+        setLoadState({ status: "loaded", client: parsedClient.data });
+        showSuccessToast(
+          isInCare ? "Client returned to care" : "Client moved out of care",
+        );
+      } catch {
+        showErrorToast(
+          "Couldn't change care status",
+          "The previous status is still in place. Please try again.",
+        );
+      } finally {
+        careStatusMutationPending.current = false;
+        setIsCareStatusPending(false);
+      }
+    },
+    [clientId, db],
+  );
+
+  /** Confirms removal from care while allowing an immediate return to care. */
+  const changeCareStatus = useCallback(
+    (isInCare: boolean) => {
+      if (isInCare) {
+        void persistCareStatus(true);
+        return;
+      }
+      Alert.alert(
+        "Move client out of care?",
+        "They will appear under Out of Care until returned to care.",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Move out of care",
+            style: "destructive",
+            onPress: () => void persistCareStatus(false),
+          },
+        ],
+      );
+    },
+    [persistCareStatus],
+  );
 
   return (
     <SlideUpScreen controller={sheet}>
@@ -160,7 +218,11 @@ export default function ClientDetailScreen() {
           </View>
         )}
         {loadState.status === "loaded" && (
-          <ClientDetailContent client={loadState.client} />
+          <ClientDetailContent
+            client={loadState.client}
+            isCareStatusPending={isCareStatusPending}
+            onCareStatusChange={changeCareStatus}
+          />
         )}
       </View>
     </SlideUpScreen>
