@@ -67,12 +67,13 @@ jest.mock("@react-native-community/datetimepicker", () => ({
 
 jest.mock("@/db", () => {
   const values = jest.fn();
-  const from = jest.fn();
+  const where = jest.fn();
+  const from = jest.fn(() => ({ where }));
   const db = {
     insert: jest.fn(() => ({ values })),
     select: jest.fn(() => ({ from })),
   };
-  return { __esModule: true, db, from, getDb: () => db, values };
+  return { __esModule: true, db, from, getDb: () => db, values, where };
 });
 
 jest.mock("@/lib/toast", () => ({
@@ -92,6 +93,7 @@ const mockDb = mockDatabaseModule.db as {
   select: jest.Mock;
 };
 const mockFrom = mockDatabaseModule.from as jest.Mock;
+const mockWhere = mockDatabaseModule.where as jest.Mock;
 const mockValues = mockDatabaseModule.values as jest.Mock;
 const mockShowErrorToast = jest.requireMock("@/lib/toast")
   .showErrorToast as jest.Mock;
@@ -108,7 +110,8 @@ describe("NewClientScreen", () => {
     jest.clearAllMocks();
     mockValues.mockResolvedValue(undefined);
     mockDb.insert.mockReturnValue({ values: mockValues });
-    mockFrom.mockResolvedValue([]);
+    mockWhere.mockResolvedValue([]);
+    mockFrom.mockReturnValue({ where: mockWhere });
     mockDb.select.mockReturnValue({ from: mockFrom });
   });
 
@@ -284,7 +287,8 @@ describe("NewClientScreen", () => {
 describe("ClientsScreen focus refresh", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockFrom.mockResolvedValue([]);
+    mockWhere.mockResolvedValue([]);
+    mockFrom.mockReturnValue({ where: mockWhere });
     mockDb.select.mockReturnValue({ from: mockFrom });
   });
 
@@ -299,7 +303,7 @@ describe("ClientsScreen focus refresh", () => {
   });
 
   it("recovers when retrying after a database row fails validation", async () => {
-    mockFrom.mockResolvedValueOnce([{ id: 1 }]).mockResolvedValueOnce([]);
+    mockWhere.mockResolvedValueOnce([{ id: 1 }]).mockResolvedValueOnce([]);
     renderWithTheme(<ClientsScreen />);
 
     expect(await screen.findByText("Couldn’t load clients")).toBeTruthy();

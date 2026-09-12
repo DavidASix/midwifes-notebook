@@ -148,6 +148,7 @@ describe("EditClientScreen", () => {
     expect(await screen.findByLabelText("First name")).toBeTruthy();
     expect(screen.getByLabelText("First name").props.value).toBe("Amina");
     expect(screen.getByLabelText("Last name").props.value).toBe("Yusuf");
+    expect(screen.getByRole("button", { name: "Delete" })).toBeTruthy();
   });
 
   it("saves edits, clears optional values to null, and preserves non-form fields", async () => {
@@ -256,6 +257,25 @@ describe("EditClientScreen", () => {
     act(() => discardButtons?.[1].onPress?.());
     expect(mockNavigation.dispatch).toHaveBeenCalledWith(action);
     expect(mockRouter.back).not.toHaveBeenCalled();
+  });
+
+  it("archives with matching timestamps and returns to Clients", async () => {
+    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation();
+    renderWithTheme(<EditClientScreen />);
+    await screen.findByLabelText("First name");
+
+    fireEvent.press(screen.getByRole("button", { name: "Delete" }));
+    const buttons = alertSpy.mock.calls.at(-1)?.[2];
+    await act(async () => buttons?.[1].onPress?.());
+
+    await waitFor(() => expect(mockSet).toHaveBeenCalledTimes(1));
+    const update = mockSet.mock.calls[0][0];
+    expect(update.deletedAt).toBe(update.updatedAt);
+    expect(mockRouter.dismissTo).toHaveBeenCalledWith("/(app)/(tabs)/clients");
+    expect(mockShowSuccessToast).toHaveBeenCalledWith(
+      "Client archived",
+      "The record remains stored locally.",
+    );
   });
 
   it("rejects malformed IDs before querying", async () => {
