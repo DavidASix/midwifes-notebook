@@ -202,6 +202,52 @@ export default function EditClientScreen() {
     }
   }
 
+  /** Requires explicit confirmation before starting the archive mutation. */
+  function requestArchive() {
+    if (mutationPending.current) return;
+    Alert.alert(
+      "Delete this client?",
+      "They will remain stored locally and may be restored in future, but will no longer appear in your client list.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete client",
+          style: "destructive",
+          onPress: () => void archiveClient(),
+        },
+      ],
+    );
+  }
+
+  /** Soft-archives the current client and returns to the client list. */
+  async function archiveClient() {
+    if (clientId == null || mutationPending.current) return;
+    mutationPending.current = true;
+    setIsArchiving(true);
+    const timestamp = new Date().toISOString();
+    try {
+      const rows = await db
+        .update(clients)
+        .set({ deletedAt: timestamp, updatedAt: timestamp })
+        .where(and(eq(clients.id, clientId), isNull(clients.deletedAt)))
+        .returning();
+      const parsed = clientsSchema.safeParse(rows[0]);
+      if (!parsed.success || parsed.data.deletedAt !== timestamp) {
+        throw new Error("Client archive returned no valid record");
+      }
+      leavingAllowed.current = true;
+      showSuccessToast("Client archived", "The record remains stored locally.");
+      router.dismissTo("/(app)/(tabs)/clients");
+    } catch {
+      showErrorToast(
+        "Couldn't archive client",
+        "The client and your unsaved entries are still here. Please try again.",
+      );
+      mutationPending.current = false;
+      setIsArchiving(false);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -257,6 +303,7 @@ export default function EditClientScreen() {
           isArchiving={isArchiving}
           isSubmitting={isSubmitting}
           mode="edit"
+          onArchive={requestArchive}
           onCancel={requestLeave}
           onChange={changeValue}
           onSubmit={submit}

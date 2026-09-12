@@ -382,6 +382,26 @@ export function ClientForm({
           />
         </FormSection>
 
+        {mode === "edit" && onArchive && (
+          <View style={styles.archiveSection}>
+            <View style={styles.archiveCopy}>
+              <Text style={styles.archiveTitle}>Delete Client</Text>
+              <Text style={styles.archiveDescription}>
+                This client will be hidden from the app and can be restored
+                later.
+              </Text>
+            </View>
+            <Button
+              disabled={isPending}
+              icon={<Trash2 color={theme.primaryForeground} size={16} />}
+              onPress={onArchive}
+              size="compact"
+              title={isArchiving ? "Deleting…" : "Delete"}
+              variant="destructive"
+            />
+          </View>
+        )}
+
         <View style={styles.privacyNote}>
           <View style={styles.privacyDivider} />
           <View style={styles.privacyContent}>
@@ -539,6 +559,31 @@ const useStyles = makeStyles((theme) => ({
   privacyText: {
     color: theme.mutedForeground,
     fontSize: fontSize.sm,
+  },
+  archiveSection: {
+    marginTop: 4,
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    borderWidth: 1,
+    borderColor: theme.destructive,
+    borderRadius: 12,
+  },
+  archiveCopy: {
+    flex: 1,
+    gap: 4,
+  },
+  archiveTitle: {
+    color: theme.foreground,
+    fontFamily: fontFamilies.base.semiBold,
+    fontSize: fontSize.md,
+  },
+  archiveDescription: {
+    color: theme.mutedForeground,
+    fontSize: fontSize.sm,
+    lineHeight: 19,
   },
   footer: {
     paddingHorizontal: 16,
