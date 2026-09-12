@@ -72,9 +72,11 @@ export default function NewClientScreen() {
       <ClientForm
         errors={errors}
         isSubmitting={isSubmitting}
+        mode="create"
         onCancel={sheet.requestDismiss}
         onChange={changeValue}
         onSubmit={submit}
+        presentation="bottom-sheet"
         values={values}
       />
     </SlideUpScreen>
