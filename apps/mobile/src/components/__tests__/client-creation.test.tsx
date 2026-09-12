@@ -77,6 +77,7 @@ jest.mock("@/db", () => {
 
 jest.mock("@/lib/toast", () => ({
   showErrorToast: jest.fn(),
+  showSuccessToast: jest.fn(),
 }));
 
 const mockExpoRouter = jest.requireMock("expo-router");
@@ -94,6 +95,8 @@ const mockFrom = mockDatabaseModule.from as jest.Mock;
 const mockValues = mockDatabaseModule.values as jest.Mock;
 const mockShowErrorToast = jest.requireMock("@/lib/toast")
   .showErrorToast as jest.Mock;
+const mockShowSuccessToast = jest.requireMock("@/lib/toast")
+  .showSuccessToast as jest.Mock;
 
 function enterRequiredNames() {
   fireEvent.changeText(screen.getByLabelText("First name"), "  Zara ");
@@ -126,6 +129,10 @@ describe("NewClientScreen", () => {
           lastName: "Okafor",
         }),
       ),
+    );
+    expect(mockShowSuccessToast).toHaveBeenCalledWith(
+      "Client added",
+      "The client record is ready.",
     );
     await waitFor(() => expect(mockRouter.back).toHaveBeenCalledTimes(1));
   });

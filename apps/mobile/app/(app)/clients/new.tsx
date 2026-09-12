@@ -11,7 +11,7 @@ import {
   type ClientFormErrors,
   type ClientFormValues,
 } from "@/lib/client-form";
-import { showErrorToast } from "@/lib/toast";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 export default function NewClientScreen() {
   const db = getDb();
@@ -57,6 +57,7 @@ export default function NewClientScreen() {
     setErrors({});
     try {
       await db.insert(clients).values(result.data);
+      showSuccessToast("Client added", "The client record is ready.");
       sheet.dismiss();
     } catch {
       showErrorToast(
