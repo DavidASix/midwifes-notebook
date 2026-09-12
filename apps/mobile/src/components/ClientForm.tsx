@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import {
   CalendarDays,
   ChevronDown,
   ChevronUp,
   HeartPulse,
   Phone,
+  Save,
+  Trash2,
   UserRound,
   UserRoundPlus,
   UsersRound,
@@ -18,7 +21,7 @@ import {
 } from "@/lib/client-form";
 import { makeStyles } from "@/lib/make-styles";
 import { useTheme } from "@/lib/theme-context";
-import { fontFamilies, fontSize } from "@/lib/themes";
+import { fontFamilies, fontSize, useFormBottomPadding } from "@/lib/themes";
 
 import { Button } from "@/components/ui/Button";
 import { BottomSheetKeyboardAwareScrollView } from "@/components/ui/BottomSheetKeyboardAwareScrollView";
@@ -29,6 +32,8 @@ import { FormTextField } from "@/components/ui/FormTextField";
 import { Text } from "@/components/ui/Text";
 
 type ClientFormProps = {
+  mode: "create" | "edit";
+  presentation: "bottom-sheet" | "screen";
   values: ClientFormValues;
   errors: ClientFormErrors;
   isSubmitting: boolean;
@@ -38,7 +43,35 @@ type ClientFormProps = {
   ) => void;
   onSubmit: () => void;
   onCancel: () => void;
+  onArchive?: () => void;
+  isArchiving?: boolean;
 };
+
+/** Selects the keyboard-aware scroll primitive required by the form's route presentation. */
+function FormScroll({
+  children,
+  presentation,
+}: {
+  children: React.ReactNode;
+  presentation: ClientFormProps["presentation"];
+}) {
+  const styles = useStyles();
+  const props = {
+    bottomOffset: 12,
+    contentContainerStyle: styles.content,
+    keyboardDismissMode: "on-drag" as const,
+    keyboardShouldPersistTaps: "handled" as const,
+    style: styles.container,
+  };
+
+  return presentation === "bottom-sheet" ? (
+    <BottomSheetKeyboardAwareScrollView {...props}>
+      {children}
+    </BottomSheetKeyboardAwareScrollView>
+  ) : (
+    <KeyboardAwareScrollView {...props}>{children}</KeyboardAwareScrollView>
+  );
+}
 
 function FormSection({
   icon,
@@ -97,15 +130,22 @@ function FormSection({
 
 /** Renders all editable client fields using controls matched to their stored data types. */
 export function ClientForm({
+  mode,
+  presentation,
   values,
   errors,
   isSubmitting,
   onChange,
   onSubmit,
   onCancel,
+  onArchive,
+  isArchiving = false,
 }: ClientFormProps) {
   const styles = useStyles();
   const theme = useTheme();
+  const footerBottomPadding = useFormBottomPadding(
+    presentation === "bottom-sheet",
+  );
   const today = new Date();
   const typicalBirthDate = new Date(
     today.getFullYear() - 30,
@@ -113,25 +153,22 @@ export function ClientForm({
     today.getDate(),
     12,
   );
+  const isPending = isSubmitting || isArchiving;
 
   return (
     <>
-      <BottomSheetKeyboardAwareScrollView
-        bottomOffset={12}
-        contentContainerStyle={styles.content}
-        keyboardDismissMode="on-drag"
-        keyboardShouldPersistTaps="handled"
-        style={styles.container}
-      >
-        <View style={styles.intro}>
-          <Text header style={styles.introTitle}>
-            Begin with the essentials.
-          </Text>
-          <Text style={styles.introCopy}>
-            Only a first and last name are required. Everything else can be
-            added now or later.
-          </Text>
-        </View>
+      <FormScroll presentation={presentation}>
+        {mode === "create" && (
+          <View style={styles.intro}>
+            <Text header style={styles.introTitle}>
+              Begin with the essentials.
+            </Text>
+            <Text style={styles.introCopy}>
+              Only a first and last name are required. Everything else can be
+              added now or later.
+            </Text>
+          </View>
+        )}
 
         <FormSection
           description="Names and ways to get in touch"
@@ -141,6 +178,7 @@ export function ClientForm({
           <View style={styles.twoColumnRow}>
             <View style={styles.column}>
               <FormTextField
+                disabled={isPending}
                 error={errors.firstName}
                 label="First name"
                 onChangeText={(value) => onChange("firstName", value)}
@@ -151,6 +189,7 @@ export function ClientForm({
             </View>
             <View style={styles.column}>
               <FormTextField
+                disabled={isPending}
                 error={errors.lastName}
                 label="Last name"
                 onChangeText={(value) => onChange("lastName", value)}
@@ -163,6 +202,7 @@ export function ClientForm({
           <View style={styles.twoColumnRow}>
             <View style={styles.column}>
               <FormTextField
+                disabled={isPending}
                 label="Middle name"
                 onChangeText={(value) => onChange("middleName", value)}
                 placeholder="Optional"
@@ -171,6 +211,7 @@ export function ClientForm({
             </View>
             <View style={styles.column}>
               <FormTextField
+                disabled={isPending}
                 label="Preferred name"
                 onChangeText={(value) => onChange("preferredName", value)}
                 placeholder="Optional"
@@ -179,6 +220,7 @@ export function ClientForm({
             </View>
           </View>
           <FormTextField
+            disabled={isPending}
             label="Address"
             multiline
             onChangeText={(value) => onChange("address", value)}
@@ -187,6 +229,7 @@ export function ClientForm({
           />
           <FormTextField
             accessibilityLabel="Primary phone number"
+            disabled={isPending}
             keyboardType="phone-pad"
             label="Primary phone"
             onChangeText={(value) => onChange("primaryPhone", value)}
@@ -200,6 +243,7 @@ export function ClientForm({
           </Text>
           <FormDateField
             defaultDate={typicalBirthDate}
+            disabled={isPending}
             error={errors.dateOfBirth}
             label="Date of birth"
             maximumDate={today}
@@ -210,6 +254,7 @@ export function ClientForm({
             value={values.dateOfBirth}
           />
           <FormIntegerField
+            disabled={isPending}
             error={errors.age}
             label="Age, if birth date is unknown"
             onChange={(value) => {
@@ -228,6 +273,7 @@ export function ClientForm({
           title="Clinical"
         >
           <FormDateField
+            disabled={isPending}
             error={errors.estimatedDeliveryDate}
             label="Estimated delivery date"
             onChange={(value) => onChange("estimatedDeliveryDate", value)}
@@ -236,6 +282,7 @@ export function ClientForm({
           <View style={styles.twoColumnRow}>
             <View style={styles.column}>
               <FormIntegerField
+                disabled={isPending}
                 error={errors.gravida}
                 label="Gravida"
                 onChange={(value) => onChange("gravida", value)}
@@ -245,6 +292,7 @@ export function ClientForm({
             </View>
             <View style={styles.column}>
               <FormIntegerField
+                disabled={isPending}
                 error={errors.parity}
                 label="Parity"
                 onChange={(value) => onChange("parity", value)}
@@ -254,6 +302,7 @@ export function ClientForm({
             </View>
           </View>
           <FormChoiceGroup
+            disabled={isPending}
             label="Blood type"
             onChange={(value) => onChange("bloodType", value)}
             value={values.bloodType}
@@ -262,6 +311,7 @@ export function ClientForm({
           <View style={styles.twoColumnRow}>
             <View style={styles.column}>
               <FormChoiceGroup
+                disabled={isPending}
                 getLabel={(value) => (value === "+" ? "Positive" : "Negative")}
                 label="Rh status"
                 onChange={(value) => onChange("rhStatus", value)}
@@ -271,6 +321,7 @@ export function ClientForm({
             </View>
             <View style={styles.column}>
               <FormChoiceGroup
+                disabled={isPending}
                 getLabel={(value) => (value === "+" ? "Positive" : "Negative")}
                 label="GBS status"
                 onChange={(value) => onChange("gbsStatus", value)}
@@ -280,6 +331,7 @@ export function ClientForm({
             </View>
           </View>
           <FormTextField
+            disabled={isPending}
             label="Risk factors"
             multiline
             onChangeText={(value) => onChange("riskFactors", value)}
@@ -295,12 +347,14 @@ export function ClientForm({
           title="Partner"
         >
           <FormTextField
+            disabled={isPending}
             label="Partner name"
             onChangeText={(value) => onChange("partnerName", value)}
             placeholder="Full name"
             value={values.partnerName}
           />
           <FormTextField
+            disabled={isPending}
             label="Relationship"
             onChangeText={(value) => onChange("partnerRelationship", value)}
             placeholder="Partner, spouse, support person…"
@@ -312,6 +366,7 @@ export function ClientForm({
           </View>
           <FormTextField
             accessibilityLabel="Partner phone number"
+            disabled={isPending}
             keyboardType="phone-pad"
             label="Partner phone"
             onChangeText={(value) => onChange("partnerPhone", value)}
@@ -319,6 +374,7 @@ export function ClientForm({
             value={values.partnerPhone}
           />
           <FormChoiceGroup
+            disabled={isPending}
             label="Partner blood type"
             onChange={(value) => onChange("partnerBloodType", value)}
             value={values.partnerBloodType}
@@ -335,11 +391,11 @@ export function ClientForm({
             </Text>
           </View>
         </View>
-      </BottomSheetKeyboardAwareScrollView>
+      </FormScroll>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: footerBottomPadding }]}>
         <Button
-          disabled={isSubmitting}
+          disabled={isPending}
           onPress={onCancel}
           size="compact"
           style={styles.footerButton}
@@ -347,12 +403,26 @@ export function ClientForm({
           variant="secondary"
         />
         <Button
-          disabled={isSubmitting}
-          icon={<UserRoundPlus color={theme.primaryForeground} size={17} />}
+          disabled={isPending}
+          icon={
+            mode === "create" ? (
+              <UserRoundPlus color={theme.primaryForeground} size={17} />
+            ) : (
+              <Save color={theme.primaryForeground} size={17} />
+            )
+          }
           onPress={onSubmit}
           size="compact"
           style={styles.footerButton}
-          title={isSubmitting ? "Adding client…" : "Add client"}
+          title={
+            isSubmitting
+              ? mode === "create"
+                ? "Adding client…"
+                : "Saving…"
+              : mode === "create"
+                ? "Add client"
+                : "Save changes"
+          }
         />
       </View>
     </>
@@ -473,7 +543,6 @@ const useStyles = makeStyles((theme) => ({
   footer: {
     paddingHorizontal: 16,
     paddingTop: 12,
-    paddingBottom: Platform.OS === "ios" ? 26 : 20,
     flexDirection: "row",
     gap: 12,
     borderTopWidth: 1,
