@@ -29,6 +29,7 @@ export function FormDecimalField({
     setInputValue(value === undefined ? "" : String(value));
   }, [value]);
 
+  /** Keeps partial decimal text editable, rejects invalid values, and reports an empty input as unset. */
   function handleChangeText(nextValue: string) {
     if (nextValue === "") {
       setInputValue("");

@@ -44,6 +44,7 @@ export default function NewBabyScreen() {
     [values],
   );
 
+  /** Confirms draft loss once and resumes the original navigation action when approved. */
   const confirmDiscard = useCallback(() => {
     if (confirmationOpen.current) return;
     confirmationOpen.current = true;
@@ -72,6 +73,7 @@ export default function NewBabyScreen() {
     );
   }, [navigation]);
 
+  /** Blocks departure during persistence and confirms leaving when edits are unsaved. */
   const requestLeave = useCallback(() => {
     if (mutationPending.current) return;
     if (isDirty) confirmDiscard();
@@ -94,6 +96,7 @@ export default function NewBabyScreen() {
     [confirmDiscard, isDirty, navigation],
   );
 
+  /** Updates an editable field and clears its previous validation error while mutations are idle. */
   function changeValue<K extends keyof BabyFormValues>(
     field: K,
     value: BabyFormValues[K],
@@ -103,6 +106,7 @@ export default function NewBabyScreen() {
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
+  /** Validates and persists the draft, retaining entered values after a failed save. */
   async function submit() {
     if (clientId == null || mutationPending.current) return;
     const result = buildBabyInsert(clientId, values);

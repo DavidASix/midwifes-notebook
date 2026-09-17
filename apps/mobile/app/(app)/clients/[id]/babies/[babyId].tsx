@@ -67,6 +67,7 @@ export default function EditBabyScreen() {
     [loadState, values],
   );
 
+  /** Loads and validates the client-owned record before initializing the editable baseline. */
   const loadBaby = useCallback(async () => {
     if (clientId == null || babyId == null) {
       setLoadState({ status: "invalid" });
@@ -107,6 +108,7 @@ export default function EditBabyScreen() {
     void loadBaby();
   }, [loadBaby]);
 
+  /** Confirms draft loss once and resumes the original navigation action when approved. */
   const confirmDiscard = useCallback(() => {
     if (confirmationOpen.current) return;
     confirmationOpen.current = true;
@@ -135,6 +137,7 @@ export default function EditBabyScreen() {
     );
   }, [navigation]);
 
+  /** Blocks departure during persistence and confirms leaving when edits are unsaved. */
   const requestLeave = useCallback(() => {
     if (mutationPending.current) return;
     if (isDirty) confirmDiscard();
@@ -157,6 +160,7 @@ export default function EditBabyScreen() {
     [confirmDiscard, isDirty, navigation],
   );
 
+  /** Updates an editable field and clears its previous validation error while mutations are idle. */
   function changeValue<K extends keyof BabyFormValues>(
     field: K,
     value: BabyFormValues[K],
@@ -166,6 +170,7 @@ export default function EditBabyScreen() {
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
+  /** Validates and persists the draft, retaining entered values after a failed save. */
   async function submit() {
     if (clientId == null || babyId == null || mutationPending.current) return;
     const result = buildBabyUpdate(values);
@@ -208,6 +213,7 @@ export default function EditBabyScreen() {
     }
   }
 
+  /** Requests confirmation before hiding the stored baby record. */
   function requestArchive() {
     if (mutationPending.current) return;
     Alert.alert(
@@ -224,6 +230,7 @@ export default function EditBabyScreen() {
     );
   }
 
+  /** Soft-deletes the scoped record with matching timestamps and leaves only after a valid result. */
   async function archiveBaby() {
     if (clientId == null || babyId == null || mutationPending.current) return;
     mutationPending.current = true;
@@ -315,6 +322,7 @@ export default function EditBabyScreen() {
   );
 }
 
+/** Displays a loading or unavailable-record state with an optional recovery action. */
 function StateView({
   title,
   message,

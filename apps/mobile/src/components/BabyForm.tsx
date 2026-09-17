@@ -33,6 +33,7 @@ type BabyFormProps = {
   onArchive?: () => void;
 };
 
+/** Groups related form controls under a shared section heading and divider. */
 function FormSection({
   title,
   children,
@@ -85,6 +86,7 @@ export function BabyForm({
     setWeightMode("lb-oz");
   }
 
+  /** Preserves independently cleared imperial inputs while updating the canonical weight in grams. */
   function changeImperialWeight(
     pounds: number | undefined,
     ounces: number | undefined,

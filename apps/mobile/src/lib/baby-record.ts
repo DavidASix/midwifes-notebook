@@ -1,11 +1,13 @@
 import type { BabyRecord } from "@/db/schema";
 
+/** Displays stored total gestational days as whole weeks and remaining days. */
 export function formatGestationalAge(totalDays: number): string {
   const weeks = Math.floor(totalDays / 7);
   const days = totalDays % 7;
   return `${weeks} ${weeks === 1 ? "week" : "weeks"}, ${days} ${days === 1 ? "day" : "days"}`;
 }
 
+/** Chooses birth, loss, or neutral date copy from the recorded outcome. */
 export function getEventDateLabel(
   outcome: BabyRecord["outcome"],
 ): "Birth date" | "Loss date" | "Event date" {

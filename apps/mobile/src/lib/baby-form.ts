@@ -76,6 +76,7 @@ export type BabyUpdateResult =
   | { success: true; data: BabyMutationData }
   | { success: false; errors: BabyFormErrors };
 
+/** Maps validation issues to the form fields that need correction. */
 function getErrors(error: z.ZodError): BabyFormErrors {
   return Object.fromEntries(
     error.issues.map((issue) => [issue.path[0], issue.message]),
@@ -86,6 +87,7 @@ function nullable(value: string | undefined): string | null {
   return value || null;
 }
 
+/** Normalizes cleared fields to SQL null and combines gestational weeks and days for storage. */
 function toMutationData(
   values: z.output<typeof babyFormSchema>,
 ): BabyMutationData {

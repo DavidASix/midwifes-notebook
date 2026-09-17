@@ -27,6 +27,7 @@ type BabiesLoadState =
   | { status: "loaded"; babies: BabyRecord[] }
   | { status: "error" };
 
+/** Formats the record timestamp in the device locale and time zone. */
 function formatCreatedAt(timestamp: string): string {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
@@ -34,6 +35,7 @@ function formatCreatedAt(timestamp: string): string {
   }).format(new Date(timestamp));
 }
 
+/** Pairs a clinical label with its value in the baby record grid. */
 function Detail({ label, value }: { label: string; value: string }) {
   const styles = useStyles();
   return (
@@ -61,6 +63,7 @@ export function ClientBabiesPage({
     status: "loading",
   });
 
+  /** Loads active records newest first and ignores results superseded by a newer request or focus change. */
   const loadBabies = useCallback(async () => {
     const version = ++requestVersion.current;
     setLoadState({ status: "loading" });
