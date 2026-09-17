@@ -197,19 +197,28 @@ describe("ClientDetailScreen data lifecycle", () => {
       .mockResolvedValueOnce([makeClient({ preferredName: "Ellie" })]);
     renderWithTheme(<ClientDetailScreen />);
     expect(await screen.findByText("Eleanor Rigby")).toBeTruthy();
-
-    const latestFocusCallback = mockUseFocusEffect.mock.calls.at(-1)?.[0];
-    await act(async () => {
-      await latestFocusCallback?.();
-    });
-
-    await waitFor(() => expect(mockLimit).toHaveBeenCalledTimes(2));
     fireEvent(screen.getByTestId("client-detail-pager"), "layout", {
       nativeEvent: {
         layout: { width: 320, height: 600, x: 0, y: 0 },
       },
     });
+    fireEvent.press(screen.getByRole("tab", { name: "Notes" }));
+    expect(
+      screen.getByRole("tab", { name: "Notes" }).props.accessibilityState
+        .selected,
+    ).toBe(true);
+
+    const clientFocusCallback = mockUseFocusEffect.mock.calls[0]?.[0];
+    await act(async () => {
+      await clientFocusCallback?.();
+    });
+
+    await waitFor(() => expect(mockLimit).toHaveBeenCalledTimes(2));
     expect(await screen.findByText("Ellie")).toBeTruthy();
+    expect(
+      screen.getByRole("tab", { name: "Notes" }).props.accessibilityState
+        .selected,
+    ).toBe(true);
   });
 
   it("confirms moving out of care and updates the displayed derived status", async () => {

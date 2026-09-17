@@ -48,7 +48,9 @@ export default function ClientDetailScreen() {
       return;
     }
 
-    setLoadState({ status: "loading" });
+    setLoadState((current) =>
+      current.status === "loaded" ? current : { status: "loading" },
+    );
     try {
       const result = await db
         .select()
