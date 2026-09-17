@@ -10,8 +10,7 @@ import {
 import { ArrowBigLeft } from "lucide-react-native";
 
 import { ClientForm } from "@/components/ClientForm";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
+import { StateView } from "@/components/ui/StateView";
 import { getDb } from "@/db";
 import { clients, clientsSchema } from "@/db/schema";
 import {
@@ -23,7 +22,6 @@ import {
 import { makeStyles } from "@/lib/make-styles";
 import { parsePositiveIntegerRouteParam } from "@/lib/route-params";
 import { useTheme } from "@/lib/theme-context";
-import { fontFamilies, fontSize } from "@/lib/themes";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 type EditLoadState =
@@ -315,60 +313,6 @@ export default function EditClientScreen() {
   );
 }
 
-type StateViewProps = {
-  title?: string;
-  message: string;
-  action?: () => void;
-  actionLabel?: string;
-  children?: React.ReactNode;
-};
-
-/** Renders a centered loading, failure, or missing-record state for the edit route. */
-function StateView({
-  title,
-  message,
-  action,
-  actionLabel,
-  children,
-}: StateViewProps) {
-  const styles = useStyles();
-  return (
-    <View style={styles.centeredState}>
-      {children}
-      {title && (
-        <Text header style={styles.stateTitle}>
-          {title}
-        </Text>
-      )}
-      <Text style={styles.stateText}>{message}</Text>
-      {action && actionLabel && <Button onPress={action} title={actionLabel} />}
-    </View>
-  );
-}
-
 const useStyles = makeStyles((theme) => ({
-  container: {
-    flex: 1,
-    backgroundColor: theme.background,
-  },
-  centeredState: {
-    flex: 1,
-    padding: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
-  stateTitle: {
-    color: theme.primary,
-    fontFamily: fontFamilies.heading.bold,
-    fontSize: fontSize["2xl"],
-    textAlign: "center",
-  },
-  stateText: {
-    maxWidth: 300,
-    color: theme.mutedForeground,
-    fontSize: fontSize.md,
-    lineHeight: 22,
-    textAlign: "center",
-  },
+  container: { flex: 1, backgroundColor: theme.background },
 }));

@@ -9,8 +9,7 @@ import {
 } from "expo-router";
 
 import { NoteForm } from "@/components/NoteForm";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
+import { StateView } from "@/components/ui/StateView";
 import { getDb } from "@/db";
 import { notes, notesSchema } from "@/db/schema";
 import {
@@ -22,7 +21,6 @@ import {
 import { makeStyles } from "@/lib/make-styles";
 import { parsePositiveIntegerRouteParam } from "@/lib/route-params";
 import { useTheme } from "@/lib/theme-context";
-import { fontFamilies, fontSize } from "@/lib/themes";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 type NoteLoadState =
@@ -31,14 +29,6 @@ type NoteLoadState =
   | { status: "invalid" }
   | { status: "missing" }
   | { status: "error" };
-
-type StateViewProps = {
-  title?: string;
-  message: string;
-  action?: () => void;
-  actionLabel?: string;
-  children?: React.ReactNode;
-};
 
 /** Edits and archives one client-owned note while protecting unsaved content. */
 export default function EditNoteScreen() {
@@ -332,52 +322,6 @@ export default function EditNoteScreen() {
   );
 }
 
-/** Displays a centered note loading or recovery state. */
-function StateView({
-  title,
-  message,
-  action,
-  actionLabel,
-  children,
-}: StateViewProps) {
-  const styles = useStyles();
-  return (
-    <View style={styles.centeredState}>
-      {children}
-      {title && (
-        <Text header style={styles.stateTitle}>
-          {title}
-        </Text>
-      )}
-      <Text style={styles.stateText}>{message}</Text>
-      {action && actionLabel && <Button onPress={action} title={actionLabel} />}
-    </View>
-  );
-}
-
 const useStyles = makeStyles((theme) => ({
-  container: {
-    flex: 1,
-    backgroundColor: theme.background,
-  },
-  centeredState: {
-    flex: 1,
-    padding: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
-  stateTitle: {
-    color: theme.primary,
-    fontFamily: fontFamilies.heading.bold,
-    fontSize: fontSize["2xl"],
-    textAlign: "center",
-  },
-  stateText: {
-    maxWidth: 300,
-    color: theme.mutedForeground,
-    fontSize: fontSize.md,
-    lineHeight: 22,
-    textAlign: "center",
-  },
+  container: { flex: 1, backgroundColor: theme.background },
 }));

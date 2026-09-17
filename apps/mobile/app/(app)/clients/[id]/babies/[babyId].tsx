@@ -9,8 +9,7 @@ import {
 } from "expo-router";
 
 import { BabyForm } from "@/components/BabyForm";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
+import { StateView } from "@/components/ui/StateView";
 import { getDb } from "@/db";
 import { babies, babiesSchema } from "@/db/schema";
 import {
@@ -24,7 +23,6 @@ import { makeStyles } from "@/lib/make-styles";
 import { markBabyRecordsChanged } from "@/lib/baby-records-revision";
 import { parsePositiveIntegerRouteParam } from "@/lib/route-params";
 import { useTheme } from "@/lib/theme-context";
-import { fontFamilies, fontSize } from "@/lib/themes";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 type BabyLoadState =
@@ -334,55 +332,6 @@ export default function EditBabyScreen() {
   );
 }
 
-/** Displays a loading or unavailable-record state with an optional recovery action. */
-function StateView({
-  title,
-  message,
-  action,
-  actionLabel,
-  children,
-}: {
-  title?: string;
-  message: string;
-  action?: () => void;
-  actionLabel?: string;
-  children?: React.ReactNode;
-}) {
-  const styles = useStyles();
-  return (
-    <View style={styles.centeredState}>
-      {children}
-      {title && (
-        <Text header style={styles.stateTitle}>
-          {title}
-        </Text>
-      )}
-      <Text style={styles.stateText}>{message}</Text>
-      {action && actionLabel && <Button onPress={action} title={actionLabel} />}
-    </View>
-  );
-}
-
 const useStyles = makeStyles((theme) => ({
   container: { flex: 1, backgroundColor: theme.background },
-  centeredState: {
-    flex: 1,
-    padding: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
-  stateTitle: {
-    color: theme.primary,
-    fontFamily: fontFamilies.heading.bold,
-    fontSize: fontSize["2xl"],
-    textAlign: "center",
-  },
-  stateText: {
-    maxWidth: 300,
-    color: theme.mutedForeground,
-    fontSize: fontSize.md,
-    lineHeight: 22,
-    textAlign: "center",
-  },
 }));
