@@ -1,0 +1,122 @@
+import React from "react";
+
+import { ClientBabiesPage } from "@/components/ClientBabiesPage";
+import type { BabyRecord } from "@/db/schema";
+import { fireEvent, renderWithTheme, screen, waitFor } from "@/test-utils";
+
+jest.mock("@gorhom/bottom-sheet", () =>
+  jest.requireActual("@gorhom/bottom-sheet/mock"),
+);
+
+jest.mock("expo-router", () => {
+  const ReactForMock = jest.requireActual<typeof import("react")>("react");
+  return {
+    __esModule: true,
+    router: { push: jest.fn() },
+    useFocusEffect: jest.fn((callback: () => void | (() => void)) => {
+      ReactForMock.useEffect(callback, [callback]);
+    }),
+  };
+});
+
+jest.mock("@/db", () => {
+  const orderBy = jest.fn();
+  const where = jest.fn(() => ({ orderBy }));
+  const from = jest.fn(() => ({ where }));
+  const db = { select: jest.fn(() => ({ from })) };
+  return { __esModule: true, db, getDb: () => db, orderBy };
+});
+
+const mockRouter = jest.requireMock("expo-router").router as {
+  push: jest.Mock;
+};
+const mockOrderBy = jest.requireMock("@/db").orderBy as jest.Mock;
+
+function makeBaby(overrides: Partial<BabyRecord> = {}): BabyRecord {
+  return {
+    id: 8,
+    clientId: 3,
+    name: "Robin",
+    sex: "unknown",
+    eventDate: "2026-09-15",
+    birthWeightGrams: 3402,
+    gestationalAgeDays: 276,
+    bloodType: "O+",
+    feedingType: "combination",
+    riskFactors: "Monitor bilirubin and follow up with the care team.",
+    outcome: "live_birth",
+    createdAt: "2026-09-16T20:00:00.000Z",
+    updatedAt: "2026-09-16T20:00:00.000Z",
+    deletedAt: null,
+    ...overrides,
+  };
+}
+
+describe("ClientBabiesPage", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockOrderBy.mockResolvedValue([]);
+  });
+
+  it("loads only when active and opens client-scoped creation", async () => {
+    const { unmount } = renderWithTheme(
+      <ClientBabiesPage active={false} clientId={3} width={320} />,
+    );
+    expect(mockOrderBy).not.toHaveBeenCalled();
+
+    unmount();
+    renderWithTheme(<ClientBabiesPage active clientId={3} width={320} />);
+    expect(await screen.findByText("No baby records yet")).toBeTruthy();
+    fireEvent.press(screen.getByText("Add baby"));
+    expect(mockRouter.push).toHaveBeenCalledWith("/clients/3/babies/new");
+  });
+
+  it("renders rich optional details and opens the selected record", async () => {
+    mockOrderBy.mockResolvedValue([makeBaby()]);
+    renderWithTheme(<ClientBabiesPage active clientId={3} width={320} />);
+
+    expect(await screen.findByText("Robin")).toBeTruthy();
+    expect(screen.getByText("Live birth")).toBeTruthy();
+    expect(screen.getByText("Birth date")).toBeTruthy();
+    expect(screen.getByText("3402 g · 7 lb 8.0 oz")).toBeTruthy();
+    expect(screen.getByText("39 weeks, 3 days")).toBeTruthy();
+    expect(screen.getByText("Combination")).toBeTruthy();
+    expect(screen.getByText(/Monitor bilirubin/).props.numberOfLines).toBe(3);
+    fireEvent.press(screen.getByLabelText("Open Robin"));
+    expect(mockRouter.push).toHaveBeenCalledWith("/clients/3/babies/8");
+  });
+
+  it("uses a neutral fallback for a blank record", async () => {
+    mockOrderBy.mockResolvedValue([
+      makeBaby({
+        name: null,
+        sex: null,
+        eventDate: null,
+        birthWeightGrams: null,
+        gestationalAgeDays: null,
+        bloodType: null,
+        feedingType: null,
+        riskFactors: null,
+        outcome: null,
+      }),
+    ]);
+    renderWithTheme(<ClientBabiesPage active clientId={3} width={320} />);
+    expect(await screen.findByText("Baby record")).toBeTruthy();
+    expect(screen.getByText("Not specified")).toBeTruthy();
+    expect(screen.queryByText("Age")).toBeNull();
+  });
+
+  it("keeps malformed and database failures recoverable with retry", async () => {
+    mockOrderBy
+      .mockResolvedValueOnce([{ id: 8 }])
+      .mockRejectedValueOnce(new Error("database unavailable"))
+      .mockResolvedValueOnce([]);
+    renderWithTheme(<ClientBabiesPage active clientId={3} width={320} />);
+    expect(await screen.findByText("Couldn’t load baby records")).toBeTruthy();
+
+    fireEvent.press(screen.getByText("Retry"));
+    await waitFor(() => expect(mockOrderBy).toHaveBeenCalledTimes(2));
+    fireEvent.press(await screen.findByText("Retry"));
+    expect(await screen.findByText("No baby records yet")).toBeTruthy();
+  });
+});

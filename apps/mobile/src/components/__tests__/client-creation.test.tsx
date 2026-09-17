@@ -294,12 +294,12 @@ describe("ClientsScreen focus refresh", () => {
 
   it("queries clients again whenever the list regains focus", async () => {
     renderWithTheme(<ClientsScreen />);
-    await waitFor(() => expect(mockFrom).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockFrom).toHaveBeenCalledTimes(2));
 
     const latestFocusCallback = mockUseFocusEffect.mock.calls.at(-1)?.[0];
     act(() => latestFocusCallback?.());
 
-    await waitFor(() => expect(mockFrom).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(mockFrom).toHaveBeenCalledTimes(4));
   });
 
   it("recovers when retrying after a database row fails validation", async () => {
@@ -310,6 +310,6 @@ describe("ClientsScreen focus refresh", () => {
     fireEvent.press(screen.getByText("Retry"));
 
     expect(await screen.findByText("No clients yet.")).toBeTruthy();
-    expect(mockFrom).toHaveBeenCalledTimes(2);
+    expect(mockFrom).toHaveBeenCalledTimes(4);
   });
 });

@@ -1,0 +1,23 @@
+CREATE TABLE `babies` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`client_id` integer NOT NULL,
+	`name` text,
+	`sex` text,
+	`event_date` text,
+	`birth_weight_grams` integer,
+	`gestational_age_days` integer,
+	`blood_type` text,
+	`feeding_type` text,
+	`risk_factors` text,
+	`outcome` text,
+	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+	`updated_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+	`deleted_at` text,
+	FOREIGN KEY (`client_id`) REFERENCES `clients`(`id`) ON UPDATE no action ON DELETE no action,
+	CONSTRAINT "babies_sex_check" CHECK("babies"."sex" IN ('male', 'female', 'unknown')),
+	CONSTRAINT "babies_blood_type_check" CHECK("babies"."blood_type" IN ('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-')),
+	CONSTRAINT "babies_feeding_type_check" CHECK("babies"."feeding_type" IN ('breast_milk', 'formula', 'combination')),
+	CONSTRAINT "babies_outcome_check" CHECK("babies"."outcome" IN ('live_birth', 'miscarriage', 'stillbirth')),
+	CONSTRAINT "babies_birth_weight_check" CHECK("babies"."birth_weight_grams" >= 0),
+	CONSTRAINT "babies_gestational_age_check" CHECK("babies"."gestational_age_days" >= 0)
+);

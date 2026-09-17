@@ -12,7 +12,13 @@ import { Search, UserRoundPlus, X } from "lucide-react-native";
 import { isNull } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { clients, clientsSchema, type ClientRecord } from "@/db/schema";
+import {
+  babies,
+  babiesSchema,
+  clients,
+  clientsSchema,
+  type ClientRecord,
+} from "@/db/schema";
 import {
   clientStatusFilters,
   getClientStatusFilterForOffset,
@@ -68,6 +74,9 @@ export default function ClientsScreen() {
   const styles = useStyles();
   const pagerRef = useRef<FlatList<ClientView>>(null);
   const [data, setData] = useState<ClientRecord[]>([]);
+  const [babyNamesByClient, setBabyNamesByClient] = useState<
+    Map<number, string[]>
+  >(new Map());
   const [hasLoadError, setHasLoadError] = useState(false);
   const [query, setQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -83,17 +92,28 @@ export default function ClientsScreen() {
 
   const fetchClients = useCallback(async () => {
     try {
-      const rows = await db
-        .select()
-        .from(clients)
-        .where(isNull(clients.deletedAt));
-      const result = clientListSchema.safeParse(rows);
-      if (!result.success) {
+      const [clientRows, babyRows] = await Promise.all([
+        db.select().from(clients).where(isNull(clients.deletedAt)),
+        db.select().from(babies).where(isNull(babies.deletedAt)),
+      ]);
+      const clientResult = clientListSchema.safeParse(clientRows);
+      const babyResult = babiesSchema.array().safeParse(babyRows);
+      if (!clientResult.success || !babyResult.success) {
         setHasLoadError(true);
         return;
       }
 
-      setData(result.data);
+      const groupedNames = new Map<number, string[]>();
+      for (const baby of babyResult.data) {
+        const name = baby.name?.trim();
+        if (!name) continue;
+        groupedNames.set(baby.clientId, [
+          ...(groupedNames.get(baby.clientId) ?? []),
+          name,
+        ]);
+      }
+      setData(clientResult.data);
+      setBabyNamesByClient(groupedNames);
       setHasLoadError(false);
     } catch {
       setHasLoadError(true);
@@ -111,10 +131,17 @@ export default function ClientsScreen() {
       clientStatusFilters.map((filter) => ({
         filter,
         sections: groupClientsByLastName(
-          data.filter((client) => isClientVisible(client, query, filter)),
+          data.filter((client) =>
+            isClientVisible(
+              client,
+              query,
+              filter,
+              babyNamesByClient.get(client.id),
+            ),
+          ),
         ),
       })),
-    [data, query],
+    [babyNamesByClient, data, query],
   );
 
   function selectStatusFilter(filter: ClientStatusFilter) {

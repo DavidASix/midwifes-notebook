@@ -22,6 +22,7 @@ import { makeStyles } from "@/lib/make-styles";
 import { fontFamilies, fontSize } from "@/lib/themes";
 
 import { Text } from "@/components/ui/Text";
+import { ClientBabiesPage } from "@/components/ClientBabiesPage";
 import { ClientNotesPage } from "@/components/ClientNotesPage";
 
 const clientDetailTabs = ["client", "babies", "notes"] as const;
@@ -255,20 +256,6 @@ function ClientInformationPage({
   );
 }
 
-function PlaceholderPage({ label, width }: { label: string; width: number }) {
-  const styles = useStyles();
-  return (
-    <BottomSheetScrollView
-      contentContainerStyle={styles.placeholderPage}
-      style={{ width }}
-    >
-      <Text header style={styles.placeholderText}>
-        {label}
-      </Text>
-    </BottomSheetScrollView>
-  );
-}
-
 /** Displays one client across independently scrollable, horizontally paged detail tabs. */
 export function ClientDetailContent({
   client,
@@ -399,7 +386,11 @@ export function ClientDetailContent({
                   );
                 }
                 return (
-                  <PlaceholderPage label={tabLabels[item]} width={pageWidth} />
+                  <ClientBabiesPage
+                    active={selectedTab === "babies"}
+                    clientId={client.id}
+                    width={pageWidth}
+                  />
                 );
               }}
               showsHorizontalScrollIndicator={false}
@@ -515,16 +506,5 @@ const useStyles = makeStyles((theme) => ({
   },
   switchThumb: {
     color: theme.primaryForeground,
-  },
-  placeholderPage: {
-    minHeight: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  placeholderText: {
-    color: theme.primary,
-    fontFamily: fontFamilies.heading.bold,
-    fontSize: fontSize["2xl"],
   },
 }));

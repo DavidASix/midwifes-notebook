@@ -70,16 +70,18 @@ A `Tabs` navigator with four tabs: Tools, Clients, Calendar, Statistics. Each ta
 
 Screens at the root stack level (outside tabs) are pushed over the tab bar:
 
-| Route                         | Description                                         |
-| ----------------------------- | --------------------------------------------------- |
-| `onboarding`                  | First-launch onboarding flow                        |
-| `(tabs)`                      | The tab navigator (treated as a single stack entry) |
-| `clients/[id]`                | Client detail                                       |
-| `clients/[id]/edit`           | Full-screen client edit form                        |
-| `clients/[id]/notes/new`      | Full-screen note creation form                      |
-| `clients/[id]/notes/[noteId]` | Full-screen note editing form                       |
-| `clients/new`                 | Add client form                                     |
-| `settings`                    | Settings screen                                     |
+| Route                          | Description                                         |
+| ------------------------------ | --------------------------------------------------- |
+| `onboarding`                   | First-launch onboarding flow                        |
+| `(tabs)`                       | The tab navigator (treated as a single stack entry) |
+| `clients/[id]`                 | Client detail                                       |
+| `clients/[id]/edit`            | Full-screen client edit form                        |
+| `clients/[id]/notes/new`       | Full-screen note creation form                      |
+| `clients/[id]/notes/[noteId]`  | Full-screen note editing form                       |
+| `clients/[id]/babies/new`      | Full-screen baby-record creation form               |
+| `clients/[id]/babies/[babyId]` | Full-screen baby-record viewing and editing form    |
+| `clients/new`                  | Add client form                                     |
+| `settings`                     | Settings screen                                     |
 
 ---
 
@@ -132,8 +134,9 @@ Client rows show available pregnancy and clinical details. When neither is recor
 Each tab represents a full-width list page. Users can swipe horizontally between pages or tap a tab to scroll directly
 to that view; each page keeps its own independent vertical client-list scroll.
 
-**Search** — search icon in the header opens an inline search bar. The single field searches client and partner names;
-baby names use the same matching path once baby records are implemented.
+**Search** — search icon in the header opens an inline search bar. The single field searches client, partner, and active
+baby-record names. Client and baby rows are loaded and runtime-validated together, so a failed or malformed related-data
+query produces the same recoverable client-list error rather than incomplete search results.
 
 **Add client** — person+ icon in the header navigates to the Add Client form (pushed as a stack screen).
 
@@ -189,13 +192,30 @@ disabled while saving, reflects the newly derived status after success, and reta
 
 #### Tab 2 — Babies
 
-A list of the client's babies. Each baby entry shows all details from the babies table, some with multiple format variants (brith weight in both grams and pounds/ounces, for example)
-An **Add Baby** button at the bottom opens a form to create a new baby entry for this client.
+A newest-first list of the client's active baby records. Records may describe a live birth, miscarriage, stillbirth, or
+an outcome that has not been specified. Copy remains neutral: an unnamed row is titled **Baby record**, dates are labelled
+**Birth date**, **Loss date**, or **Event date** according to outcome, and unspecified outcomes display **Not specified**.
+Age in calendar days is shown only for live-birth records with an event date.
 
-Each baby row is tappable to view/edit full baby details.
+Each row always shows its creation time and outcome, then omits any absent optional details. Available details include the
+appropriately labelled event date, live-birth age, sex, weight in grams and pounds/ounces, gestational weeks/days, blood
+type, feeding type, and a short multi-line risk-factor preview. Tapping a row opens the full-screen combined view/edit
+form. **Add baby** opens the full-screen create form. The tab loads lazily while selected, refreshes when the route regains
+focus, and keeps its selection when returning from either form. Loading, empty, malformed-data, and database-failure
+states are handled in place, with Retry available after failures.
 
-The initial client-detail implementation displays a centered **Babies** placeholder until baby persistence and forms
-are implemented.
+All baby-record fields are optional, so a blank record can be saved and identified by its creation time. The create/edit
+form groups record, pregnancy, and optional clinical details. Event dates cannot be in the future. Gestational age is
+entered as non-negative whole weeks plus 0–6 days and stored as total days. Weight is stored as rounded whole grams. A
+non-persisted Grams/lb-oz toggle starts on Grams each time the form opens; switching units preserves the canonical weight,
+and pounds/ounces entry accepts non-negative pounds with ounces below 16. Converted display ounces use one decimal place
+and carry 16.0 ounces into the next pound.
+
+Creation first confirms that the owning client still exists and is not archived. Editing, updating, and deletion scope
+every query by both client and baby IDs and exclude archived rows. Cancel, header back, Android back, and navigation
+gestures protect dirty forms; mutations are locked against duplicate submissions. Failures retain entered values, while
+successful saves show a toast and return to the still-selected Babies tab. Delete is a confirmed soft deletion with no
+restore or permanent-delete interface.
 
 #### Tab 3 — Notes
 
