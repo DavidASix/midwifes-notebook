@@ -125,6 +125,8 @@ describe("NewBabyScreen", () => {
 
   it("allows a completely blank record after confirming the active client", async () => {
     renderWithTheme(<NewBabyScreen />);
+    expect(screen.queryByText(/All details are optional/)).toBeNull();
+    expect(screen.getByText("Record details")).toBeTruthy();
     fireEvent.press(screen.getByText("Save record"));
 
     await waitFor(() =>

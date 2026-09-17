@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { Baby, Save, Trash2 } from "lucide-react-native";
+import { Save, Trash2 } from "lucide-react-native";
 
 import { Button } from "@/components/ui/Button";
 import { FormChoiceGroup } from "@/components/ui/FormChoiceGroup";
@@ -117,20 +117,6 @@ export function BabyForm({
         keyboardShouldPersistTaps="handled"
         style={styles.container}
       >
-        <View style={styles.intro}>
-          <View style={styles.icon}>
-            <Baby color={theme.primary} size={22} />
-          </View>
-          <View style={styles.introCopy}>
-            <Text header style={styles.title}>
-              Baby record
-            </Text>
-            <Text style={styles.description}>
-              All details are optional and can be added or changed later.
-            </Text>
-          </View>
-        </View>
-
         <FormSection title="Record details">
           <FormTextField
             disabled={isPending}
@@ -326,26 +312,6 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: 22,
     paddingBottom: 28,
     gap: 24,
-  },
-  intro: { flexDirection: "row", alignItems: "center", gap: 13 },
-  icon: {
-    width: 44,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 22,
-    backgroundColor: theme.accent,
-  },
-  introCopy: { flex: 1, gap: 2 },
-  title: {
-    color: theme.foreground,
-    fontFamily: fontFamilies.heading.bold,
-    fontSize: fontSize["2xl"],
-  },
-  description: {
-    color: theme.mutedForeground,
-    fontSize: fontSize.sm,
-    lineHeight: 19,
   },
   section: { gap: 8 },
   sectionTitle: {
