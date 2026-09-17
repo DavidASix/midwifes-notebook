@@ -74,15 +74,27 @@ export function BabyForm({
   const footerBottomPadding = useFormBottomPadding(false);
   const [weightMode, setWeightMode] = useState<"grams" | "lb-oz">("grams");
   const isPending = isSubmitting || isArchiving;
-  const converted =
-    values.birthWeightGrams === undefined
-      ? { pounds: undefined, ounces: undefined }
-      : gramsToPoundsOunces(values.birthWeightGrams);
+  const [imperialWeight, setImperialWeight] = useState<{
+    pounds: number | undefined;
+    ounces: number | undefined;
+  }>({ pounds: undefined, ounces: undefined });
+
+  /** Initializes imperial entry from grams only when switching units, preserving cleared fields while editing. */
+  function selectImperialWeight() {
+    if (weightMode === "lb-oz") return;
+    setImperialWeight(
+      values.birthWeightGrams === undefined
+        ? { pounds: undefined, ounces: undefined }
+        : gramsToPoundsOunces(values.birthWeightGrams),
+    );
+    setWeightMode("lb-oz");
+  }
 
   function changeImperialWeight(
     pounds: number | undefined,
     ounces: number | undefined,
   ) {
+    setImperialWeight({ pounds, ounces });
     if (pounds === undefined && ounces === undefined) {
       onChange("birthWeightGrams", undefined);
       return;
@@ -174,7 +186,7 @@ export function BabyForm({
             />
             <Button
               disabled={isPending}
-              onPress={() => setWeightMode("lb-oz")}
+              onPress={selectImperialWeight}
               size="compact"
               title="lb / oz"
               variant={weightMode === "lb-oz" ? "primary" : "secondary"}
@@ -195,9 +207,9 @@ export function BabyForm({
                   disabled={isPending}
                   label="Pounds"
                   onChange={(value) =>
-                    changeImperialWeight(value, converted.ounces)
+                    changeImperialWeight(value, imperialWeight.ounces)
                   }
-                  value={converted.pounds}
+                  value={imperialWeight.pounds}
                 />
               </View>
               <View style={styles.splitField}>
@@ -206,9 +218,9 @@ export function BabyForm({
                   label="Ounces"
                   maximumExclusive={16}
                   onChange={(value) =>
-                    changeImperialWeight(converted.pounds, value)
+                    changeImperialWeight(imperialWeight.pounds, value)
                   }
-                  value={converted.ounces}
+                  value={imperialWeight.ounces}
                 />
               </View>
             </View>

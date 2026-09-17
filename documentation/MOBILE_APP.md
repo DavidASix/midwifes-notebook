@@ -209,7 +209,7 @@ form groups record, pregnancy, and optional clinical details. Event dates cannot
 entered as non-negative whole weeks plus 0–6 days and stored as total days. Weight is stored as rounded whole grams. A
 non-persisted Grams/lb-oz toggle starts on Grams each time the form opens; switching units preserves the canonical weight,
 and pounds/ounces entry accepts non-negative pounds with ounces below 16. Converted display ounces use one decimal place
-and carry 16.0 ounces into the next pound.
+and carry 16.0 ounces into the next pound. Clearing both imperial fields removes the weight; an explicitly entered zero remains zero.
 
 Creation first confirms that the owning client still exists and is not archived. Editing, updating, and deletion scope
 every query by both client and baby IDs and exclude archived rows. Cancel, header back, Android back, and navigation

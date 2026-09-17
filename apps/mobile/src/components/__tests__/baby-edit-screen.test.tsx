@@ -107,6 +107,28 @@ describe("EditBabyScreen", () => {
     expect(mockRouter.back).toHaveBeenCalled();
   });
 
+  it.each([
+    ["Pounds", "Ounces"],
+    ["Ounces", "Pounds"],
+  ])(
+    "clears stored weight after clearing %s then %s",
+    async (first, second) => {
+      renderWithTheme(<EditBabyScreen />);
+      await screen.findByDisplayValue("Robin");
+      fireEvent.press(screen.getByText("lb / oz"));
+      fireEvent.changeText(screen.getByLabelText(first), "");
+      expect(screen.getByLabelText(first).props.value).toBe("");
+      fireEvent.changeText(screen.getByLabelText(second), "");
+      fireEvent.press(screen.getByText("Save record"));
+
+      await waitFor(() =>
+        expect(mockSet).toHaveBeenCalledWith(
+          expect.objectContaining({ birthWeightGrams: null }),
+        ),
+      );
+    },
+  );
+
   it("shows a missing state when the scoped record is unavailable", async () => {
     mockLimit.mockResolvedValue([]);
     renderWithTheme(<EditBabyScreen />);
