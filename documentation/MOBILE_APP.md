@@ -70,14 +70,16 @@ A `Tabs` navigator with four tabs: Tools, Clients, Calendar, Statistics. Each ta
 
 Screens at the root stack level (outside tabs) are pushed over the tab bar:
 
-| Route               | Description                                         |
-| ------------------- | --------------------------------------------------- |
-| `onboarding`        | First-launch onboarding flow                        |
-| `(tabs)`            | The tab navigator (treated as a single stack entry) |
-| `clients/[id]`      | Client detail                                       |
-| `clients/[id]/edit` | Full-screen client edit form                        |
-| `clients/new`       | Add client form                                     |
-| `settings`          | Settings screen                                     |
+| Route                         | Description                                         |
+| ----------------------------- | --------------------------------------------------- |
+| `onboarding`                  | First-launch onboarding flow                        |
+| `(tabs)`                      | The tab navigator (treated as a single stack entry) |
+| `clients/[id]`                | Client detail                                       |
+| `clients/[id]/edit`           | Full-screen client edit form                        |
+| `clients/[id]/notes/new`      | Full-screen note creation form                      |
+| `clients/[id]/notes/[noteId]` | Full-screen note editing form                       |
+| `clients/new`                 | Add client form                                     |
+| `settings`                    | Settings screen                                     |
 
 ---
 
@@ -197,12 +199,14 @@ are implemented.
 
 #### Tab 3 — Notes
 
-A general-purpose scratchpad for the client. Notes are stored as individual entries (title, content, date) in the `notes` table.
+A general-purpose scratchpad for the client. Notes are stored as individual entries with an optional title and required
+content in the `notes` table.
 
-The tab shows a chronological list of notes. Tapping a note opens it for viewing/editing. A **New Note** button creates a new entry.
-
-The initial client-detail implementation displays a centered **Notes** placeholder until note persistence and forms
-are implemented.
+The tab shows notes newest-first by creation time. Each row includes its title when present, creation timestamp, and up to
+eight lines of content so most notes can be read without opening them. Tapping a note opens a full-screen form for
+viewing/editing. A **New Note** button opens the same full-screen form for a new entry. Returning from either form
+preserves the selected Notes tab. Both forms preserve drafts after failures and protect unsaved changes when leaving.
+Existing notes can be soft-deleted after confirmation.
 
 ---
 

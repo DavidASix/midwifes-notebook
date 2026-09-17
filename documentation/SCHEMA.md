@@ -106,8 +106,7 @@ CREATE TABLE notes (
   client_id               INTEGER NOT NULL REFERENCES clients (id),
 
   title                   TEXT,
-  content                 TEXT,
-  note_date               TEXT,                          -- ISO 8601; date the note pertains to
+  content                 TEXT NOT NULL,
 
   -- Timestamps
   created_at              TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),

@@ -1,9 +1,10 @@
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { check, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 import { joinSqlValues } from "../utils";
+import { notes } from "./notes";
 import { isoCalendarDateSchema, isoTimestampSchema } from "./shared";
 
 export const bloodTypes = [
@@ -112,5 +113,9 @@ export const clientsSchema = createSelectSchema(clients, {
   updatedAt: isoTimestampSchema,
   deletedAt: isoTimestampSchema.nullable(),
 });
+
+export const clientsRelations = relations(clients, ({ many }) => ({
+  notes: many(notes),
+}));
 
 export type ClientRecord = z.infer<typeof clientsSchema>;

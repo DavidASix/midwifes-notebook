@@ -8,6 +8,15 @@ import {
 import { missingClientValue, type ClientRecord } from "@/lib/client-detail";
 import { fireEvent, renderWithTheme, screen } from "@/test-utils";
 
+jest.mock("@/components/ClientNotesPage", () => {
+  const ReactForMock = jest.requireActual<typeof import("react")>("react");
+  const { Text } =
+    jest.requireActual<typeof import("react-native")>("react-native");
+  return {
+    ClientNotesPage: () => ReactForMock.createElement(Text, null, "Notes"),
+  };
+});
+
 jest.mock("@gorhom/bottom-sheet", () =>
   jest.requireActual("@gorhom/bottom-sheet/mock"),
 );
