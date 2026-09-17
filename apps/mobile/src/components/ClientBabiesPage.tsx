@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { and, desc, eq, isNull } from "drizzle-orm";
@@ -55,10 +55,7 @@ export function ClientBabiesPage({
 
   // Refs for lifecycle management
   const requestVersion = useRef(0);
-  const activeRef = useRef(active);
-  const hasRequestedRecords = useRef(false);
   const lastRequestedRevision = useRef<number | null>(null);
-  activeRef.current = active;
 
   // Component state
   const [loadState, setLoadState] = useState<BabiesLoadState>({
@@ -69,7 +66,8 @@ export function ClientBabiesPage({
   const loadBabies = useCallback(async () => {
     const version = ++requestVersion.current;
     const revision = getBabyRecordsRevision(clientId);
-    hasRequestedRecords.current = true;
+    // An interrupted query must remain eligible for a reload on the next focus.
+    lastRequestedRevision.current = null;
     setLoadState({ status: "loading" });
     try {
       const rows = await getDb()
@@ -93,25 +91,16 @@ export function ClientBabiesPage({
     }
   }, [clientId]);
 
-  useEffect(() => {
-    if (active && !hasRequestedRecords.current) void loadBabies();
-  }, [active, loadBabies]);
-
   useFocusEffect(
     useCallback(() => {
       const currentRevision = getBabyRecordsRevision(clientId);
-      if (
-        activeRef.current &&
-        hasRequestedRecords.current &&
-        lastRequestedRevision.current !== null &&
-        lastRequestedRevision.current !== currentRevision
-      ) {
+      if (active && lastRequestedRevision.current !== currentRevision) {
         void loadBabies();
       }
       return () => {
         requestVersion.current += 1;
       };
-    }, [clientId, loadBabies]),
+    }, [active, clientId, loadBabies]),
   );
 
   return (

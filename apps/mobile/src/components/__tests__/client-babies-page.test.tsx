@@ -12,11 +12,16 @@ jest.mock("@gorhom/bottom-sheet", () =>
 
 jest.mock("expo-router", () => {
   const ReactForMock = jest.requireActual<typeof import("react")>("react");
+  const FocusContext = ReactForMock.createContext(true);
   return {
     __esModule: true,
+    FocusContext,
     router: { push: jest.fn() },
     useFocusEffect: jest.fn((callback: () => void | (() => void)) => {
-      ReactForMock.useEffect(callback, [callback]);
+      const focused = ReactForMock.useContext(FocusContext);
+      ReactForMock.useEffect(() => {
+        if (focused) return callback();
+      }, [callback, focused]);
     }),
   };
 });
@@ -35,16 +40,26 @@ const mockRouter = jest.requireMock("expo-router").router as {
 const mockUseFocusEffect = jest.requireMock("expo-router")
   .useFocusEffect as jest.Mock;
 const mockOrderBy = jest.requireMock("@/db").orderBy as jest.Mock;
+const FocusContext = jest.requireMock("expo-router")
+  .FocusContext as React.Context<boolean>;
 
+/** Simulates detail-tab selection and route focus without unmounting the page. */
 function BabiesPageHarness({ initiallyActive = true }) {
   const [active, setActive] = useState(initiallyActive);
+  const [focused, setFocused] = useState(true);
   return (
     <>
       <Pressable
         accessibilityLabel="Toggle babies tab"
         onPress={() => setActive((current) => !current)}
       />
-      <ClientBabiesPage active={active} clientId={3} width={320} />
+      <Pressable
+        accessibilityLabel="Toggle route focus"
+        onPress={() => setFocused((current) => !current)}
+      />
+      <FocusContext.Provider value={focused}>
+        <ClientBabiesPage active={active} clientId={3} width={320} />
+      </FocusContext.Provider>
     </>
   );
 }
@@ -158,4 +173,28 @@ describe("ClientBabiesPage", () => {
 
     await waitFor(() => expect(mockOrderBy).toHaveBeenCalledTimes(2));
   });
+
+  it.each([false, true])(
+    "restarts an interrupted initial load on return (saved baby: %s)",
+    async (savedBaby) => {
+      let resolveInitial!: (rows: BabyRecord[]) => void;
+      mockOrderBy.mockReturnValueOnce(
+        new Promise<BabyRecord[]>((resolve) => {
+          resolveInitial = resolve;
+        }),
+      );
+      renderWithTheme(<BabiesPageHarness />);
+      expect(screen.getByText("Loading baby records…")).toBeTruthy();
+      fireEvent.press(screen.getByText("Add baby"));
+      fireEvent.press(screen.getByLabelText("Toggle route focus"));
+      if (savedBaby) markBabyRecordsChanged(3);
+      mockOrderBy.mockResolvedValue([makeBaby()]);
+      fireEvent.press(screen.getByLabelText("Toggle route focus"));
+
+      expect(await screen.findByText("Robin")).toBeTruthy();
+      await act(async () => resolveInitial([]));
+      expect(screen.getByText("Robin")).toBeTruthy();
+      expect(mockOrderBy).toHaveBeenCalledTimes(2);
+    },
+  );
 });

@@ -202,7 +202,8 @@ appropriately labelled event date, live-birth age, sex, weight in grams, gestati
 type, feeding type, and a short multi-line risk-factor preview. Tapping a row opens the full-screen combined view/edit
 form. **Add baby** opens the full-screen create form. The tab loads lazily the first time it is selected and reuses that
 data when swiping between detail tabs. A successful baby create, edit, or deletion marks the records stale so they refresh
-when returning to Client Detail. The selected tab remains in place. Loading, empty, malformed-data, and database-failure
+when returning to Client Detail. Queries interrupted by leaving the page restart when the Babies tab becomes active and
+focused again. The selected tab remains in place. Loading, empty, malformed-data, and database-failure
 states are handled in place, with Retry available after failures.
 
 All baby-record fields are optional, so a blank record can be saved and identified by its creation time. The create/edit
