@@ -56,9 +56,14 @@ export function ClientBabiesPage({
   clientId: number;
   width: number;
 }) {
+  // Hooks
   const styles = useStyles();
   const theme = useTheme();
+
+  // Refs for lifecycle management
   const requestVersion = useRef(0);
+
+  // Component state
   const [loadState, setLoadState] = useState<BabiesLoadState>({
     status: "loading",
   });

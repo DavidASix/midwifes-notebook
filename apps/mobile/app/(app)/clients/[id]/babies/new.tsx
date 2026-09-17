@@ -26,19 +26,28 @@ import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 /** Creates a baby record for one active client while protecting form content. */
 export default function NewBabyScreen() {
+  // Hooks
   const db = getDb();
   const styles = useStyles();
   const navigation = useNavigation();
+
+  // URL state
   const { id: routeId } = useLocalSearchParams<{ id?: string | string[] }>();
   const clientId = parsePositiveIntegerRouteParam(routeId);
+
+  // Refs for lifecycle management
   const leavingAllowed = useRef(false);
   const confirmationOpen = useRef(false);
   const mutationPending = useRef(false);
   const pendingNavigationAction =
     useRef<Parameters<typeof navigation.dispatch>[0]>(null);
+
+  // Component state
   const [values, setValues] = useState<BabyFormValues>(initialBabyFormValues);
   const [errors, setErrors] = useState<BabyFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Derived state
   const isDirty = useMemo(
     () => JSON.stringify(values) !== JSON.stringify(initialBabyFormValues),
     [values],

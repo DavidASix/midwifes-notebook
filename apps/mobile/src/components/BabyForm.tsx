@@ -65,15 +65,20 @@ export function BabyForm({
   onCancel,
   onArchive,
 }: BabyFormProps) {
+  // Hooks
   const styles = useStyles();
   const theme = useTheme();
   const footerBottomPadding = useFormBottomPadding(false);
+
+  // Component state
   const [weightMode, setWeightMode] = useState<"grams" | "lb-oz">("grams");
-  const isPending = isSubmitting || isArchiving;
   const [imperialWeight, setImperialWeight] = useState<{
     pounds: number | undefined;
     ounces: number | undefined;
   }>({ pounds: undefined, ounces: undefined });
+
+  // Derived state
+  const isPending = isSubmitting || isArchiving;
 
   /** Initializes imperial entry from grams only when switching units, preserving cleared fields while editing. */
   function selectImperialWeight() {

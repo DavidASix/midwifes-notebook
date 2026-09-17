@@ -35,21 +35,28 @@ type BabyLoadState =
 
 /** Edits and archives one client-owned baby record while protecting changes. */
 export default function EditBabyScreen() {
+  // Hooks
   const db = getDb();
   const styles = useStyles();
   const theme = useTheme();
   const navigation = useNavigation();
+
+  // URL state
   const { id: routeId, babyId: routeBabyId } = useLocalSearchParams<{
     id?: string | string[];
     babyId?: string | string[];
   }>();
   const clientId = parsePositiveIntegerRouteParam(routeId);
   const babyId = parsePositiveIntegerRouteParam(routeBabyId);
+
+  // Refs for lifecycle management
   const leavingAllowed = useRef(false);
   const confirmationOpen = useRef(false);
   const mutationPending = useRef(false);
   const pendingNavigationAction =
     useRef<Parameters<typeof navigation.dispatch>[0]>(null);
+
+  // Component state
   const [loadState, setLoadState] = useState<BabyLoadState>(() =>
     clientId == null || babyId == null
       ? { status: "invalid" }
@@ -59,6 +66,8 @@ export default function EditBabyScreen() {
   const [errors, setErrors] = useState<BabyFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
+
+  // Derived state
   const isMutationPending = isSubmitting || isArchiving;
   const isDirty = useMemo(
     () =>
