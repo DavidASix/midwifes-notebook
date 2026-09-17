@@ -198,7 +198,7 @@ an outcome that has not been specified. Copy remains neutral: an unnamed row is 
 Age in calendar days is shown only for live-birth records with an event date.
 
 Each row always shows its creation time and outcome, then omits any absent optional details. Available details include the
-appropriately labelled event date, live-birth age, sex, weight in grams and pounds/ounces, gestational weeks/days, blood
+appropriately labelled event date, live-birth age, sex, weight in grams, gestational weeks/days, blood
 type, feeding type, and a short multi-line risk-factor preview. Tapping a row opens the full-screen combined view/edit
 form. **Add baby** opens the full-screen create form. The tab loads lazily while selected, refreshes when the route regains
 focus, and keeps its selection when returning from either form. Loading, empty, malformed-data, and database-failure

@@ -78,7 +78,8 @@ describe("ClientBabiesPage", () => {
     expect(await screen.findByText("Robin")).toBeTruthy();
     expect(screen.getByText("Live birth")).toBeTruthy();
     expect(screen.getByText("Birth date")).toBeTruthy();
-    expect(screen.getByText("3402 g · 7 lb 8.0 oz")).toBeTruthy();
+    expect(screen.getByText("3402 g")).toBeTruthy();
+    expect(screen.queryByText(/lb/)).toBeNull();
     expect(screen.getByText("39 weeks, 3 days")).toBeTruthy();
     expect(screen.getByText("Combination")).toBeTruthy();
     expect(screen.getByText(/Monitor bilirubin/).props.numberOfLines).toBe(3);

@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
 import { getDb } from "@/db";
 import { babies, babiesSchema, type BabyRecord } from "@/db/schema";
-import { formatWeight } from "@/lib/weight";
 import {
   babyOutcomeLabels,
   feedingTypeLabels,
@@ -202,7 +201,7 @@ export function ClientBabiesPage({
                     {baby.birthWeightGrams != null && (
                       <Detail
                         label="Weight"
-                        value={formatWeight(baby.birthWeightGrams)}
+                        value={`${baby.birthWeightGrams} g`}
                       />
                     )}
                     {baby.gestationalAgeDays != null && (
