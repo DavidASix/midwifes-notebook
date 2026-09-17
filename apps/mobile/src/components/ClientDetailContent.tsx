@@ -22,6 +22,7 @@ import { makeStyles } from "@/lib/make-styles";
 import { fontFamilies, fontSize } from "@/lib/themes";
 
 import { Text } from "@/components/ui/Text";
+import { ClientNotesPage } from "@/components/ClientNotesPage";
 
 const clientDetailTabs = ["client", "babies", "notes"] as const;
 
@@ -384,6 +385,15 @@ export function ClientDetailContent({
                       client={client}
                       isCareStatusPending={isCareStatusPending}
                       onCareStatusChange={onCareStatusChange}
+                      width={pageWidth}
+                    />
+                  );
+                }
+                if (item === "notes") {
+                  return (
+                    <ClientNotesPage
+                      active={selectedTab === "notes"}
+                      clientId={client.id}
                       width={pageWidth}
                     />
                   );
