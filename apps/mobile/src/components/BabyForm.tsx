@@ -13,7 +13,11 @@ import { Text } from "@/components/ui/Text";
 import { babyOutcomes, babySexes, bloodTypes, feedingTypes } from "@/db/schema";
 import { type BabyFormErrors, type BabyFormValues } from "@/lib/baby-form";
 import { gramsToPoundsOunces, poundsOuncesToGrams } from "@/lib/weight";
-import { babyOutcomeLabels, feedingTypeLabels } from "@/lib/baby-record";
+import {
+  babyOutcomeLabels,
+  feedingTypeLabels,
+  getEventDateLabel,
+} from "@/lib/baby-record";
 import { makeStyles } from "@/lib/make-styles";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize, useFormBottomPadding } from "@/lib/themes";
@@ -148,14 +152,7 @@ export function BabyForm({
           <FormDateField
             disabled={isPending}
             error={errors.eventDate}
-            label={
-              values.outcome === "live_birth"
-                ? "Birth date"
-                : values.outcome === "miscarriage" ||
-                    values.outcome === "stillbirth"
-                  ? "Loss date"
-                  : "Event date"
-            }
+            label={getEventDateLabel(values.outcome ?? null)}
             maximumDate={new Date()}
             onChange={(value) => onChange("eventDate", value)}
             value={values.eventDate}
