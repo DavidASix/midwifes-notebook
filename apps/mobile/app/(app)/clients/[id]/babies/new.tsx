@@ -20,6 +20,7 @@ import {
   type BabyFormValues,
 } from "@/lib/baby-form";
 import { makeStyles } from "@/lib/make-styles";
+import { markBabyRecordsChanged } from "@/lib/baby-records-revision";
 import { parsePositiveIntegerRouteParam } from "@/lib/route-params";
 import { fontFamilies, fontSize } from "@/lib/themes";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
@@ -145,6 +146,7 @@ export default function NewBabyScreen() {
         throw new Error("Baby insert returned no valid record");
       }
       leavingAllowed.current = true;
+      markBabyRecordsChanged(clientId);
       showSuccessToast("Baby record added", "The record was saved.");
       router.back();
     } catch {

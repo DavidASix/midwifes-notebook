@@ -46,6 +46,10 @@ jest.mock("@/lib/toast", () => ({
   showSuccessToast: jest.fn(),
 }));
 
+jest.mock("@/lib/baby-records-revision", () => ({
+  markBabyRecordsChanged: jest.fn(),
+}));
+
 const mockDatabase = jest.requireMock("@/db");
 const mockLimit = mockDatabase.limit as jest.Mock;
 const mockReturning = mockDatabase.returning as jest.Mock;
@@ -59,6 +63,9 @@ const mockNavigation = jest.requireMock("expo-router").navigation as {
 };
 const mockShowErrorToast = jest.requireMock("@/lib/toast")
   .showErrorToast as jest.Mock;
+const mockMarkBabyRecordsChanged = jest.requireMock(
+  "@/lib/baby-records-revision",
+).markBabyRecordsChanged as jest.Mock;
 
 function makeClient(): ClientRecord {
   return {
@@ -143,6 +150,7 @@ describe("NewBabyScreen", () => {
         riskFactors: null,
       }),
     );
+    expect(mockMarkBabyRecordsChanged).toHaveBeenCalledWith(3);
     expect(mockRouter.back).toHaveBeenCalledTimes(1);
   });
 

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { and, desc, eq, isNull } from "drizzle-orm";
@@ -19,6 +19,7 @@ import {
 } from "@/lib/baby-record";
 import { makeStyles } from "@/lib/make-styles";
 import { formatTimestamp } from "@/lib/dates";
+import { getBabyRecordsRevision } from "@/lib/baby-records-revision";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";
 
@@ -54,6 +55,10 @@ export function ClientBabiesPage({
 
   // Refs for lifecycle management
   const requestVersion = useRef(0);
+  const activeRef = useRef(active);
+  const hasRequestedRecords = useRef(false);
+  const lastRequestedRevision = useRef<number | null>(null);
+  activeRef.current = active;
 
   // Component state
   const [loadState, setLoadState] = useState<BabiesLoadState>({
@@ -63,6 +68,8 @@ export function ClientBabiesPage({
   /** Loads active records newest first and ignores results superseded by a newer request or focus change. */
   const loadBabies = useCallback(async () => {
     const version = ++requestVersion.current;
+    const revision = getBabyRecordsRevision(clientId);
+    hasRequestedRecords.current = true;
     setLoadState({ status: "loading" });
     try {
       const rows = await getDb()
@@ -72,24 +79,39 @@ export function ClientBabiesPage({
         .orderBy(desc(babies.createdAt), desc(babies.id));
       if (version !== requestVersion.current) return;
       const parsed = z.array(babiesSchema).safeParse(rows);
+      lastRequestedRevision.current = revision;
       setLoadState(
         parsed.success
           ? { status: "loaded", babies: parsed.data }
           : { status: "error" },
       );
     } catch {
-      if (version === requestVersion.current) setLoadState({ status: "error" });
+      if (version === requestVersion.current) {
+        lastRequestedRevision.current = revision;
+        setLoadState({ status: "error" });
+      }
     }
   }, [clientId]);
 
+  useEffect(() => {
+    if (active && !hasRequestedRecords.current) void loadBabies();
+  }, [active, loadBabies]);
+
   useFocusEffect(
     useCallback(() => {
-      if (!active) return;
-      void loadBabies();
+      const currentRevision = getBabyRecordsRevision(clientId);
+      if (
+        activeRef.current &&
+        hasRequestedRecords.current &&
+        lastRequestedRevision.current !== null &&
+        lastRequestedRevision.current !== currentRevision
+      ) {
+        void loadBabies();
+      }
       return () => {
         requestVersion.current += 1;
       };
-    }, [active, loadBabies]),
+    }, [clientId, loadBabies]),
   );
 
   return (

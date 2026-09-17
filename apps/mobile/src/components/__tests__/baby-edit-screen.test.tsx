@@ -48,6 +48,10 @@ jest.mock("@/lib/toast", () => ({
   showSuccessToast: jest.fn(),
 }));
 
+jest.mock("@/lib/baby-records-revision", () => ({
+  markBabyRecordsChanged: jest.fn(),
+}));
+
 const mockDatabase = jest.requireMock("@/db");
 const mockLimit = mockDatabase.limit as jest.Mock;
 const mockReturning = mockDatabase.returning as jest.Mock;
@@ -59,6 +63,9 @@ const mockNavigation = jest.requireMock("expo-router").navigation as {
   addListener: jest.Mock;
   dispatch: jest.Mock;
 };
+const mockMarkBabyRecordsChanged = jest.requireMock(
+  "@/lib/baby-records-revision",
+).markBabyRecordsChanged as jest.Mock;
 
 function makeBaby(overrides: Partial<BabyRecord> = {}): BabyRecord {
   return {
@@ -105,6 +112,7 @@ describe("EditBabyScreen", () => {
         }),
       ),
     );
+    expect(mockMarkBabyRecordsChanged).toHaveBeenCalledWith(3);
     expect(mockRouter.back).toHaveBeenCalled();
   });
 
@@ -169,6 +177,7 @@ describe("EditBabyScreen", () => {
 
     const update = mockSet.mock.calls.at(-1)?.[0];
     expect(update.deletedAt).toBe(update.updatedAt);
+    expect(mockMarkBabyRecordsChanged).toHaveBeenCalledWith(3);
     expect(mockRouter.back).toHaveBeenCalled();
   });
 

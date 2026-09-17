@@ -200,8 +200,9 @@ Age in calendar days is shown only for live-birth records with an event date.
 Each row always shows its creation time and outcome, then omits any absent optional details. Available details include the
 appropriately labelled event date, live-birth age, sex, weight in grams, gestational weeks/days, blood
 type, feeding type, and a short multi-line risk-factor preview. Tapping a row opens the full-screen combined view/edit
-form. **Add baby** opens the full-screen create form. The tab loads lazily while selected, refreshes when the route regains
-focus, and keeps its selection when returning from either form. Loading, empty, malformed-data, and database-failure
+form. **Add baby** opens the full-screen create form. The tab loads lazily the first time it is selected and reuses that
+data when swiping between detail tabs. A successful baby create, edit, or deletion marks the records stale so they refresh
+when returning to Client Detail. The selected tab remains in place. Loading, empty, malformed-data, and database-failure
 states are handled in place, with Retry available after failures.
 
 All baby-record fields are optional, so a blank record can be saved and identified by its creation time. The create/edit

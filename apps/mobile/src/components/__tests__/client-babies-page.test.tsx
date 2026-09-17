@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
+import { Pressable } from "react-native";
 
 import { ClientBabiesPage } from "@/components/ClientBabiesPage";
 import type { BabyRecord } from "@/db/schema";
-import { fireEvent, renderWithTheme, screen, waitFor } from "@/test-utils";
+import { markBabyRecordsChanged } from "@/lib/baby-records-revision";
+import { act, fireEvent, renderWithTheme, screen, waitFor } from "@/test-utils";
 
 jest.mock("@gorhom/bottom-sheet", () =>
   jest.requireActual("@gorhom/bottom-sheet/mock"),
@@ -30,7 +32,22 @@ jest.mock("@/db", () => {
 const mockRouter = jest.requireMock("expo-router").router as {
   push: jest.Mock;
 };
+const mockUseFocusEffect = jest.requireMock("expo-router")
+  .useFocusEffect as jest.Mock;
 const mockOrderBy = jest.requireMock("@/db").orderBy as jest.Mock;
+
+function BabiesPageHarness({ initiallyActive = true }) {
+  const [active, setActive] = useState(initiallyActive);
+  return (
+    <>
+      <Pressable
+        accessibilityLabel="Toggle babies tab"
+        onPress={() => setActive((current) => !current)}
+      />
+      <ClientBabiesPage active={active} clientId={3} width={320} />
+    </>
+  );
+}
 
 function makeBaby(overrides: Partial<BabyRecord> = {}): BabyRecord {
   return {
@@ -59,13 +76,10 @@ describe("ClientBabiesPage", () => {
   });
 
   it("loads only when active and opens client-scoped creation", async () => {
-    const { unmount } = renderWithTheme(
-      <ClientBabiesPage active={false} clientId={3} width={320} />,
-    );
+    renderWithTheme(<BabiesPageHarness initiallyActive={false} />);
     expect(mockOrderBy).not.toHaveBeenCalled();
 
-    unmount();
-    renderWithTheme(<ClientBabiesPage active clientId={3} width={320} />);
+    fireEvent.press(screen.getByLabelText("Toggle babies tab"));
     expect(await screen.findByText("No baby records yet")).toBeTruthy();
     fireEvent.press(screen.getByText("Add baby"));
     expect(mockRouter.push).toHaveBeenCalledWith("/clients/3/babies/new");
@@ -119,5 +133,29 @@ describe("ClientBabiesPage", () => {
     await waitFor(() => expect(mockOrderBy).toHaveBeenCalledTimes(2));
     fireEvent.press(await screen.findByText("Retry"));
     expect(await screen.findByText("No baby records yet")).toBeTruthy();
+  });
+
+  it("reuses loaded records when swiping away and back", async () => {
+    renderWithTheme(<BabiesPageHarness />);
+    expect(await screen.findByText("No baby records yet")).toBeTruthy();
+    expect(mockOrderBy).toHaveBeenCalledTimes(1);
+
+    fireEvent.press(screen.getByLabelText("Toggle babies tab"));
+    fireEvent.press(screen.getByLabelText("Toggle babies tab"));
+
+    await waitFor(() => expect(mockOrderBy).toHaveBeenCalledTimes(1));
+  });
+
+  it("refreshes on focus after a successful baby mutation", async () => {
+    renderWithTheme(<ClientBabiesPage active clientId={3} width={320} />);
+    expect(await screen.findByText("No baby records yet")).toBeTruthy();
+    markBabyRecordsChanged(3);
+    const focusCallback = mockUseFocusEffect.mock.calls.at(-1)?.[0];
+
+    act(() => {
+      focusCallback?.();
+    });
+
+    await waitFor(() => expect(mockOrderBy).toHaveBeenCalledTimes(2));
   });
 });
