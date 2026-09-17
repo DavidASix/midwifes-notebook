@@ -13,7 +13,7 @@ export const notes = sqliteTable("notes", {
     .references(() => clients.id),
 
   title: text("title"),
-  content: text("content"),
+  content: text("content").notNull(),
 
   createdAt: text("created_at")
     .notNull()
