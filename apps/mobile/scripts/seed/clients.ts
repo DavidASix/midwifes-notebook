@@ -108,6 +108,9 @@ export const clientSeedData = [
 ] satisfies (typeof clients.$inferInsert)[];
 
 /** Inserts fictional clients ranging from minimal records to complete care histories. */
-export async function seedClients(db: SeedDatabase): Promise<void> {
-  await db.insert(clients).values(clientSeedData);
+export async function seedClients(db: SeedDatabase) {
+  return db
+    .insert(clients)
+    .values(clientSeedData)
+    .returning({ id: clients.id });
 }
