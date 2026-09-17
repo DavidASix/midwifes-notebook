@@ -3,19 +3,16 @@ import { check, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
+import { toIsoDate } from "@/lib/dates";
+
 import { joinSqlValues } from "../utils";
 import { clients, bloodTypes } from "./clients";
 import { isoCalendarDateSchema, isoTimestampSchema } from "./shared";
 
-const nonFutureCalendarDateSchema = isoCalendarDateSchema.refine((value) => {
-  const today = new Date();
-  const localDate = [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, "0"),
-    String(today.getDate()).padStart(2, "0"),
-  ].join("-");
-  return value <= localDate;
-}, "Event date cannot be in the future.");
+const nonFutureCalendarDateSchema = isoCalendarDateSchema.refine(
+  (value) => value <= toIsoDate(new Date()),
+  "Event date cannot be in the future.",
+);
 
 export const babySexes = ["male", "female", "unknown"] as const;
 export const feedingTypes = ["breast_milk", "formula", "combination"] as const;
