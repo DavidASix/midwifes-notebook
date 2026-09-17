@@ -3,6 +3,7 @@ import { Alert } from "react-native";
 
 import EditBabyScreen from "../../../app/(app)/clients/[id]/babies/[babyId]";
 import type { BabyRecord } from "@/db/schema";
+import { buildBabyUpdate } from "@/lib/baby-form";
 import { act, fireEvent, renderWithTheme, screen, waitFor } from "@/test-utils";
 
 jest.mock("react-native-keyboard-controller", () =>
@@ -133,6 +134,29 @@ describe("EditBabyScreen", () => {
     mockLimit.mockResolvedValue([]);
     renderWithTheme(<EditBabyScreen />);
     expect(await screen.findByText("Baby record not found")).toBeTruthy();
+  });
+
+  it("shows imperial weight validation errors and saves after correction", async () => {
+    renderWithTheme(<EditBabyScreen />);
+    await screen.findByDisplayValue("Robin");
+    fireEvent.press(screen.getByText("lb / oz"));
+    fireEvent.changeText(screen.getByLabelText("Pounds"), "-1");
+    fireEvent.press(screen.getByText("Save record"));
+
+    const validation = buildBabyUpdate({ birthWeightGrams: -1 });
+    if (validation.success) throw new Error("Expected invalid weight");
+    const error = validation.errors.birthWeightGrams!;
+    expect(screen.getByText(error)).toBeTruthy();
+    expect(mockSet).not.toHaveBeenCalled();
+
+    fireEvent.changeText(screen.getByLabelText("Pounds"), "7");
+    expect(screen.queryByText(error)).toBeNull();
+    fireEvent.press(screen.getByText("Save record"));
+    await waitFor(() =>
+      expect(mockSet).toHaveBeenCalledWith(
+        expect.objectContaining({ birthWeightGrams: 3402 }),
+      ),
+    );
   });
 
   it("archives with matching deletion and update timestamps after confirmation", async () => {

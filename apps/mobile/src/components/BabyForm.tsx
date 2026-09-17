@@ -207,6 +207,7 @@ export function BabyForm({
               <View style={styles.splitField}>
                 <FormIntegerField
                   disabled={isPending}
+                  error={errors.birthWeightGrams}
                   label="Pounds"
                   onChange={(value) =>
                     changeImperialWeight(value, imperialWeight.ounces)
