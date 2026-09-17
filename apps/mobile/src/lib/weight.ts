@@ -17,9 +17,3 @@ export function gramsToPoundsOunces(grams: number): {
   }
   return { pounds, ounces };
 }
-
-/** Displays canonical grams alongside rounded pounds and ounces. */
-export function formatWeight(grams: number): string {
-  const { pounds, ounces } = gramsToPoundsOunces(grams);
-  return `${grams} g · ${pounds} lb ${ounces.toFixed(1)} oz`;
-}

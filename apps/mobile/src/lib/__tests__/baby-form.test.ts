@@ -4,11 +4,7 @@ import {
   buildBabyInsert,
   buildBabyUpdate,
 } from "@/lib/baby-form";
-import {
-  formatWeight,
-  gramsToPoundsOunces,
-  poundsOuncesToGrams,
-} from "@/lib/weight";
+import { gramsToPoundsOunces, poundsOuncesToGrams } from "@/lib/weight";
 import { getBabyAgeInDays, getEventDateLabel } from "@/lib/baby-record";
 
 function makeBaby(overrides: Partial<BabyRecord> = {}): BabyRecord {
@@ -100,9 +96,9 @@ describe("baby record persistence", () => {
 });
 
 describe("baby display conversions", () => {
-  it("rounds imperial entry to whole grams and renders ounces to one decimal", () => {
+  it("rounds imperial entry to whole grams and converts back to tenths of an ounce", () => {
     expect(poundsOuncesToGrams(7, 8)).toBe(3402);
-    expect(formatWeight(3402)).toBe("3402 g · 7 lb 8.0 oz");
+    expect(gramsToPoundsOunces(3402)).toEqual({ pounds: 7, ounces: 8 });
   });
 
   it("carries a displayed 16.0 ounces into the next pound", () => {
