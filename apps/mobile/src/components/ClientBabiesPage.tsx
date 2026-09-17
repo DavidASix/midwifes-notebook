@@ -19,6 +19,7 @@ import {
   getEventDateLabel,
 } from "@/lib/baby-record";
 import { makeStyles } from "@/lib/make-styles";
+import { formatTimestamp } from "@/lib/dates";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";
 
@@ -26,14 +27,6 @@ type BabiesLoadState =
   | { status: "loading" }
   | { status: "loaded"; babies: BabyRecord[] }
   | { status: "error" };
-
-/** Formats the record timestamp in the device locale and time zone. */
-function formatCreatedAt(timestamp: string): string {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(timestamp));
-}
 
 /** Pairs a clinical label with its value in the baby record grid. */
 function Detail({ label, value }: { label: string; value: string }) {
@@ -171,7 +164,7 @@ export function ClientBabiesPage({
                     {baby.name || "Baby record"}
                   </Text>
                   <Text style={styles.timestamp}>
-                    Created {formatCreatedAt(baby.createdAt)}
+                    Created {formatTimestamp(baby.createdAt)}
                   </Text>
                   <View style={styles.details}>
                     <Detail

@@ -1,3 +1,11 @@
+/** Formats an ISO timestamp as a medium date and short time in the device locale and time zone. */
+export function formatTimestamp(timestamp: string): string {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(timestamp));
+}
+
 /** Converts a Date to an ISO calendar date without applying a UTC timezone shift. */
 export function toIsoDate(date: Date): string {
   const year = date.getFullYear();

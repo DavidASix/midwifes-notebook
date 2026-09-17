@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
 import { getDb } from "@/db";
 import { notes, notesSchema, type NoteRecord } from "@/db/schema";
+import { formatTimestamp } from "@/lib/dates";
 import { makeStyles } from "@/lib/make-styles";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";
@@ -18,14 +19,6 @@ type NotesLoadState =
   | { status: "loading" }
   | { status: "loaded"; notes: NoteRecord[] }
   | { status: "error" };
-
-/** Formats a validated note timestamp for the device locale. */
-function formatCreatedAt(timestamp: string): string {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(timestamp));
-}
 
 /** Loads and displays one client's active notes inside the Client Detail pager. */
 export function ClientNotesPage({
@@ -154,7 +147,7 @@ export function ClientNotesPage({
                   </Text>
                 )}
                 <Text style={styles.timestamp}>
-                  {formatCreatedAt(note.createdAt)}
+                  {formatTimestamp(note.createdAt)}
                 </Text>
                 <Text numberOfLines={8} style={styles.preview}>
                   {note.content}
