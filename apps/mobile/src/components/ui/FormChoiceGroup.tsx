@@ -13,6 +13,7 @@ export type FormChoiceGroupProps<T extends string | number> = {
   onChange: (value: T | undefined) => void;
   getLabel?: (value: T) => string;
   error?: string;
+  disabled?: boolean;
 };
 
 /** A nullable segmented choice group whose selected option can be tapped again to clear it. */
@@ -23,6 +24,7 @@ export function FormChoiceGroup<T extends string | number>({
   onChange,
   getLabel = String,
   error,
+  disabled = false,
 }: FormChoiceGroupProps<T>) {
   const styles = useStyles();
 
@@ -47,6 +49,7 @@ export function FormChoiceGroup<T extends string | number>({
               accessibilityLabel={`${label}: ${getLabel(option)}`}
               accessibilityRole="radio"
               accessibilityState={{ checked: selected }}
+              disabled={disabled}
               onPress={() => onChange(selected ? undefined : option)}
               size="compact"
               style={styles.choice}

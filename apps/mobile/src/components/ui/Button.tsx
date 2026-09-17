@@ -16,7 +16,7 @@ type ButtonProps = {
   children?: ReactNode;
   onPress?: () => void;
   disabled?: boolean;
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "destructive";
   size?: "default" | "compact" | "bare";
   style?: StyleProp<ViewStyle>;
   accessibilityLabel?: string;
@@ -103,6 +103,9 @@ const useStyles = makeStyles((theme) => ({
   ghost: {
     backgroundColor: "transparent",
   },
+  destructive: {
+    backgroundColor: theme.destructive,
+  },
   pressed: {
     opacity: 0.8,
   },
@@ -121,5 +124,8 @@ const useStyles = makeStyles((theme) => ({
   },
   ghostLabel: {
     color: theme.primary,
+  },
+  destructiveLabel: {
+    color: theme.primaryForeground,
   },
 }));

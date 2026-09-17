@@ -1,7 +1,9 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 import { fireEvent, renderWithTheme, screen } from "@/test-utils";
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
+import { themes } from "@/lib/themes";
 
 describe("Button", () => {
   it("renders the title", () => {
@@ -26,6 +28,12 @@ describe("Button", () => {
   it("renders secondary variant without crashing", () => {
     renderWithTheme(<Button title="Cancel" variant="secondary" />);
     expect(screen.getByText("Cancel")).toBeTruthy();
+  });
+
+  it("uses the destructive theme color for destructive actions", () => {
+    renderWithTheme(<Button title="Archive" variant="destructive" />);
+    const style = StyleSheet.flatten(screen.getByRole("button").props.style);
+    expect(style.backgroundColor).toBe(themes.light.destructive);
   });
 
   it("renders an icon beside its title", () => {

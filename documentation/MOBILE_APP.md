@@ -70,13 +70,14 @@ A `Tabs` navigator with four tabs: Tools, Clients, Calendar, Statistics. Each ta
 
 Screens at the root stack level (outside tabs) are pushed over the tab bar:
 
-| Route          | Description                                         |
-| -------------- | --------------------------------------------------- |
-| `onboarding`   | First-launch onboarding flow                        |
-| `(tabs)`       | The tab navigator (treated as a single stack entry) |
-| `clients/[id]` | Client detail                                       |
-| `clients/new`  | Add client form                                     |
-| `settings`     | Settings screen                                     |
+| Route               | Description                                         |
+| ------------------- | --------------------------------------------------- |
+| `onboarding`        | First-launch onboarding flow                        |
+| `(tabs)`            | The tab navigator (treated as a single stack entry) |
+| `clients/[id]`      | Client detail                                       |
+| `clients/[id]/edit` | Full-screen client edit form                        |
+| `clients/new`       | Add client form                                     |
+| `settings`          | Settings screen                                     |
 
 ---
 
@@ -163,8 +164,7 @@ visible but dimmed behind it. Invalid, missing, and failed client loads are hand
 can be retried without dismissing it. Invalid or missing client links provide a direct action back to the client list.
 The selected client is reloaded whenever the route regains focus.
 
-**Header:** Close action, client full name, and `EDIT` on the right. Until the dedicated edit route is implemented,
-`EDIT` remains intentionally inactive.
+**Header:** Close action, client full name, and `EDIT` on the right. `EDIT` pushes the dedicated full-screen edit route.
 
 **Three tabs:**
 
@@ -181,6 +181,9 @@ Grouped sections with labeled field pairs in a two-column grid. Should include a
 **Status**
 
 - Active toggle (active = in care; inactive = Out of Care)
+
+Moving an active client out of care requires confirmation; returning a client to care is immediate. The switch is
+disabled while saving, reflects the newly derived status after success, and retains its stored value after failure.
 
 #### Tab 2 — Babies
 
@@ -215,15 +218,19 @@ Pushed as a stack screen on top of the Client Detail modal when `EDIT` is tapped
 - New-client entry excludes delivery outcome fields; actual delivery date, delivery method, and tear degree are recorded
   through the birth workflow after delivery
 - New clients are active by default; care status is changed later from the client record rather than during creation
-- Save button commits changes and pops back to the detail modal
-- Cancel discards changes and pops back
+- Save updates only non-archived records, writes cleared optional fields as `NULL`, refreshes `updated_at`, and pops back
+  so Client Detail reloads
+- Cancel, header back, Android back, and iOS navigation gestures protect dirty forms with a discard confirmation
+- An edit-only, single-row Delete Client action archives after confirmation by assigning the same timestamp to `deleted_at` and
+  `updated_at`. Related baby and note rows remain stored, unsaved edits are not saved, and navigation returns to Clients.
+- Validation and database failures retain entered values; successful edits and archives show app-wide toasts
 
 The same form is used for **Add Client** (reached from the client list header), with optional fields unset and active care
 enabled. It is presented in a tall, route-backed Gorhom bottom sheet that slides up over the dimmed client list, leaves
 context above its rounded top edge and along both sides, and can be pulled down to dismiss. When values have been entered,
 pull-down, backdrop press, Cancel, and the platform back action keep the sheet in place and present the discard
 confirmation. The sheet has no stack header; its opening copy provides the page title. Saving inserts the client into the
-local database, dismisses the sheet, and refreshes the alphabetically sorted client list. Validation and database errors
+local database, shows a success toast, dismisses the sheet, and refreshes the alphabetically sorted client list. Validation and database errors
 leave the entered values in place so they can be corrected or retried. App-wide toast notifications surface both error
 types above the current screen, while invalid fields also retain their inline guidance. On Android, focusing any text,
 phone, numeric, or multiline field automatically scrolls it above the software keyboard and keeps it visible while the

@@ -137,7 +137,12 @@ CREATE TABLE settings (
 ## Notes
 
 - All dates are stored as **ISO 8601 text** (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SS.sssZ`). SQLite has no native date type; text ISO 8601 sorts correctly and is compatible with Drizzle's date helpers.
-- `deleted_at` soft deletes are used on `clients`, `babies`, and `notes`. Queries should filter `WHERE deleted_at IS NULL` by default.
-- `updated_at` must be kept current via Drizzle model hooks or a SQLite `AFTER UPDATE` trigger.
+- `deleted_at` soft deletes are used on `clients`, `babies`, and `notes`. Normal list, detail, and edit queries filter
+  `WHERE deleted_at IS NULL` by default.
+- Existing client mutations explicitly set `updated_at` to the current ISO timestamp. Archiving sets `deleted_at` and
+  `updated_at` to the same timestamp without deleting related baby or note rows. Permanent deletion and restore UI are
+  outside the current lifecycle.
+- Client mutations target `WHERE id = ? AND deleted_at IS NULL`; returned rows are runtime-validated before success.
+  Cleared nullable edit fields are written as SQL `NULL`.
 - `birth_weight_grams` is the single source of truth for weight. The UI layer handles conversion to lbs/oz for display.
 - `age` on `clients` is only populated when `date_of_birth` is unknown; otherwise it is always `NULL` and age is derived from `date_of_birth`.

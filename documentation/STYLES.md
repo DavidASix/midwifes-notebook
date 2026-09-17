@@ -49,7 +49,14 @@ Clean, clinical minimalism with warm undertones. Intentionally approachable for 
 - Form controls: text inputs use a compact 40-point height; date selectors, segmented choices, and footer actions use a
   denser 36-point visual height, while disclosure headers retain a 44-point touch target
 - Form actions: a persistent bottom action bar above the safe area, with equal-width secondary Cancel and primary Save
-  actions
+  actions. `useFormBottomPadding` in `apps/mobile/src/lib/themes.ts` centralizes its platform minimum (26 points on iOS
+  and 20 on Android) and reads the device inset; a larger bottom inset takes precedence for full-screen forms without
+  being added twice when a parent already owns the safe area.
+- Destructive actions: red (`destructive` theme token) filled buttons with high-contrast text, reserved for confirmed
+  operations such as archival. Client editing presents deletion in a red outlined card with foreground heading, muted
+  explanatory copy, and a trailing compact button.
+- Care-status switches: secondary emerald when active and muted when inactive; disabled while persistence is pending so
+  an unpersisted status is never presented as final
 - Slide-up screens: tall, rounded Gorhom sheets over a dimmed originating screen, inset 8 points from both horizontal
   edges so the underlying context remains visible at the sides as well as above; they use a compact centered drag handle
   and no stack navigation header. Their bottom edge respects the device safe area so actions remain above system

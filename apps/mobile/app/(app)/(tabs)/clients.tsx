@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { router, useFocusEffect, useNavigation } from "expo-router";
 import { Search, UserRoundPlus, X } from "lucide-react-native";
+import { isNull } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import { clients, clientsSchema, type ClientRecord } from "@/db/schema";
@@ -82,7 +83,10 @@ export default function ClientsScreen() {
 
   const fetchClients = useCallback(async () => {
     try {
-      const rows = await db.select().from(clients);
+      const rows = await db
+        .select()
+        .from(clients)
+        .where(isNull(clients.deletedAt));
       const result = clientListSchema.safeParse(rows);
       if (!result.success) {
         setHasLoadError(true);

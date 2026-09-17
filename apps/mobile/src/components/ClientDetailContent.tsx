@@ -2,12 +2,12 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   Pressable,
+  Switch,
   View,
   type LayoutChangeEvent,
 } from "react-native";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { z } from "zod";
 
 import {
   formatClientAge,
@@ -25,24 +25,7 @@ import { Text } from "@/components/ui/Text";
 
 const clientDetailTabs = ["client", "babies", "notes"] as const;
 
-/**
- * Regex is included to avoid non integers from passing (like 4e1) and displaying an different client.
- */
-const clientIdSchema = z
-  .string()
-  .regex(/^[1-9]\d*$/)
-  .pipe(z.coerce.number())
-  .pipe(z.int().positive());
-
 type ClientDetailTab = (typeof clientDetailTabs)[number];
-
-/** Accepts only one positive integer Expo Router path parameter. */
-export function parseClientId(
-  routeId: string | string[] | undefined,
-): number | null {
-  const result = clientIdSchema.safeParse(routeId);
-  return result.success ? result.data : null;
-}
 
 /** Resolves a horizontal pager offset to the nearest detail tab. */
 export function getClientDetailTabForOffset(
@@ -122,13 +105,20 @@ function DetailSection({
   );
 }
 
+type ClientInformationPageProps = {
+  client: ClientRecord;
+  width: number;
+  onCareStatusChange: (isInCare: boolean) => void;
+  isCareStatusPending: boolean;
+};
+
+/** Displays persisted identity, clinical, partner, and care-status information. */
 function ClientInformationPage({
   client,
   width,
-}: {
-  client: ClientRecord;
-  width: number;
-}) {
+  onCareStatusChange,
+  isCareStatusPending,
+}: ClientInformationPageProps) {
   const styles = useStyles();
   const gravidaParity =
     client.gravida == null && client.parity == null
@@ -233,16 +223,33 @@ function ClientInformationPage({
           },
         ]}
       />
-      <DetailSection
-        title="Status"
-        fields={[
-          {
-            label: "Care status",
-            value: formatClientStatus(client),
-            fullWidth: true,
-          },
-        ]}
-      />
+      <View style={styles.section}>
+        <Text header style={styles.sectionTitle}>
+          Status
+        </Text>
+        <View style={styles.sectionDivider} />
+        <View style={styles.careStatusRow}>
+          <View style={styles.careStatusCopy}>
+            <Text style={styles.fieldLabel}>Care status</Text>
+            <Text style={styles.fieldValue}>{formatClientStatus(client)}</Text>
+          </View>
+          <Switch
+            accessibilityLabel="Client is in care"
+            accessibilityState={{
+              checked: client.isActive === 1,
+              disabled: isCareStatusPending,
+            }}
+            disabled={isCareStatusPending}
+            onValueChange={onCareStatusChange}
+            trackColor={{
+              false: styles.switchTrack.color,
+              true: styles.switchActive.color,
+            }}
+            thumbColor={styles.switchThumb.color}
+            value={client.isActive === 1}
+          />
+        </View>
+      </View>
     </BottomSheetScrollView>
   );
 }
@@ -262,7 +269,15 @@ function PlaceholderPage({ label, width }: { label: string; width: number }) {
 }
 
 /** Displays one client across independently scrollable, horizontally paged detail tabs. */
-export function ClientDetailContent({ client }: { client: ClientRecord }) {
+export function ClientDetailContent({
+  client,
+  onCareStatusChange,
+  isCareStatusPending = false,
+}: {
+  client: ClientRecord;
+  onCareStatusChange: (isInCare: boolean) => void;
+  isCareStatusPending?: boolean;
+}) {
   const styles = useStyles();
   const pagerRef = useRef<FlatList<ClientDetailTab>>(null);
   const [selectedTab, setSelectedTab] = useState<ClientDetailTab>("client");
@@ -365,7 +380,12 @@ export function ClientDetailContent({ client }: { client: ClientRecord }) {
               renderItem={({ item }) => {
                 if (item === "client") {
                   return (
-                    <ClientInformationPage client={client} width={pageWidth} />
+                    <ClientInformationPage
+                      client={client}
+                      isCareStatusPending={isCareStatusPending}
+                      onCareStatusChange={onCareStatusChange}
+                      width={pageWidth}
+                    />
                   );
                 }
                 return (
@@ -465,6 +485,26 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: fontFamilies.base.regular,
     fontSize: fontSize.md,
     lineHeight: 21,
+  },
+  careStatusRow: {
+    minHeight: 48,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 16,
+  },
+  careStatusCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  switchTrack: {
+    color: theme.muted,
+  },
+  switchActive: {
+    color: theme.secondary,
+  },
+  switchThumb: {
+    color: theme.primaryForeground,
   },
   placeholderPage: {
     minHeight: "100%",

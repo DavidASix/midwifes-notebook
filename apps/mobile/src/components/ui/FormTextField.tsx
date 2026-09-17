@@ -15,6 +15,7 @@ export type FormTextFieldProps = {
   keyboardType?: KeyboardTypeOptions;
   multiline?: boolean;
   accessibilityLabel?: string;
+  disabled?: boolean;
 };
 
 /** A labeled, themed text input for single-line, phone, and multiline form values. */
@@ -28,6 +29,7 @@ export function FormTextField({
   keyboardType,
   multiline,
   accessibilityLabel,
+  disabled = false,
 }: FormTextFieldProps) {
   const styles = useStyles();
 
@@ -39,7 +41,9 @@ export function FormTextField({
       </Text>
       <TextInput
         accessibilityLabel={accessibilityLabel ?? label}
+        accessibilityState={{ disabled }}
         autoCapitalize={keyboardType === "phone-pad" ? "none" : "sentences"}
+        editable={!disabled}
         keyboardType={keyboardType}
         multiline={multiline}
         onChangeText={onChangeText}

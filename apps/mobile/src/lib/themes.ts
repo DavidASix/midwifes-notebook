@@ -1,3 +1,6 @@
+import { Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 export const fontSize = {
   xs: 11,
   sm: 13,
@@ -38,6 +41,22 @@ export const radius = {
   "3xl": 18,
   "4xl": 21,
 } as const;
+
+const formFooterMinimumBottomPadding = Platform.OS === "ios" ? 26 : 20;
+
+/** Keeps form actions above the device safe area without stacking duplicate inset spacing.
+ *
+ * @param containerHandlesSafeArea Whether the form's parent already applies its bottom inset.
+ */
+export function useFormBottomPadding(
+  containerHandlesSafeArea: boolean,
+): number {
+  const insets = useSafeAreaInsets();
+  return Math.max(
+    formFooterMinimumBottomPadding,
+    containerHandlesSafeArea ? 0 : insets.bottom,
+  );
+}
 
 export type ColorTheme = {
   background: string;
