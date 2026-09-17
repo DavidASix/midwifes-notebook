@@ -14,6 +14,7 @@ export type FormTextFieldProps = {
   required?: boolean;
   keyboardType?: KeyboardTypeOptions;
   multiline?: boolean;
+  multilineMinHeight?: number;
   accessibilityLabel?: string;
   disabled?: boolean;
 };
@@ -28,6 +29,7 @@ export function FormTextField({
   required,
   keyboardType,
   multiline,
+  multilineMinHeight,
   accessibilityLabel,
   disabled = false,
 }: FormTextFieldProps) {
@@ -52,6 +54,8 @@ export function FormTextField({
         style={[
           styles.input,
           multiline && styles.multilineInput,
+          multiline &&
+            multilineMinHeight != null && { minHeight: multilineMinHeight },
           error && styles.inputError,
         ]}
         textAlignVertical={multiline ? "top" : "center"}
