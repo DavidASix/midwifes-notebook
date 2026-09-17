@@ -11,14 +11,9 @@ import { FormIntegerField } from "@/components/ui/FormIntegerField";
 import { FormTextField } from "@/components/ui/FormTextField";
 import { Text } from "@/components/ui/Text";
 import { babyOutcomes, babySexes, bloodTypes, feedingTypes } from "@/db/schema";
-import {
-  babyOutcomeLabels,
-  feedingTypeLabels,
-  gramsToPoundsOunces,
-  poundsOuncesToGrams,
-  type BabyFormErrors,
-  type BabyFormValues,
-} from "@/lib/baby-form";
+import { type BabyFormErrors, type BabyFormValues } from "@/lib/baby-form";
+import { gramsToPoundsOunces, poundsOuncesToGrams } from "@/lib/weight";
+import { babyOutcomeLabels, feedingTypeLabels } from "@/lib/baby-record";
 import { makeStyles } from "@/lib/make-styles";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize, useFormBottomPadding } from "@/lib/themes";

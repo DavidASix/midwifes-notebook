@@ -10,14 +10,14 @@ import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
 import { getDb } from "@/db";
 import { babies, babiesSchema, type BabyRecord } from "@/db/schema";
+import { formatWeight } from "@/lib/weight";
 import {
   babyOutcomeLabels,
   feedingTypeLabels,
   formatGestationalAge,
-  formatWeight,
   getBabyAgeInDays,
   getEventDateLabel,
-} from "@/lib/baby-form";
+} from "@/lib/baby-record";
 import { makeStyles } from "@/lib/make-styles";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";

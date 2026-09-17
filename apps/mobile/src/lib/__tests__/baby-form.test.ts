@@ -3,12 +3,13 @@ import {
   babyToFormValues,
   buildBabyInsert,
   buildBabyUpdate,
+} from "@/lib/baby-form";
+import {
   formatWeight,
-  getBabyAgeInDays,
-  getEventDateLabel,
   gramsToPoundsOunces,
   poundsOuncesToGrams,
-} from "../baby-form";
+} from "@/lib/weight";
+import { getBabyAgeInDays, getEventDateLabel } from "@/lib/baby-record";
 
 function makeBaby(overrides: Partial<BabyRecord> = {}): BabyRecord {
   return {
