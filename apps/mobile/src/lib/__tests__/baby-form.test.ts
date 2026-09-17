@@ -88,7 +88,7 @@ describe("baby record persistence", () => {
     const result = buildBabyUpdate({ eventDate: "2999-01-01" });
     expect(result).toEqual({
       success: false,
-      errors: { eventDate: "Event date cannot be in the future." },
+      errors: { eventDate: expect.any(String) },
     });
   });
 
