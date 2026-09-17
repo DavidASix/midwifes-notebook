@@ -26,7 +26,11 @@ export function FormDecimalField({
   );
 
   useEffect(() => {
-    setInputValue(value === undefined ? "" : String(value));
+    setInputValue((current) => {
+      // Keep editable decimal text when the parent echoes the same numeric value.
+      if (current !== "" && Number(current) === value) return current;
+      return value === undefined ? "" : String(value);
+    });
   }, [value]);
 
   /** Keeps partial decimal text editable, rejects invalid values, and reports an empty input as unset. */
@@ -41,7 +45,7 @@ export function FormDecimalField({
     if (!Number.isFinite(parsed) || parsed < 0) return;
     if (maximumExclusive !== undefined && parsed >= maximumExclusive) return;
     setInputValue(nextValue);
-    if (!nextValue.endsWith(".")) onChange(parsed);
+    onChange(parsed);
   }
 
   return (

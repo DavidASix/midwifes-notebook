@@ -22,6 +22,17 @@ function DecimalFieldHarness({ initialValue }: { initialValue?: number }) {
 }
 
 describe("FormDecimalField", () => {
+  it("updates the stored value after deleting fractional digits while retaining the decimal point", () => {
+    renderWithTheme(<DecimalFieldHarness initialValue={7.5} />);
+    fireEvent.changeText(screen.getByLabelText("Ounces"), "7.");
+
+    expect(screen.getByTestId("managed-value").props.children).toBe("7");
+    expect(screen.getByLabelText("Ounces").props.value).toBe("7.");
+
+    fireEvent.changeText(screen.getByLabelText("Ounces"), "7.2");
+    expect(screen.getByTestId("managed-value").props.children).toBe("7.2");
+  });
+
   it("accepts a non-negative decimal and maps an empty field to unset", () => {
     renderWithTheme(<DecimalFieldHarness />);
     fireEvent.changeText(screen.getByLabelText("Ounces"), "7.5");
