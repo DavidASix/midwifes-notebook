@@ -42,6 +42,18 @@ describe("FormDecimalField", () => {
     expect(screen.getByTestId("managed-value").props.children).toBe("unset");
   });
 
+  it("accepts a decimal entered without a leading zero", () => {
+    renderWithTheme(<DecimalFieldHarness />);
+    fireEvent.changeText(screen.getByLabelText("Ounces"), ".");
+
+    expect(screen.getByTestId("managed-value").props.children).toBe("unset");
+    expect(screen.getByLabelText("Ounces").props.value).toBe(".");
+
+    fireEvent.changeText(screen.getByLabelText("Ounces"), ".5");
+    expect(screen.getByTestId("managed-value").props.children).toBe("0.5");
+    expect(screen.getByLabelText("Ounces").props.value).toBe(".5");
+  });
+
   it("rejects negative, malformed, and 16-ounce values", () => {
     renderWithTheme(<DecimalFieldHarness initialValue={7.5} />);
     fireEvent.changeText(screen.getByLabelText("Ounces"), "-1");

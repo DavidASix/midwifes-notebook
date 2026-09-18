@@ -28,6 +28,7 @@ export function FormDecimalField({
   useEffect(() => {
     setInputValue((current) => {
       // Keep editable decimal text when the parent echoes the same numeric value.
+      if (current === "." && value === undefined) return current;
       if (current !== "" && Number(current) === value) return current;
       return value === undefined ? "" : String(value);
     });
@@ -41,6 +42,11 @@ export function FormDecimalField({
       return;
     }
     if (!/^\d*(?:\.\d*)?$/.test(nextValue)) return;
+    if (nextValue === ".") {
+      setInputValue(nextValue);
+      onChange(undefined);
+      return;
+    }
     const parsed = Number(nextValue);
     if (!Number.isFinite(parsed) || parsed < 0) return;
     if (maximumExclusive !== undefined && parsed >= maximumExclusive) return;
