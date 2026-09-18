@@ -3,7 +3,7 @@ import { Pressable } from "react-native";
 
 import { ClientBabiesPage } from "@/components/ClientBabiesPage";
 import type { BabyRecord } from "@/db/schema";
-import { markBabyRecordsChanged } from "@/lib/baby-records-revision";
+import { markBabyRecordsChanged } from "@/lib/baby-record";
 import { act, fireEvent, renderWithTheme, screen, waitFor } from "@/test-utils";
 
 jest.mock("@gorhom/bottom-sheet", () =>

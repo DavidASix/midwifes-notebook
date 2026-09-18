@@ -15,11 +15,11 @@ import {
   feedingTypeLabels,
   formatGestationalAge,
   getBabyAgeInDays,
+  getBabyRecordsRevision,
   getEventDateLabel,
 } from "@/lib/baby-record";
 import { makeStyles } from "@/lib/make-styles";
 import { formatTimestamp } from "@/lib/dates";
-import { getBabyRecordsRevision } from "@/lib/baby-records-revision";
 import { useTheme } from "@/lib/theme-context";
 import { fontFamilies, fontSize } from "@/lib/themes";
 

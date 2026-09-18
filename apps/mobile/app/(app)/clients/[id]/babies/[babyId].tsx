@@ -20,7 +20,7 @@ import {
   type BabyFormValues,
 } from "@/lib/baby-form";
 import { makeStyles } from "@/lib/make-styles";
-import { markBabyRecordsChanged } from "@/lib/baby-records-revision";
+import { markBabyRecordsChanged } from "@/lib/baby-record";
 import { parsePositiveIntegerRouteParam } from "@/lib/route-params";
 import { useTheme } from "@/lib/theme-context";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";

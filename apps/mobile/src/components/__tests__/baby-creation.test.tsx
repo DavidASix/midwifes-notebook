@@ -46,7 +46,8 @@ jest.mock("@/lib/toast", () => ({
   showSuccessToast: jest.fn(),
 }));
 
-jest.mock("@/lib/baby-records-revision", () => ({
+jest.mock("@/lib/baby-record", () => ({
+  ...jest.requireActual("@/lib/baby-record"),
   markBabyRecordsChanged: jest.fn(),
 }));
 
@@ -63,9 +64,8 @@ const mockNavigation = jest.requireMock("expo-router").navigation as {
 };
 const mockShowErrorToast = jest.requireMock("@/lib/toast")
   .showErrorToast as jest.Mock;
-const mockMarkBabyRecordsChanged = jest.requireMock(
-  "@/lib/baby-records-revision",
-).markBabyRecordsChanged as jest.Mock;
+const mockMarkBabyRecordsChanged = jest.requireMock("@/lib/baby-record")
+  .markBabyRecordsChanged as jest.Mock;
 
 function makeClient(): ClientRecord {
   return {
