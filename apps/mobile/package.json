@@ -20,6 +20,7 @@
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
     "@expo-google-fonts/newsreader": "^0.4.1",
+    "@faker-js/faker": "^9.9.0",
     "@gorhom/bottom-sheet": "^5.2.14",
     "@midwifes-notebook/server": "workspace:*",
     "@op-engineering/op-sqlite": "^16.2.2",

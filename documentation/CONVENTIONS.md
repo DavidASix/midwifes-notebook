@@ -20,6 +20,8 @@ Before reaching for a React Native primitive (`Pressable`, `Text`, `View`, etc.)
 - Use `<Text>` from `@/components/ui/Text` instead of the React Native `Text` primitive.
 - Use the form primitives in `src/components/ui/` (`FormTextField`, `FormDateField`, and `FormChoiceGroup`) instead of
   defining styled inputs inside a screen or feature component.
+- Use `StateView` from `src/components/ui/` for centered record loading, missing-record, and error states. Screens supply
+  the copy, optional loading indicator, and recovery action.
 - For any other element, check `src/components/ui/` first before writing a new styled primitive.
 
 ---

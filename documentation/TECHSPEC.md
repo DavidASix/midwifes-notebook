@@ -90,6 +90,9 @@ Navigation is handled by **Expo Router** (file-system based routing, built on Re
 - Generated mobile migrations live in `apps/mobile/drizzle`. Its `migrations.js` manifest must statically import every generated SQL file so Metro can bundle them.
 - `expo-drizzle-studio-plugin` is available for inspecting the database in Expo DevTools during development
 
+Development database resets use a fixed-seed `@faker-js/faker` generator to add zero to three representative baby
+records for every seeded client. Keeping the Faker seed stable makes local UI states reproducible across reloads.
+
 **Zod** provides runtime validation at untyped boundaries. Database row schemas are generated from Drizzle definitions
 with **`drizzle-zod`** and refined for formats or SQLite constraints that Drizzle cannot express in its inferred runtime
 schema. Generated row schemas are colocated with their Drizzle tables, while reusable field schemas live in

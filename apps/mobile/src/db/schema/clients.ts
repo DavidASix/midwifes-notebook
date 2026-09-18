@@ -4,6 +4,7 @@ import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 import { joinSqlValues } from "../utils";
+import { babies } from "./babies";
 import { notes } from "./notes";
 import { isoCalendarDateSchema, isoTimestampSchema } from "./shared";
 
@@ -115,6 +116,7 @@ export const clientsSchema = createSelectSchema(clients, {
 });
 
 export const clientsRelations = relations(clients, ({ many }) => ({
+  babies: many(babies),
   notes: many(notes),
 }));
 

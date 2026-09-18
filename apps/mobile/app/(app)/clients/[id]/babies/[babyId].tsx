@@ -8,57 +8,65 @@ import {
   useNavigation,
 } from "expo-router";
 
-import { NoteForm } from "@/components/NoteForm";
+import { BabyForm } from "@/components/BabyForm";
 import { StateView } from "@/components/ui/StateView";
 import { getDb } from "@/db";
-import { notes, notesSchema } from "@/db/schema";
+import { babies, babiesSchema } from "@/db/schema";
 import {
-  buildNoteUpdate,
-  noteToFormValues,
-  type NoteFormErrors,
-  type NoteFormValues,
-} from "@/lib/note-form";
+  babyToFormValues,
+  buildBabyUpdate,
+  initialBabyFormValues,
+  type BabyFormErrors,
+  type BabyFormValues,
+} from "@/lib/baby-form";
 import { makeStyles } from "@/lib/make-styles";
+import { markBabyRecordsChanged } from "@/lib/baby-record";
 import { parsePositiveIntegerRouteParam } from "@/lib/route-params";
 import { useTheme } from "@/lib/theme-context";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
-type NoteLoadState =
+type BabyLoadState =
   | { status: "loading" }
-  | { status: "loaded"; baseline: NoteFormValues }
+  | { status: "loaded"; baseline: BabyFormValues }
   | { status: "invalid" }
   | { status: "missing" }
   | { status: "error" };
 
-/** Edits and archives one client-owned note while protecting unsaved content. */
-export default function EditNoteScreen() {
+/** Edits and archives one client-owned baby record while protecting changes. */
+export default function EditBabyScreen() {
+  // Hooks
   const db = getDb();
   const styles = useStyles();
   const theme = useTheme();
   const navigation = useNavigation();
-  const { id: routeId, noteId: routeNoteId } = useLocalSearchParams<{
+
+  // URL state
+  const { id: routeId, babyId: routeBabyId } = useLocalSearchParams<{
     id?: string | string[];
-    noteId?: string | string[];
+    babyId?: string | string[];
   }>();
   const clientId = parsePositiveIntegerRouteParam(routeId);
-  const noteId = parsePositiveIntegerRouteParam(routeNoteId);
+  const babyId = parsePositiveIntegerRouteParam(routeBabyId);
+
+  // Refs for lifecycle management
   const leavingAllowed = useRef(false);
   const confirmationOpen = useRef(false);
   const mutationPending = useRef(false);
   const pendingNavigationAction =
     useRef<Parameters<typeof navigation.dispatch>[0]>(null);
-  const [loadState, setLoadState] = useState<NoteLoadState>(() =>
-    clientId == null || noteId == null
+
+  // Component state
+  const [loadState, setLoadState] = useState<BabyLoadState>(() =>
+    clientId == null || babyId == null
       ? { status: "invalid" }
       : { status: "loading" },
   );
-  const [values, setValues] = useState<NoteFormValues>({
-    title: "",
-    content: "",
-  });
-  const [errors, setErrors] = useState<NoteFormErrors>({});
+  const [values, setValues] = useState<BabyFormValues>(initialBabyFormValues);
+  const [errors, setErrors] = useState<BabyFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
+
+  // Derived state
   const isMutationPending = isSubmitting || isArchiving;
   const isDirty = useMemo(
     () =>
@@ -67,9 +75,9 @@ export default function EditNoteScreen() {
     [loadState, values],
   );
 
-  /** Loads and validates the client-owned note before exposing it to the form. */
-  const loadNote = useCallback(async () => {
-    if (clientId == null || noteId == null) {
+  /** Loads and validates the client-owned record before initializing the editable baseline. */
+  const loadBaby = useCallback(async () => {
+    if (clientId == null || babyId == null) {
       setLoadState({ status: "invalid" });
       return;
     }
@@ -77,12 +85,12 @@ export default function EditNoteScreen() {
     try {
       const rows = await db
         .select()
-        .from(notes)
+        .from(babies)
         .where(
           and(
-            eq(notes.id, noteId),
-            eq(notes.clientId, clientId),
-            isNull(notes.deletedAt),
+            eq(babies.id, babyId),
+            eq(babies.clientId, clientId),
+            isNull(babies.deletedAt),
           ),
         )
         .limit(1);
@@ -90,46 +98,45 @@ export default function EditNoteScreen() {
         setLoadState({ status: "missing" });
         return;
       }
-      const parsed = notesSchema.safeParse(rows[0]);
+      const parsed = babiesSchema.safeParse(rows[0]);
       if (!parsed.success) {
         setLoadState({ status: "error" });
         return;
       }
-      const baseline = noteToFormValues(parsed.data);
+      const baseline = babyToFormValues(parsed.data);
       setValues(baseline);
       setErrors({});
       setLoadState({ status: "loaded", baseline });
     } catch {
       setLoadState({ status: "error" });
     }
-  }, [clientId, db, noteId]);
+  }, [babyId, clientId, db]);
 
   useEffect(() => {
-    void loadNote();
-  }, [loadNote]);
+    void loadBaby();
+  }, [loadBaby]);
 
-  /** Confirms abandoning edits, then completes the pending navigation. */
+  /** Confirms draft loss once and resumes the original navigation action when approved. */
   const confirmDiscard = useCallback(() => {
     if (confirmationOpen.current) return;
     confirmationOpen.current = true;
-    /** Clears transient confirmation and navigation state. */
     const closeConfirmation = () => {
       confirmationOpen.current = false;
       pendingNavigationAction.current = null;
     };
     Alert.alert(
       "Discard your changes?",
-      "Your unsaved note edits will be lost.",
+      "Your unsaved baby record edits will be lost.",
       [
         { text: "Keep editing", style: "cancel", onPress: closeConfirmation },
         {
           text: "Discard",
           style: "destructive",
           onPress: () => {
-            const pendingAction = pendingNavigationAction.current;
+            const action = pendingNavigationAction.current;
             leavingAllowed.current = true;
             closeConfirmation();
-            if (pendingAction) navigation.dispatch(pendingAction);
+            if (action) navigation.dispatch(action);
             else router.back();
           },
         },
@@ -138,14 +145,13 @@ export default function EditNoteScreen() {
     );
   }, [navigation]);
 
-  /** Routes explicit exits through dirty-form confirmation when necessary. */
+  /** Blocks departure during persistence and confirms leaving when edits are unsaved. */
   const requestLeave = useCallback(() => {
     if (mutationPending.current) return;
     if (isDirty) confirmDiscard();
     else router.back();
   }, [confirmDiscard, isDirty]);
 
-  /** Intercepts native navigation while edits or mutations need protection. */
   useEffect(
     () =>
       navigation.addListener("beforeRemove", (event) => {
@@ -162,106 +168,110 @@ export default function EditNoteScreen() {
     [confirmDiscard, isDirty, navigation],
   );
 
-  /** Updates one form field and clears its stale validation error. */
-  function changeValue<K extends keyof NoteFormValues>(
+  /** Updates an editable field and clears its previous validation error while mutations are idle. */
+  function changeValue<K extends keyof BabyFormValues>(
     field: K,
-    value: NoteFormValues[K],
+    value: BabyFormValues[K],
   ) {
     if (mutationPending.current) return;
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
-  /** Validates and persists edits before returning to client detail. */
+  /** Validates and persists the draft, retaining entered values after a failed save. */
   async function submit() {
-    if (clientId == null || noteId == null || mutationPending.current) return;
-    const result = buildNoteUpdate(values);
+    if (clientId == null || babyId == null || mutationPending.current) return;
+    const result = buildBabyUpdate(values);
     if (!result.success) {
       setErrors(result.errors);
       showErrorToast(
-        "Add note content",
-        "Write a note before saving this entry.",
+        "Check baby record",
+        "Correct the highlighted details and try again.",
       );
       return;
     }
-
     mutationPending.current = true;
     setIsSubmitting(true);
     setErrors({});
     try {
       const rows = await db
-        .update(notes)
+        .update(babies)
         .set({ ...result.data, updatedAt: new Date().toISOString() })
         .where(
           and(
-            eq(notes.id, noteId),
-            eq(notes.clientId, clientId),
-            isNull(notes.deletedAt),
+            eq(babies.id, babyId),
+            eq(babies.clientId, clientId),
+            isNull(babies.deletedAt),
           ),
         )
         .returning();
-      if (!notesSchema.safeParse(rows[0]).success) {
-        throw new Error("Note update returned no valid record");
+      if (!babiesSchema.safeParse(rows[0]).success) {
+        throw new Error("Baby update returned no valid record");
       }
       leavingAllowed.current = true;
-      showSuccessToast("Note updated", "Changes were saved.");
+      markBabyRecordsChanged(clientId);
+      showSuccessToast("Baby record updated", "Changes were saved.");
       router.back();
     } catch {
       showErrorToast(
-        "Couldn’t save note",
-        "Your entry is still here. Please try again.",
+        "Couldn’t save baby record",
+        "Your entries are still here. Please try again.",
       );
       mutationPending.current = false;
       setIsSubmitting(false);
     }
   }
 
-  /** Requires confirmation before soft-deleting the note. */
+  /** Requests confirmation before hiding the stored baby record. */
   function requestArchive() {
     if (mutationPending.current) return;
     Alert.alert(
-      "Delete this note?",
+      "Delete this baby record?",
       "It will be hidden from the client record but remain stored locally.",
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Delete note",
+          text: "Delete record",
           style: "destructive",
-          onPress: () => void archiveNote(),
+          onPress: () => void archiveBaby(),
         },
       ],
     );
   }
 
-  /** Soft-deletes the current note and returns to client detail. */
-  async function archiveNote() {
-    if (clientId == null || noteId == null || mutationPending.current) return;
+  /** Soft-deletes the scoped record with matching timestamps and leaves only after a valid result. */
+  async function archiveBaby() {
+    if (clientId == null || babyId == null || mutationPending.current) return;
     mutationPending.current = true;
     setIsArchiving(true);
     const timestamp = new Date().toISOString();
     try {
       const rows = await db
-        .update(notes)
+        .update(babies)
         .set({ deletedAt: timestamp, updatedAt: timestamp })
         .where(
           and(
-            eq(notes.id, noteId),
-            eq(notes.clientId, clientId),
-            isNull(notes.deletedAt),
+            eq(babies.id, babyId),
+            eq(babies.clientId, clientId),
+            isNull(babies.deletedAt),
           ),
         )
         .returning();
-      const parsed = notesSchema.safeParse(rows[0]);
+      const parsed = babiesSchema.safeParse(rows[0]);
       if (!parsed.success || parsed.data.deletedAt !== timestamp) {
-        throw new Error("Note archive returned no valid record");
+        throw new Error("Baby archive returned no valid record");
       }
       leavingAllowed.current = true;
-      showSuccessToast("Note deleted", "The note remains stored locally.");
+      markBabyRecordsChanged(clientId);
+      showSuccessToast(
+        "Baby record deleted",
+        "The record remains stored locally.",
+      );
       router.back();
     } catch {
       showErrorToast(
-        "Couldn’t delete note",
-        "The note and your unsaved entries are still here. Please try again.",
+        "Couldn’t delete baby record",
+        "The record and your unsaved entries are still here. Please try again.",
       );
       mutationPending.current = false;
       setIsArchiving(false);
@@ -273,11 +283,11 @@ export default function EditNoteScreen() {
       <Stack.Screen
         options={{
           gestureEnabled: !isDirty && !isMutationPending,
-          title: "Edit note",
+          title: "Baby record",
         }}
       />
       {loadState.status === "loading" && (
-        <StateView message="Loading note…">
+        <StateView message="Loading baby record…">
           <ActivityIndicator color={theme.primary} />
         </StateView>
       )}
@@ -285,28 +295,28 @@ export default function EditNoteScreen() {
         <StateView
           action={() => router.back()}
           actionLabel="Go back"
-          message="This note link does not contain valid record numbers."
-          title="Invalid note"
+          message="This link does not contain valid record numbers."
+          title="Invalid baby record"
         />
       )}
       {loadState.status === "missing" && (
         <StateView
           action={() => router.back()}
           actionLabel="Go back"
-          message="This note may have been deleted."
-          title="Note not found"
+          message="This baby record may have been deleted."
+          title="Baby record not found"
         />
       )}
       {loadState.status === "error" && (
         <StateView
-          action={() => void loadNote()}
+          action={() => void loadBaby()}
           actionLabel="Retry"
           message="Check the database and try again."
-          title="Couldn’t load note"
+          title="Couldn’t load baby record"
         />
       )}
       {loadState.status === "loaded" && (
-        <NoteForm
+        <BabyForm
           errors={errors}
           isArchiving={isArchiving}
           isSubmitting={isSubmitting}

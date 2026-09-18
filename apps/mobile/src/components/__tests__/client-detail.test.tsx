@@ -17,6 +17,15 @@ jest.mock("@/components/ClientNotesPage", () => {
   };
 });
 
+jest.mock("@/components/ClientBabiesPage", () => {
+  const ReactForMock = jest.requireActual<typeof import("react")>("react");
+  const { Text } =
+    jest.requireActual<typeof import("react-native")>("react-native");
+  return {
+    ClientBabiesPage: () => ReactForMock.createElement(Text, null, "Babies"),
+  };
+});
+
 jest.mock("@gorhom/bottom-sheet", () =>
   jest.requireActual("@gorhom/bottom-sheet/mock"),
 );

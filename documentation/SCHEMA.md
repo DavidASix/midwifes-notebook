@@ -8,11 +8,11 @@ Local SQLite database managed via `expo-sqlite` and Drizzle ORM. All schema chan
 
 Primary record for each client. Partner details are embedded as prefixed columns. Client **status** is derived at query time — not stored — using `is_active` and `actual_delivery_date`:
 
-| Condition | Derived Status |
-|---|---|
-| `is_active = 0` | Out of Care |
-| `is_active = 1` AND `actual_delivery_date IS NULL` | Prenatal |
-| `is_active = 1` AND `actual_delivery_date IS NOT NULL` | Postpartum |
+| Condition                                              | Derived Status |
+| ------------------------------------------------------ | -------------- |
+| `is_active = 0`                                        | Out of Care    |
+| `is_active = 1` AND `actual_delivery_date IS NULL`     | Prenatal       |
+| `is_active = 1` AND `actual_delivery_date IS NOT NULL` | Postpartum     |
 
 ```sql
 CREATE TABLE clients (
@@ -66,7 +66,9 @@ CREATE TABLE clients (
 
 ## Table: `babies`
 
-Zero or more babies per client. **Age in days** is derived from `date_of_birth` at query/display time.
+Zero or more baby records per client. A record may describe a live birth, miscarriage, stillbirth, or an unspecified
+outcome. **Age in days** is derived only for a live birth with an `event_date`; loss and unspecified outcomes never show
+an age.
 
 ```sql
 CREATE TABLE babies (
@@ -76,7 +78,7 @@ CREATE TABLE babies (
   -- Identity
   name                    TEXT,
   sex                     TEXT CHECK (sex IN ('male', 'female', 'unknown')),
-  date_of_birth           TEXT,                          -- ISO 8601
+  event_date              TEXT,                          -- ISO 8601; birth, loss, or neutral event date
 
   -- Birth details
   birth_weight_grams      INTEGER,                       -- Stored in grams; lbs/oz displayed by the app
@@ -86,6 +88,7 @@ CREATE TABLE babies (
   blood_type              TEXT CHECK (blood_type IN ('A+','A-','B+','B-','AB+','AB-','O+','O-')),
   feeding_type            TEXT CHECK (feeding_type IN ('breast_milk', 'formula', 'combination')),
   risk_factors            TEXT,                          -- Free text
+  outcome                 TEXT CHECK (outcome IN ('live_birth','miscarriage','stillbirth')),
 
   -- Timestamps
   created_at              TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
@@ -93,6 +96,15 @@ CREATE TABLE babies (
   deleted_at              TEXT
 );
 ```
+
+`birth_weight_grams` and `gestational_age_days` have `CHECK (value >= 0)` constraints. Baby fields other than
+`client_id` and the standard timestamps are independently nullable. The app validates rows at the SQLite boundary and
+accepts only valid, non-future ISO event dates, allowed enum values, and whole non-negative stored numeric values. Blank
+strings and cleared selections are normalized to SQL `NULL`.
+
+Gestational age is edited as non-negative whole weeks plus 0–6 days and converted to total days for storage. Weight is
+stored as the nearest whole gram; the form can enter it in grams or pounds/ounces without persisting the selected unit.
+Pounds/ounces display uses ounces to one decimal place and carries a rounded 16.0 ounces into the next pound.
 
 ---
 
@@ -143,5 +155,5 @@ CREATE TABLE settings (
   outside the current lifecycle.
 - Client mutations target `WHERE id = ? AND deleted_at IS NULL`; returned rows are runtime-validated before success.
   Cleared nullable edit fields are written as SQL `NULL`.
-- `birth_weight_grams` is the single source of truth for weight. The UI layer handles conversion to lbs/oz for display.
+- `birth_weight_grams` is the single source of truth for weight. The UI layer handles conversion to lb/oz for entry and display.
 - `age` on `clients` is only populated when `date_of_birth` is unknown; otherwise it is always `NULL` and age is derived from `date_of_birth`.
