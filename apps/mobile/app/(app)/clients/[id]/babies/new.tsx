@@ -9,8 +9,7 @@ import {
 } from "expo-router";
 
 import { BabyForm } from "@/components/BabyForm";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
+import { StateView } from "@/components/ui/StateView";
 import { getDb } from "@/db";
 import { babies, babiesSchema, clients, clientsSchema } from "@/db/schema";
 import {
@@ -22,7 +21,6 @@ import {
 import { makeStyles } from "@/lib/make-styles";
 import { markBabyRecordsChanged } from "@/lib/baby-records-revision";
 import { parsePositiveIntegerRouteParam } from "@/lib/route-params";
-import { fontFamilies, fontSize } from "@/lib/themes";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 /** Creates a baby record for one active client while protecting form content. */
@@ -168,15 +166,12 @@ export default function NewBabyScreen() {
         }}
       />
       {clientId == null ? (
-        <View style={styles.centeredState}>
-          <Text header style={styles.stateTitle}>
-            Invalid client
-          </Text>
-          <Text style={styles.stateText}>
-            This link does not contain a valid client record number.
-          </Text>
-          <Button onPress={() => router.back()} title="Go back" />
-        </View>
+        <StateView
+          action={() => router.back()}
+          actionLabel="Go back"
+          message="This link does not contain a valid client record number."
+          title="Invalid client"
+        />
       ) : (
         <BabyForm
           errors={errors}
@@ -194,24 +189,4 @@ export default function NewBabyScreen() {
 
 const useStyles = makeStyles((theme) => ({
   container: { flex: 1, backgroundColor: theme.background },
-  centeredState: {
-    flex: 1,
-    padding: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
-  stateTitle: {
-    color: theme.primary,
-    fontFamily: fontFamilies.heading.bold,
-    fontSize: fontSize["2xl"],
-    textAlign: "center",
-  },
-  stateText: {
-    maxWidth: 300,
-    color: theme.mutedForeground,
-    fontSize: fontSize.md,
-    lineHeight: 22,
-    textAlign: "center",
-  },
 }));
